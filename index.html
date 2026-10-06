@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pagamento seguro</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--txt:#14181f;--mut:#566070;--brd:#d5dae1;--acc:#E8720C;--acd:#C4580A;--grn:#16a34a;--red:#dc2626;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:18px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:520px;margin:0 auto;padding:16px 16px 48px}
+h1{font-size:22px;margin:8px 0 2px}
+.sub{color:var(--mut);font-size:15px;margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.prod{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.prod b{font-size:19px}.price{font-size:24px;font-weight:800;color:var(--acd);white-space:nowrap}
+label{display:block;font-weight:700;margin:14px 0 6px;font-size:16px}
+label:first-child{margin-top:0}
+input[type=email],input[type=text],input[type=tel],.field{width:100%;height:54px;font-size:19px;padding:0 14px;border:2px solid var(--brd);border-radius:12px;background:#fff;color:var(--txt)}
+input:focus,.field.focus{outline:none;border-color:var(--acc)}
+.hint{font-size:14px;color:var(--mut);margin-top:4px}
+.err{color:var(--red);font-weight:700;font-size:16px;margin-top:10px;display:none}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tab{border:2px solid var(--brd);background:#fff;border-radius:12px;padding:14px 8px;font-size:17px;font-weight:700;cursor:pointer;color:var(--txt);text-align:center}
+.tab small{display:block;font-weight:400;color:var(--mut);font-size:13px}
+.tab.on{border-color:var(--acc);background:#fff4ea}
+.btn{width:100%;margin-top:16px;height:62px;border:0;border-radius:14px;background:var(--grn);color:#fff;font-size:20px;font-weight:800;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}
+.bump{display:flex;gap:12px;align-items:flex-start;border:2px dashed var(--acc);border-radius:12px;padding:14px;margin-top:12px;cursor:pointer;background:#fffaf4}
+.bump input{width:26px;height:26px;margin-top:2px;flex:none}
+.bump .t{font-weight:800}.bump .d{font-size:15px;color:var(--mut)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.total{display:flex;justify-content:space-between;font-size:20px;font-weight:800;margin-top:14px;padding-top:12px;border-top:1px solid var(--brd)}
+.seal{text-align:center;color:var(--mut);font-size:14px;margin-top:6px}
+.hide{display:none}
+.qr{text-align:center}.qr img{width:240px;height:240px;max-width:100%;border:1px solid var(--brd);border-radius:12px}
+.code{word-break:break-all;font:13px/1.3 monospace;background:#f1f3f6;border-radius:10px;padding:10px;margin:10px 0;max-height:84px;overflow:auto}
+.btn2{width:100%;height:56px;border:2px solid var(--acc);background:#fff;color:var(--acd);border-radius:14px;font-size:18px;font-weight:800;cursor:pointer}
+.steps{padding-left:22px;margin:10px 0}.steps li{margin:6px 0}
+.ok{text-align:center}.ok .big{font-size:56px}
+.wait{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--acc);margin-right:8px;animation:p 1s infinite}
+@keyframes p{50%{opacity:.25}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="titulo">Pagamento seguro</h1>
+  <p class="sub">🔒 Pagamento processado pelo Mercado Pago</p>
+
+  <div id="erroFatal" class="card hide"></div>
+
+  <div id="tela-form" class="hide">
+    <div class="card">
+      <div class="prod"><b id="pNome"></b><span class="price" id="pPreco"></span></div>
+      <div id="bumps"></div>
+      <div class="total"><span>Total</span><span id="total"></span></div>
+    </div>
+
+    <div class="card">
+      <label for="email">Seu e-mail</label>
+      <input id="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="exemplo@email.com">
+      <label for="email2">Digite o e-mail de novo</label>
+      <input id="email2" type="email" inputmode="email" autocomplete="off" autocapitalize="off" placeholder="Confirme seu e-mail">
+      <div class="hint">⚠️ Use o mesmo e-mail para entrar no aplicativo depois. Seu acesso é liberado nele.</div>
+    </div>
+
+    <div class="card">
+      <label style="margin-top:0">Como prefere pagar?</label>
+      <div class="tabs">
+        <button type="button" class="tab on" id="tab-pix">Pix<small>Aprovação na hora</small></button>
+        <button type="button" class="tab" id="tab-card">Cartão de crédito<small>À vista</small></button>
+      </div>
+
+      <div id="box-card" class="hide">
+        <label>Número do cartão</label><div id="f-num" class="field"></div>
+        <div class="row">
+          <div><label>Validade</label><div id="f-exp" class="field"></div></div>
+          <div><label>Código (CVV)</label><div id="f-cvv" class="field"></div></div>
+        </div>
+        <label for="cnome">Nome como está no cartão</label>
+        <input id="cnome" type="text" autocomplete="cc-name" placeholder="NOME SOBRENOME">
+        <label for="ccpf">CPF do titular</label>
+        <input id="ccpf" type="tel" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="000.000.000-00">
+        <div class="hint">O CPF é exigido apenas para pagamento no cartão. No Pix não pedimos.</div>
+      </div>
+
+      <div id="erro" class="err"></div>
+      <button class="btn" id="btnPagar" type="button">Gerar Pix</button>
+      <div class="seal">🔒 Seus dados estão protegidos • Mercado Pago</div>
+    </div>
+  </div>
+
+  <div id="tela-pix" class="hide">
+    <div class="card qr">
+      <h1 style="font-size:21px">Pague com Pix</h1>
+      <p class="sub">Valor: <b id="pixValor"></b></p>
+      <img id="qrImg" alt="QR Code Pix">
+      <p style="margin:12px 0 0"><b>Ou copie o código:</b></p>
+      <div class="code" id="pixCodigo"></div>
+      <button class="btn2" id="btnCopiar" type="button">📋 Copiar código Pix</button>
+      <ol class="steps" style="text-align:left">
+        <li>Abra o app do seu banco</li>
+        <li>Escolha <b>Pix → Pix Copia e Cola</b> (ou leia o QR Code)</li>
+        <li>Cole o código e confirme</li>
+      </ol>
+      <p><span class="wait"></span><b>Aguardando o pagamento...</b></p>
+      <div class="hint">Esta tela atualiza sozinha quando o Pix for confirmado. Não feche.</div>
+    </div>
+  </div>
+
+  <div id="tela-ok" class="hide">
+    <div class="card ok">
+      <div class="big">✅</div>
+      <h1>Pagamento confirmado!</h1>
+      <p>Seu acesso já está liberado.</p>
+      <ol class="steps" style="text-align:left">
+        <li>Toque no botão abaixo para abrir o aplicativo</li>
+        <li>Entre com este e-mail:<br><b id="okEmail"></b></li>
+      </ol>
+      <a class="btn" id="btnApp" style="display:flex;align-items:center;justify-content:center;text-decoration:none">Abrir meu aplicativo</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var PID=(location.pathname.replace(/^\/|\/$/g,'').split('/')[0])||new URLSearchParams(location.search).get('p')||'';
+  var CFG=null, mp=null, metodo='pix', fields={}, bin='', pmId='', orderId=null, polling=null, enviando=false, bumpsSel={};
+  var $=function(id){return document.getElementById(id)};
+  var brl=function(v){return 'R$ '+Number(v).toFixed(2).replace('.',',')};
+  function show(id){['tela-form','tela-pix','tela-ok'].forEach(function(t){$(t).classList.toggle('hide',t!==id)});window.scrollTo(0,0)}
+  function fatal(m){$('erroFatal').textContent=m;$('erroFatal').classList.remove('hide')}
+  function erro(m){var e=$('erro');e.textContent=m||'';e.style.display=m?'block':'none'}
+  function cookie(n){var m=document.cookie.match('(?:^|; )'+n+'=([^;]*)');return m?decodeURIComponent(m[1]):''}
+  function px(ev,data,eid){try{if(window.fbq)fbq('track',ev,data||{},eid?{eventID:eid}:undefined)}catch(e){}}
+
+  function total(){var t=Math.round(CFG.produto.preco*100);CFG.produto.bumps.forEach(function(b){if(bumpsSel[b.id])t+=Math.round(b.preco*100)});return t/100}
+  function atualizaTotal(){$('total').textContent=brl(total())}
+
+  function initPixel(){
+    if(!CFG.pixelId)return;
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init',CFG.pixelId);fbq('track','PageView');
+    px('InitiateCheckout',{value:total(),currency:'BRL',content_name:CFG.produto.nome});
+  }
+
+  function montaCampos(){
+    if(!window.MercadoPago||!CFG.publicKey)return;
+    mp=new MercadoPago(CFG.publicKey,{locale:'pt-BR'});
+    var st={color:'#14181f',fontSize:'19px',placeholderColor:'#9aa3af'};
+    fields.num=mp.fields.create('cardNumber',{placeholder:'0000 0000 0000 0000',style:st}).mount('f-num');
+    fields.exp=mp.fields.create('expirationDate',{placeholder:'MM/AA',style:st}).mount('f-exp');
+    fields.cvv=mp.fields.create('securityCode',{placeholder:'123',style:st}).mount('f-cvv');
+    fields.num.on('binChange',function(d){
+      var b=d&&d.bin; if(!b){bin='';pmId='';return}
+      if(b===bin)return; bin=b;
+      mp.getPaymentMethods({bin:b}).then(function(r){pmId=(r&&r.results&&r.results[0]&&r.results[0].id)||''}).catch(function(){pmId=''});
+    });
+  }
+
+  function setMetodo(m){
+    metodo=m;
+    $('tab-pix').classList.toggle('on',m==='pix');$('tab-card').classList.toggle('on',m==='card');
+    $('box-card').classList.toggle('hide',m!=='card');
+    $('btnPagar').textContent=m==='pix'?'Gerar Pix':'Pagar '+brl(total())+' no cartão';
+    erro('');
+    if(m==='card'&&!fields.num)montaCampos();
+  }
+
+  function validaEmail(){
+    var a=$('email').value.trim().toLowerCase(),b=$('email2').value.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(a)){erro('Confira o e-mail digitado.');$('email').focus();return null}
+    if(a!==b){erro('Os dois e-mails estão diferentes. Digite igualzinho nos dois campos.');$('email2').focus();return null}
+    return a;
+  }
+
+  async function pagar(){
+    if(enviando)return; erro('');
+    var email=validaEmail(); if(!email)return;
+    var corpo={produto:PID,bumps:Object.keys(bumpsSel).filter(function(k){return bumpsSel[k]}),email:email,metodo:metodo,fbp:cookie('_fbp'),fbc:cookie('_fbc')};
+    enviando=true;$('btnPagar').disabled=true;var txt=$('btnPagar').textContent;$('btnPagar').textContent='Aguarde...';
+    try{
+      if(metodo==='card'){
+        var cpf=$('ccpf').value.replace(/\D/g,''),nome=$('cnome').value.trim();
+        if(!nome){erro('Digite o nome como está no cartão.');return}
+        if(!pmId){erro('Confira o número do cartão.');return}
+        var tk=await mp.fields.createCardToken({cardholderName:nome,identificationType:'CPF',identificationNumber:cpf});
+        corpo.card={token:tk.id,payment_method_id:pmId,cpf:cpf,nome:nome};
+      }
+      var r=await fetch('/api/pagar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(corpo)});
+      var d=await r.json();
+      if(!r.ok){erro(d.error||'Não foi possível concluir. Tente novamente.');return}
+      orderId=d.id;
+      px('AddPaymentInfo',{value:total(),currency:'BRL'});
+      if(d.status==='aprovado'){sucesso(email);return}
+      if(d.pix){
+        $('pixValor').textContent=brl(d.valor);$('pixCodigo').textContent=d.pix.copiaECola;
+        $('qrImg').src='data:image/png;base64,'+d.pix.qrBase64;show('tela-pix');
+      } else {
+        show('tela-pix');$('qrImg').classList.add('hide');
+      }
+      window._email=email;iniciaPolling();
+    }catch(e){
+      erro(metodo==='card'?'Confira os dados do cartão e tente de novo.':'Falha de conexão. Tente novamente.');
+    }finally{enviando=false;$('btnPagar').disabled=false;$('btnPagar').textContent=txt}
+  }
+
+  function iniciaPolling(){
+    var t0=Date.now();
+    clearInterval(polling);
+    polling=setInterval(async function(){
+      if(Date.now()-t0>2*60*60*1000){clearInterval(polling);return}
+      try{
+        var r=await fetch('/api/status?id='+encodeURIComponent(orderId));var d=await r.json();
+        if(d.status==='aprovado'){clearInterval(polling);sucesso(window._email)}
+        else if(d.status==='falhou'){clearInterval(polling);show('tela-form');erro('O pagamento não foi concluído. Tente de novo.')}
+      }catch(e){}
+    },4000);
+  }
+
+  function sucesso(email){
+    px('Purchase',{value:total(),currency:'BRL',content_name:CFG.produto.nome},'purchase_'+orderId);
+    $('okEmail').textContent=email;$('btnApp').href=CFG.produto.appUrl;show('tela-ok');
+  }
+
+  function copiar(){
+    var t=$('pixCodigo').textContent;
+    (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){$('btnCopiar').textContent='✅ Código copiado!'})
+    .catch(function(){var r=document.createRange();r.selectNodeContents($('pixCodigo'));var s=getSelection();s.removeAllRanges();s.addRange(r);$('btnCopiar').textContent='Segure no código e toque em Copiar'});
+  }
+
+  function maskCpf(e){var v=e.target.value.replace(/\D/g,'').slice(0,11);
+    v=v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');e.target.value=v}
+
+  async function init(){
+    try{
+      var r=await fetch('/api/config?p='+encodeURIComponent(PID));
+      if(!r.ok)throw 0; CFG=await r.json();
+    }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
+    document.title='Pagamento seguro — '+CFG.produto.nome;
+    $('titulo').textContent='Finalizar compra';
+    $('pNome').textContent=CFG.produto.nome;$('pPreco').textContent=brl(CFG.produto.preco);
+    CFG.produto.bumps.forEach(function(b){
+      var l=document.createElement('label');l.className='bump';
+      l.innerHTML='<input type="checkbox"><div><div class="t">'+'Sim, quero adicionar: '+b.nome+' por apenas '+brl(b.preco)+'</div><div class="d">'+b.desc+'</div></div>';
+      l.querySelector('input').addEventListener('change',function(e){bumpsSel[b.id]=e.target.checked;atualizaTotal();setMetodo(metodo)});
+      $('bumps').appendChild(l);
+    });
+    atualizaTotal();show('tela-form');initPixel();
+    $('tab-pix').onclick=function(){setMetodo('pix')};$('tab-card').onclick=function(){setMetodo('card')};
+    $('btnPagar').onclick=pagar;$('btnCopiar').onclick=copiar;$('ccpf').addEventListener('input',maskCpf);
+    setMetodo('pix');
+  }
+  init();
+})();
+</script>
+<script src="https://sdk.mercadopago.com/js/v2" async></script>
+</body>
+</html>
