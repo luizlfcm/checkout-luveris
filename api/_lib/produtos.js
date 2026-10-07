@@ -36,16 +36,16 @@ export const PRODUTOS = {
     appUrl: 'https://formulaauto.luverisgroup.com.br/',
     emailFrom: 'Formula Auto Pro <noreply@mail.luverisgroup.com.br>',
     titulo: 'Fórmula Auto Pro – 80 Fórmulas de Produtos Automotivos Profissionais',
-    imagem: '',
+    imagem: '/img/ap.webp',
     cor: '#E8720C', bg: '#0D0F12', rodape: 'João Silva - Engenheiro Químico - Fórmula Auto Pro',
     bumps: [
       {
-        id: 'limp', flag: 'limp', preco: 13.90, de: 54.76, imagem: '',
+        id: 'limp', flag: 'limp', preco: 13.90, de: 54.76, imagem: '/img/bump-50formulas.webp',
         nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos',
         desc: 'Aumente sua linha de produtos sem comprar outro curso: 50 fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão do Fórmula Auto Pro, prontas para produzir e vender aos mesmos clientes.',
       },
       {
-        id: 'form', flag: 'form', preco: 24.90, de: 121.37, imagem: '',
+        id: 'form', flag: 'form', preco: 24.90, de: 121.37, imagem: '/img/bump-exclusiva.webp',
         nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.',
         desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu segmento. Prazo de até 3 dias úteis.',
       },
