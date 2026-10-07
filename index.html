@@ -4,70 +4,106 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f5132">
 <title>Pagamento seguro</title>
 <style>
-:root{--bg:#f5f6f8;--card:#fff;--txt:#14181f;--mut:#566070;--brd:#d5dae1;--acc:#E8720C;--acd:#C4580A;--grn:#16a34a;--red:#dc2626;--r:14px}
+:root{--bg:#eef1f5;--card:#fff;--txt:#14181f;--mut:#566070;--brd:#d5dae1;--acc:#f97316;--acd:#c2570c;--grn:#16a34a;--grd:#128a3d;--blu:#1d4ed8;--red:#dc2626;--r:14px}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:18px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-text-size-adjust:100%}
-.wrap{max-width:520px;margin:0 auto;padding:16px 16px 48px}
+.topbar{background:#0f5132;color:#fff;text-align:center;font-size:15px;font-weight:700;padding:10px 12px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.topbar img{height:22px;background:#fff;border-radius:6px;padding:2px 6px}
+.wrap{max-width:540px;margin:0 auto;padding:14px 14px 40px}
 h1{font-size:22px;margin:8px 0 2px}
 .sub{color:var(--mut);font-size:15px;margin:0 0 14px}
-.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:18px;margin-bottom:14px}
-.prod{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.prod b{font-size:19px}.price{font-size:24px;font-weight:800;color:var(--acd);white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.prod{display:flex;gap:14px;align-items:center}
+.prod img{width:92px;height:92px;border-radius:12px;object-fit:cover;flex:none;border:1px solid var(--brd)}
+.prod .nm{font-size:19px;font-weight:800;line-height:1.2}
+.prod .ok{color:var(--grd);font-size:14px;font-weight:700;margin-top:4px}
+.price{font-size:28px;font-weight:900;color:var(--grd);margin-top:2px}
+.price small{font-size:14px;font-weight:600;color:var(--mut)}
+.step{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800;margin-bottom:12px}
+.step .n{background:var(--blu);color:#fff;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex:none}
 label{display:block;font-weight:700;margin:14px 0 6px;font-size:16px}
-label:first-child{margin-top:0}
+.step+label,.warn+label{margin-top:12px}
 input[type=email],input[type=text],input[type=tel],.field{width:100%;height:54px;font-size:19px;padding:0 14px;border:2px solid var(--brd);border-radius:12px;background:#fff;color:var(--txt)}
-input:focus,.field.focus{outline:none;border-color:var(--acc)}
+input:focus{outline:none;border-color:var(--blu)}
 .hint{font-size:14px;color:var(--mut);margin-top:4px}
-.err{color:var(--red);font-weight:700;font-size:16px;margin-top:10px;display:none}
+.warn{background:#fff7d6;border:2px solid #f5c542;border-radius:12px;padding:12px 14px;font-size:16px;font-weight:700;color:#6b4e00;margin-bottom:6px}
+.err{color:var(--red);font-weight:700;font-size:16px;margin:10px 0 0;display:none;background:#fdecec;border-radius:10px;padding:10px 12px}
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tab{border:2px solid var(--brd);background:#fff;border-radius:12px;padding:14px 8px;font-size:17px;font-weight:700;cursor:pointer;color:var(--txt);text-align:center}
-.tab small{display:block;font-weight:400;color:var(--mut);font-size:13px}
-.tab.on{border-color:var(--acc);background:#fff4ea}
-.btn{width:100%;margin-top:16px;height:62px;border:0;border-radius:14px;background:var(--grn);color:#fff;font-size:20px;font-weight:800;cursor:pointer}
-.btn:disabled{opacity:.6;cursor:wait}
-.bump{display:flex;gap:12px;align-items:flex-start;border:2px dashed var(--acc);border-radius:12px;padding:14px;margin-top:12px;cursor:pointer;background:#fffaf4}
-.bump input{width:26px;height:26px;margin-top:2px;flex:none}
-.bump .t{font-weight:800}.bump .d{font-size:15px;color:var(--mut)}
+.tab{border:2px solid var(--brd);background:#fff;border-radius:12px;padding:14px 8px;font-size:17px;font-weight:800;cursor:pointer;color:var(--txt);text-align:center;position:relative}
+.tab small{display:block;font-weight:600;color:var(--mut);font-size:13px}
+.tab.on{border-color:var(--grn);background:#ecfdf3}
+.tab.on::after{content:"✓";position:absolute;top:6px;right:9px;color:var(--grn);font-weight:900}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.total{display:flex;justify-content:space-between;font-size:20px;font-weight:800;margin-top:14px;padding-top:12px;border-top:1px solid var(--brd)}
-.seal{text-align:center;color:var(--mut);font-size:14px;margin-top:6px}
+.howto{background:#eef4ff;border:1px solid #c7d8ff;border-radius:12px;padding:14px;margin-top:14px;font-size:16px}
+.howto b.t{display:block;margin-bottom:6px;color:var(--blu)}
+.howto ol{margin:0 0 8px;padding-left:22px}.howto li{margin:3px 0}
+.howto .inst{font-weight:700;color:#0b3a99}
+.aprov{font-size:21px;font-weight:900;margin:18px 2px 10px;padding-bottom:8px;border-bottom:3px solid var(--acc)}
+.bump{background:#fff;border:2px solid var(--grn);border-radius:var(--r);margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px rgba(22,163,74,.12)}
+.bump .top{display:flex;gap:14px;padding:16px}
+.bump img{width:86px;height:86px;border-radius:10px;object-fit:cover;flex:none;border:1px solid var(--brd)}
+.bump .bt{font-weight:800;font-size:18px;line-height:1.25}
+.bump .bd{font-size:15px;color:var(--mut);margin:4px 0 6px}
+.bump .bp s{color:#8a93a0;font-size:15px}
+.bump .off{background:#16a34a;color:#fff;font-size:13px;font-weight:800;border-radius:6px;padding:2px 7px;margin:0 6px}
+.bump .bp{display:flex;align-items:center;flex-wrap:wrap;gap:4px 0}.bump .bp s,.bump .bp b,.bump .off{white-space:nowrap}.bump .bp b{font-size:22px;color:var(--grd)}
+.bump .bar{display:flex;gap:12px;align-items:center;background:#e6f8ec;padding:14px 16px;font-weight:800;cursor:pointer;font-size:17px;margin:0;border-top:1px solid #bfe9cd}
+.bump .bar input{width:28px;height:28px;flex:none;accent-color:#16a34a}
+.bump.sel{border-color:var(--acc);box-shadow:0 2px 12px rgba(249,115,22,.3)}.bump.sel .bar{background:#fff1e3;border-top-color:#fbd5ae}
+.lines .l{display:flex;justify-content:space-between;gap:12px;font-size:16px;padding:4px 0;color:var(--mut)}.lines .l span:last-child{white-space:nowrap}
+.total{display:flex;justify-content:space-between;font-size:22px;font-weight:900;margin-top:8px;padding-top:12px;border-top:1px solid var(--brd)}
+.btn{width:100%;margin-top:14px;height:66px;border:0;border-radius:14px;background:linear-gradient(180deg,#22c55e,#128a3d);color:#fff;font-size:21px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #0c6b2f,0 8px 16px rgba(22,163,74,.35);animation:pulse 2s infinite}
+.btn:active{transform:translateY(2px)}
+.btn:disabled{opacity:.6;cursor:wait;animation:none}
+@keyframes pulse{50%{transform:scale(1.015)}}
+.selos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.selo{display:flex;align-items:center;gap:8px;background:#f6f8fa;border:1px solid var(--brd);border-radius:10px;padding:9px 10px;font-size:13.5px;font-weight:700;line-height:1.2}
+.selo i{font-style:normal;font-size:20px}
+.mp{text-align:center;margin-top:14px;color:var(--mut);font-size:13px}
+.mp img{height:30px;display:block;margin:0 auto 4px}
+.foot{text-align:center;color:var(--mut);font-size:12.5px;line-height:1.5;margin-top:10px}
+.foot a{color:var(--blu)}
 .hide{display:none}
-.qr{text-align:center}.qr img{width:240px;height:240px;max-width:100%;border:1px solid var(--brd);border-radius:12px}
+.qr{text-align:center}.qr img.q{width:240px;height:240px;max-width:100%;border:1px solid var(--brd);border-radius:12px}
 .code{word-break:break-all;font:13px/1.3 monospace;background:#f1f3f6;border-radius:10px;padding:10px;margin:10px 0;max-height:84px;overflow:auto}
-.btn2{width:100%;height:56px;border:2px solid var(--acc);background:#fff;color:var(--acd);border-radius:14px;font-size:18px;font-weight:800;cursor:pointer}
-.steps{padding-left:22px;margin:10px 0}.steps li{margin:6px 0}
-.ok{text-align:center}.ok .big{font-size:56px}
+.btn2{width:100%;height:58px;border:2px solid var(--grn);background:#fff;color:var(--grd);border-radius:14px;font-size:18px;font-weight:800;cursor:pointer}
+.steps{padding-left:22px;margin:10px 0;text-align:left}.steps li{margin:6px 0}
+.okk{text-align:center}.okk .big{font-size:56px}
 .wait{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--acc);margin-right:8px;animation:p 1s infinite}
 @keyframes p{50%{opacity:.25}}
+.aviso{background:#fff7d6;border:2px solid #f5c542;border-radius:12px;padding:12px;font-weight:700;font-size:16px;color:#6b4e00;margin:12px 0}
+.linkbtn{display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:14px;height:64px;border-radius:14px;background:linear-gradient(180deg,#22c55e,#128a3d);color:#fff;font-size:20px;font-weight:900}
 </style>
 </head>
 <body>
+<div class="topbar">🔒 Ambiente 100% seguro <span>•</span> Pagamento processado pelo <img src="/img/mp-logo.png" alt="Mercado Pago"></div>
 <div class="wrap">
-  <h1 id="titulo">Pagamento seguro</h1>
-  <p class="sub">🔒 Pagamento processado pelo Mercado Pago</p>
-
   <div id="erroFatal" class="card hide"></div>
 
   <div id="tela-form" class="hide">
-    <div class="card">
-      <div class="prod"><b id="pNome"></b><span class="price" id="pPreco"></span></div>
-      <div id="bumps"></div>
-      <div class="total"><span>Total</span><span id="total"></span></div>
-      <div class="seal" style="margin-top:12px;font-size:16px;font-weight:700;color:#14181f">🛡️ 30 dias de garantia</div>
+    <div class="card prod">
+      <img id="pImg" alt="" class="hide">
+      <div>
+        <div class="nm" id="pNome"></div>
+        <div class="ok">✔ Acesso imediato após o pagamento</div>
+        <div class="price" id="pPreco"></div>
+      </div>
     </div>
 
     <div class="card">
+      <div class="step"><span class="n">1</span> Seus dados</div>
+      <div class="warn">⚠️ Atenção: confira bem o seu e-mail. É ele que libera o seu acesso e é para ele que enviamos o link.</div>
       <label for="email">Seu e-mail</label>
       <input id="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="exemplo@email.com">
       <label for="email2">Digite o e-mail de novo</label>
       <input id="email2" type="email" inputmode="email" autocomplete="off" autocapitalize="off" placeholder="Confirme seu e-mail">
-      <div class="hint">⚠️ Use o mesmo e-mail para entrar no aplicativo depois. Seu acesso é liberado nele.</div>
     </div>
 
     <div class="card">
-      <label style="margin-top:0">Como prefere pagar?</label>
+      <div class="step"><span class="n">2</span> Como prefere pagar?</div>
       <div class="tabs">
         <button type="button" class="tab on" id="tab-pix">Pix<small>Aprovação na hora</small></button>
         <button type="button" class="tab" id="tab-card">Cartão de crédito<small>À vista</small></button>
@@ -86,9 +122,35 @@ input:focus,.field.focus{outline:none;border-color:var(--acc)}
         <div class="hint">O CPF é exigido apenas para pagamento no cartão. No Pix não pedimos.</div>
       </div>
 
+      <div class="howto">
+        <b class="t" id="howTitulo">Como pagar com Pix</b>
+        <ol id="howPassos"></ol>
+        <div class="inst">⚡ O acesso é imediato: o link aparece nesta tela assim que o pagamento é confirmado. Não feche esta tela, mas fique tranquilo: o acesso também será enviado para o seu e-mail.</div>
+      </div>
+    </div>
+
+    <div id="bumpsWrap" class="hide">
+      <div class="aprov">Aproveite e compre junto:</div>
+      <div id="bumps"></div>
+    </div>
+
+    <div class="card">
+      <div class="lines" id="linhas"></div>
+      <div class="total"><span>Total</span><span id="total"></span></div>
       <div id="erro" class="err"></div>
       <button class="btn" id="btnPagar" type="button">Gerar Pix</button>
-      <div class="seal">🔒 Seus dados estão protegidos • Mercado Pago</div>
+      <div class="selos">
+        <div class="selo"><i>🔒</i>Compra 100% segura</div>
+        <div class="selo"><i>⚡</i>Acesso imediato</div>
+        <div class="selo"><i>🛡️</i>30 dias de garantia</div>
+        <div class="selo"><i>✉️</i>Acesso também por e-mail</div>
+      </div>
+      <div class="mp"><img src="/img/mp-logo.png" alt="Mercado Pago">Pagamento processado com segurança pelo Mercado Pago. Seus dados de cartão não passam pelo nosso site.</div>
+    </div>
+
+    <div class="foot">
+      Luiz Felipe Correa Miranda • CNPJ 53.168.292/0001-32<br>
+      Dúvidas? <a href="https://wa.me/558131963052">WhatsApp (81) 3196-3052</a>
     </div>
   </div>
 
@@ -96,30 +158,31 @@ input:focus,.field.focus{outline:none;border-color:var(--acc)}
     <div class="card qr">
       <h1 style="font-size:21px">Pague com Pix</h1>
       <p class="sub">Valor: <b id="pixValor"></b></p>
-      <img id="qrImg" alt="QR Code Pix">
+      <img id="qrImg" class="q" alt="QR Code Pix">
       <p style="margin:12px 0 0"><b>Ou copie o código:</b></p>
       <div class="code" id="pixCodigo"></div>
       <button class="btn2" id="btnCopiar" type="button">📋 Copiar código Pix</button>
-      <ol class="steps" style="text-align:left">
+      <ol class="steps">
         <li>Abra o app do seu banco</li>
         <li>Escolha <b>Pix → Pix Copia e Cola</b> (ou leia o QR Code)</li>
-        <li>Cole o código e confirme</li>
+        <li>Cole o código e confirme o pagamento</li>
       </ol>
       <p><span class="wait"></span><b>Aguardando o pagamento...</b></p>
-      <div class="hint">Esta tela atualiza sozinha quando o Pix for confirmado. Não feche.</div>
+      <div class="aviso">⚡ Assim que o Pix for confirmado, o botão de acesso aparece aqui. Não feche esta tela. Mas fique tranquilo: o acesso também será enviado para o seu e-mail.</div>
     </div>
   </div>
 
   <div id="tela-ok" class="hide">
-    <div class="card ok">
+    <div class="card okk">
       <div class="big">✅</div>
       <h1>Pagamento confirmado!</h1>
       <p>Seu acesso já está liberado.</p>
-      <ol class="steps" style="text-align:left">
+      <ol class="steps">
         <li>Toque no botão abaixo para abrir o aplicativo</li>
         <li>Entre com este e-mail:<br><b id="okEmail"></b></li>
       </ol>
-      <a class="btn" id="btnApp" style="display:flex;align-items:center;justify-content:center;text-decoration:none">Abrir meu aplicativo</a>
+      <a class="linkbtn" id="btnApp">Abrir meu aplicativo</a>
+      <div class="aviso" style="margin-top:14px">✉️ Também enviamos o acesso para o seu e-mail. Se não encontrar, olhe a caixa de spam.</div>
     </div>
   </div>
 </div>
@@ -135,9 +198,15 @@ input:focus,.field.focus{outline:none;border-color:var(--acc)}
   function erro(m){var e=$('erro');e.textContent=m||'';e.style.display=m?'block':'none'}
   function cookie(n){var m=document.cookie.match('(?:^|; )'+n+'=([^;]*)');return m?decodeURIComponent(m[1]):''}
   function px(ev,data,eid){try{if(window.fbq)fbq('track',ev,data||{},eid?{eventID:eid}:undefined)}catch(e){}}
+  function esc(t){return String(t).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]})}
 
   function total(){var t=Math.round(CFG.produto.preco*100);CFG.produto.bumps.forEach(function(b){if(bumpsSel[b.id])t+=Math.round(b.preco*100)});return t/100}
-  function atualizaTotal(){$('total').textContent=brl(total())}
+  function atualiza(){
+    var l='<div class="l"><span>'+esc(CFG.produto.nome)+'</span><span>'+brl(CFG.produto.preco)+'</span></div>';
+    CFG.produto.bumps.forEach(function(b){if(bumpsSel[b.id])l+='<div class="l"><span>+ '+esc(b.nome)+'</span><span>'+brl(b.preco)+'</span></div>'});
+    $('linhas').innerHTML=l;$('total').textContent=brl(total());
+    $('btnPagar').textContent=metodo==='pix'?'GERAR PIX — '+brl(total()):'PAGAR '+brl(total())+' NO CARTÃO';
+  }
 
   function initPixel(){
     if(!CFG.pixelId)return;
@@ -164,8 +233,14 @@ input:focus,.field.focus{outline:none;border-color:var(--acc)}
     metodo=m;
     $('tab-pix').classList.toggle('on',m==='pix');$('tab-card').classList.toggle('on',m==='card');
     $('box-card').classList.toggle('hide',m!=='card');
-    $('btnPagar').textContent=m==='pix'?'Gerar Pix':'Pagar '+brl(total())+' no cartão';
-    erro('');
+    if(m==='pix'){
+      $('howTitulo').textContent='Como pagar com Pix';
+      $('howPassos').innerHTML='<li>Toque em <b>Gerar Pix</b> no final da página</li><li>Copie o código e pague no app do seu banco (Pix Copia e Cola)</li><li>Pronto! O acesso é liberado na hora</li>';
+    }else{
+      $('howTitulo').textContent='Como pagar com cartão de crédito';
+      $('howPassos').innerHTML='<li>Preencha os dados do cartão acima</li><li>Toque em <b>Pagar</b> no final da página</li><li>Pronto! O acesso é liberado na hora</li>';
+    }
+    erro('');atualiza();
     if(m==='card'&&!fields.num)montaCampos();
   }
 
@@ -194,14 +269,13 @@ input:focus,.field.focus{outline:none;border-color:var(--acc)}
       if(!r.ok){erro(d.error||'Não foi possível concluir. Tente novamente.');return}
       orderId=d.id;
       px('AddPaymentInfo',{value:total(),currency:'BRL'});
+      window._email=email;
       if(d.status==='aprovado'){sucesso(email);return}
       if(d.pix){
         $('pixValor').textContent=brl(d.valor);$('pixCodigo').textContent=d.pix.copiaECola;
         $('qrImg').src='data:image/png;base64,'+d.pix.qrBase64;show('tela-pix');
-      } else {
-        show('tela-pix');$('qrImg').classList.add('hide');
-      }
-      window._email=email;iniciaPolling();
+      } else { show('tela-pix');$('qrImg').classList.add('hide'); }
+      iniciaPolling();
     }catch(e){
       erro(metodo==='card'?'Confira os dados do cartão e tente de novo.':'Falha de conexão. Tente novamente.');
     }finally{enviando=false;$('btnPagar').disabled=false;$('btnPagar').textContent=txt}
@@ -240,15 +314,22 @@ input:focus,.field.focus{outline:none;border-color:var(--acc)}
       if(!r.ok)throw 0; CFG=await r.json();
     }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
     document.title='Pagamento seguro — '+CFG.produto.nome;
-    $('titulo').textContent='Finalizar compra';
-    $('pNome').textContent=CFG.produto.nome;$('pPreco').textContent=brl(CFG.produto.preco);
-    CFG.produto.bumps.forEach(function(b){
-      var l=document.createElement('label');l.className='bump';
-      l.innerHTML='<input type="checkbox"><div><div class="t">'+'Sim, quero adicionar: '+b.nome+' por apenas '+brl(b.preco)+'</div><div class="d">'+b.desc+'</div></div>';
-      l.querySelector('input').addEventListener('change',function(e){bumpsSel[b.id]=e.target.checked;atualizaTotal();setMetodo(metodo)});
-      $('bumps').appendChild(l);
-    });
-    atualizaTotal();show('tela-form');initPixel();
+    $('pNome').textContent=CFG.produto.nome;$('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
+    if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}
+    if(CFG.produto.bumps.length){
+      $('bumpsWrap').classList.remove('hide');
+      CFG.produto.bumps.forEach(function(b){
+        var off=b.de>b.preco?Math.round((1-b.preco/b.de)*100):0;
+        var d=document.createElement('div');d.className='bump';
+        d.innerHTML='<div class="top">'+(b.imagem?'<img src="'+esc(b.imagem)+'" alt="">':'')+
+          '<div><div class="bt">'+esc(b.nome)+'</div><div class="bd">'+esc(b.desc)+'</div>'+
+          '<div class="bp">'+(b.de>b.preco?'<s>'+brl(b.de)+'</s><span class="off">'+off+'% OFF</span>':'')+'<b>'+brl(b.preco)+'</b></div></div></div>'+
+          '<label class="bar"><input type="checkbox"><span>Sim! Quero adicionar ao meu pedido</span></label>';
+        d.querySelector('input').addEventListener('change',function(e){bumpsSel[b.id]=e.target.checked;d.classList.toggle('sel',e.target.checked);atualiza()});
+        $('bumps').appendChild(d);
+      });
+    }
+    show('tela-form');initPixel();
     $('tab-pix').onclick=function(){setMetodo('pix')};$('tab-card').onclick=function(){setMetodo('card')};
     $('btnPagar').onclick=pagar;$('btnCopiar').onclick=copiar;$('ccpf').addEventListener('input',maskCpf);
     setMetodo('pix');

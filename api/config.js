@@ -9,6 +9,6 @@ export default function handler(req, res) {
   res.status(200).json({
     publicKey: process.env.MP_PUBLIC_KEY || '',
     pixelId: process.env[`META_PIXEL_ID_${id.toUpperCase()}`] || process.env.META_PIXEL_ID || '',
-    produto: { id, nome: p.nome, preco: p.preco, appUrl: p.appUrl, bumps: p.bumps.map(({ id, nome, desc, preco }) => ({ id, nome, desc, preco })) },
+    produto: { id, nome: p.nome, preco: p.preco, appUrl: p.appUrl, imagem: p.imagem || '', bumps: p.bumps.map(({ id, nome, desc, preco, de, imagem }) => ({ id, nome, desc, preco, de: de || 0, imagem: imagem || '' })) },
   });
 }
