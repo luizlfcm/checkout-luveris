@@ -8,7 +8,7 @@ Pix só com e-mail; cartão pede CPF. Libera acesso direto no Upstash (mesmo for
 - `MP_PUBLIC_KEY` — Public Key (teste/produção, mesmo ambiente do token)
 - `MP_WEBHOOK_SECRET` — assinatura secreta do webhook (painel do Mercado Pago)
 - `KV_REST_API_URL`, `KV_REST_API_TOKEN` — Upstash (token de escrita)
-- Opcionais: `META_PIXEL_ID` (ou `META_PIXEL_ID_FDL` / `META_PIXEL_ID_AP`), `META_CAPI_TOKEN`
+- Opcionais: `META_PIXEL_ID` (ou `META_PIXEL_ID_FDL` / `META_PIXEL_ID_AP`), `META_CAPI_TOKEN_FDL` / `META_CAPI_TOKEN_AP` (ou `META_CAPI_TOKEN`), `META_TEST_CODE` (só para testes no Gerenciador de Eventos)
 
 ## Webhook no Mercado Pago
 URL: `https://<dominio>/api/mp-webhook` · evento: Order (Orders)

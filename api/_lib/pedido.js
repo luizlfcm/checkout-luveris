@@ -27,8 +27,8 @@ export function statusSimples(order) {
 
 async function capiPurchase(reg, id) {
   const pixel = process.env[`META_PIXEL_ID_${String(reg.produto).toUpperCase()}`] || process.env.META_PIXEL_ID;
-  const tok = process.env.META_CAPI_TOKEN;
-  if (!pixel || !tok) return;
+  const tok = process.env[`META_CAPI_TOKEN_${String(reg.produto).toUpperCase()}`] || process.env.META_CAPI_TOKEN;
+  if (!pixel || !tok) { console.warn('capi: pixel/token ausente', { produto: reg.produto, temPixel: !!pixel, temToken: !!tok }); return; }
   const sha = (v) => createHash('sha256').update(String(v).trim().toLowerCase()).digest('hex');
   const body = {
     data: [{
@@ -47,9 +47,17 @@ async function capiPurchase(reg, id) {
       custom_data: { currency: 'BRL', value: Number(reg.valor), content_name: PRODUTOS[reg.produto]?.nome },
     }],
   };
-  await fetch(`https://graph.facebook.com/v19.0/${pixel}/events?access_token=${encodeURIComponent(tok)}`, {
+  if (process.env.META_TEST_CODE) body.test_event_code = process.env.META_TEST_CODE;
+  try {
+    const r = await fetch(`https://graph.facebook.com/v19.0/${pixel}/events?access_token=${encodeURIComponent(tok)}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
-  }).catch(() => {});
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) console.error('capi: Meta recusou o Purchase', { produto: reg.produto, status: r.status, erro: j?.error?.message });
+    else console.log('capi: Purchase enviado', { produto: reg.produto, recebidos: j?.events_received });
+  } catch (e) {
+    console.error('capi: falha de rede', e?.message);
+  }
 }
 
 export async function processarPedido(orderId) {
