@@ -5,6 +5,7 @@ import { createHash } from 'crypto';
 import { cmd, setFlag } from './redis.js';
 import { mpFetch } from './mp.js';
 import { PRODUTOS } from './produtos.js';
+import { enviarEntrega } from './email.js';
 
 const APROVADO = ['processed', 'accredited'];
 const REEMBOLSO = ['refunded', 'charged_back', 'chargeback', 'partially_refunded'];
@@ -66,6 +67,14 @@ export async function processarPedido(orderId) {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, true);
     const primeira = await cmd(['SET', `chk_paid:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     if (primeira) await capiPurchase(reg, orderId);
+    // E-mail de entrega: uma única vez por pedido; se falhar, libera a trava para tentar de novo.
+    const mailTrava = await cmd(['SET', `chk_mail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
+    if (mailTrava) {
+      try {
+        const r = await enviarEntrega(reg);
+        if (!r.enviado) await cmd(['DEL', `chk_mail:${orderId}`]);
+      } catch (e) { console.error('email entrega', e); await cmd(['DEL', `chk_mail:${orderId}`]).catch(() => {}); }
+    }
   } else if (status === 'reembolsado') {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, false);
   }

@@ -45,11 +45,12 @@ export const PRODUTOS = {
   },
 };
 
+// Cada bump pode ter `instrucoes` (texto simples) que vai no e-mail de entrega.
 export function calcular(produtoId, bumpIds = []) {
   const p = PRODUTOS[produtoId];
   if (!p) return null;
   const escolhidos = p.bumps.filter((b) => bumpIds.includes(b.id));
   const flags = [p.flag, ...escolhidos.map((b) => b.flag)];
   const centavos = Math.round(p.preco * 100) + escolhidos.reduce((s, b) => s + Math.round(b.preco * 100), 0);
-  return { produto: p, flags, centavos, valor: (centavos / 100).toFixed(2), bumps: escolhidos.map((b) => b.id) };
+  return { produto: p, flags, centavos, valor: (centavos / 100).toFixed(2), bumps: escolhidos.map((b) => b.id), escolhidos };
 }
