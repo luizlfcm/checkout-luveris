@@ -15,20 +15,32 @@ export async function mpFetch(path, { method = 'GET', body, idem } = {}) {
 }
 
 // Valida a assinatura x-signature do webhook (HMAC-SHA256 do manifest).
+// Aceita as variações de manifest documentadas (id em minúsculas ou como veio,
+// com ou sem request-id). Continua exigindo HMAC válido com o segredo.
 export function assinaturaOk(req, dataId) {
-  const secret = process.env.MP_WEBHOOK_SECRET;
+  const secret = String(process.env.MP_WEBHOOK_SECRET || '').trim();
   const sig = req.headers['x-signature'];
-  if (!secret || !sig) return false;
+  if (!secret || !sig) {
+    console.error('webhook: sem segredo ou sem x-signature', { temSegredo: !!secret, temSig: !!sig });
+    return false;
+  }
   const parts = Object.fromEntries(String(sig).split(',').map((p) => p.trim().split('=')));
-  if (!parts.ts || !parts.v1) return false;
+  if (!parts.ts || !parts.v1) { console.error('webhook: x-signature sem ts/v1'); return false; }
   const reqId = req.headers['x-request-id'];
-  let manifest = '';
-  if (dataId) manifest += `id:${String(dataId).toLowerCase()};`;
-  if (reqId) manifest += `request-id:${reqId};`;
-  manifest += `ts:${parts.ts};`;
-  const calc = createHmac('sha256', secret).update(manifest).digest('hex');
-  const a = Buffer.from(calc), b = Buffer.from(String(parts.v1));
-  return a.length === b.length && timingSafeEqual(a, b);
+  const ids = dataId ? [...new Set([String(dataId).toLowerCase(), String(dataId)])] : [''];
+  const alvo = Buffer.from(String(parts.v1));
+  for (const id of ids) {
+    for (const comReq of [true, false]) {
+      let manifest = '';
+      if (id) manifest += `id:${id};`;
+      if (comReq && reqId) manifest += `request-id:${reqId};`;
+      manifest += `ts:${parts.ts};`;
+      const calc = Buffer.from(createHmac('sha256', secret).update(manifest).digest('hex'));
+      if (calc.length === alvo.length && timingSafeEqual(calc, alvo)) return true;
+    }
+  }
+  console.error('webhook: assinatura não confere', { tamSegredo: secret.length, temReqId: !!reqId, dataId: String(dataId).slice(0, 12) });
+  return false;
 }
 
 export function cpfValido(cpf) {
