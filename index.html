@@ -315,6 +315,7 @@ input:focus{outline:none;border-color:var(--blu)}
       var r=await fetch('/api/config?p='+encodeURIComponent(PID));
       if(!r.ok)throw 0; CFG=await r.json();
     }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
+    if(CFG.teste){var tb=document.createElement('div');tb.style.cssText='background:#b00020;color:#fff;text-align:center;font-weight:800;padding:8px;font-size:15px';tb.textContent='⚠️ MODO DE TESTE DE PREÇO ATIVO — cobrança reduzida';document.body.insertBefore(tb,document.body.firstChild)}
     document.title='Pagamento seguro — '+CFG.produto.nome;
     $('pNome').textContent=CFG.produto.nome;$('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
     if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}

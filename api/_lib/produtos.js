@@ -54,11 +54,18 @@ export const PRODUTOS = {
 };
 
 // Bump com `whatsapp` = entrega manual: o e-mail leva o botão do WhatsApp (sem acesso no app).
+// Modo de teste: se PRECO_TESTE_CENTAVOS existir (ex.: 100), cada item (produto e bumps) custa esse valor.
+export function precoTeste() {
+  const n = parseInt(process.env.PRECO_TESTE_CENTAVOS || '', 10);
+  return n >= 1 && n <= 1000 ? n : 0;
+}
+export const precoItem = (preco) => (precoTeste() ? precoTeste() / 100 : preco);
+
 export function calcular(produtoId, bumpIds = []) {
   const p = PRODUTOS[produtoId];
   if (!p) return null;
   const escolhidos = p.bumps.filter((b) => bumpIds.includes(b.id));
   const flags = [p.flag, ...escolhidos.map((b) => b.flag)];
-  const centavos = Math.round(p.preco * 100) + escolhidos.reduce((s, b) => s + Math.round(b.preco * 100), 0);
+  const centavos = Math.round(precoItem(p.preco) * 100) + escolhidos.reduce((s, b) => s + Math.round(precoItem(b.preco) * 100), 0);
   return { produto: p, flags, centavos, valor: (centavos / 100).toFixed(2), bumps: escolhidos.map((b) => b.id), escolhidos };
 }
