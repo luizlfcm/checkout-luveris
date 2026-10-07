@@ -10,9 +10,18 @@ export const PRODUTOS = {
     redisPrefix: 'fdl_cliente:',
     tokenPrefix: 'FDL_',
     appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/',
-    // Order bumps: preencher quando definirmos preços/textos. Exemplo:
-    // { id: 'limp', flag: 'limp', nome: 'Ouro Automotivo', desc: '...', preco: 19.90 }
-    bumps: [],
+    bumps: [
+      {
+        id: 'limp', flag: 'limp', preco: 14.90,
+        nome: 'Ouro Automotivo — 15 Fórmulas',
+        desc: 'Aumente sua linha de produtos sem comprar outro curso: 15 fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza, prontas para produzir e vender aos mesmos clientes.',
+      },
+      {
+        id: 'form', flag: 'form', preco: 24.90,
+        nome: 'Fórmula Personalizada Premium',
+        desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu negócio. Prazo de até 3 dias úteis.',
+      },
+    ],
   },
   ap: {
     nome: 'Fórmula Auto Pro',
@@ -21,7 +30,18 @@ export const PRODUTOS = {
     redisPrefix: 'cliente:',
     tokenPrefix: 'FAP_',
     appUrl: 'https://formulaauto.luverisgroup.com.br/',
-    bumps: [],
+    bumps: [
+      {
+        id: 'limp', flag: 'limp', preco: 13.90,
+        nome: '50 Fórmulas de Limpeza',
+        desc: 'Aumente sua linha de produtos sem comprar outro curso: 50 fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão do Fórmula Auto Pro, prontas para produzir e vender aos mesmos clientes.',
+      },
+      {
+        id: 'form', flag: 'form', preco: 24.90,
+        nome: 'Fórmula Exclusiva',
+        desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu segmento. Prazo de até 3 dias úteis.',
+      },
+    ],
   },
 };
 
