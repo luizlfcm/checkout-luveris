@@ -74,6 +74,7 @@ input:focus{outline:none;border-color:var(--blu)}
 .okk{text-align:center}.okk .big{font-size:56px}
 .wait{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--acc);margin-right:8px;animation:p 1s infinite}
 @keyframes p{50%{opacity:.25}}
+.recb{background:#eaf4ff;border:2px solid #9cc7f5;border-radius:12px;padding:12px 14px;font-size:16px;line-height:1.4;color:#12395f;margin:12px 0;text-align:left}
 .aviso{background:#fff7d6;border:2px solid #f5c542;border-radius:12px;padding:12px;font-weight:700;font-size:16px;color:#6b4e00;margin:12px 0}
 .linkbtn{display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:14px;height:64px;border-radius:14px;background:linear-gradient(180deg,#22c55e,#128a3d);color:#fff;font-size:20px;font-weight:900}
 </style>
@@ -125,6 +126,7 @@ input:focus{outline:none;border-color:var(--blu)}
       <div class="howto">
         <b class="t" id="howTitulo">Como pagar com Pix</b>
         <ol id="howPassos"></ol>
+        <div class="recb" id="howRecb" style="margin:10px 0 0">🔒 No Pix, o seu banco vai mostrar o recebedor <b>53.168.292 LUIZ FELIPE CORREA MIRANDA</b>, responsável financeiro pelo curso. É normal e seguro.</div>
         <div class="inst">⚡ O acesso é imediato: o link aparece nesta tela assim que o pagamento é confirmado. Não feche esta tela, mas fique tranquilo: o acesso também será enviado para o seu e-mail.</div>
       </div>
     </div>
@@ -158,6 +160,7 @@ input:focus{outline:none;border-color:var(--blu)}
     <div class="card qr">
       <h1 style="font-size:21px">Pague com Pix</h1>
       <p class="sub">Valor: <b id="pixValor"></b></p>
+      <div class="recb">🔒 <b>Pagamento seguro.</b> O pagamento será feito em nome de <b>53.168.292 LUIZ FELIPE CORREA MIRANDA</b> (CNPJ 53.168.292/0001-32), responsável financeiro pelo curso. É normal o seu banco exibir esse nome.</div>
       <img id="qrImg" class="q" alt="QR Code Pix">
       <p style="margin:12px 0 0"><b>Ou copie o código:</b></p>
       <div class="code" id="pixCodigo"></div>
@@ -234,10 +237,10 @@ input:focus{outline:none;border-color:var(--blu)}
     $('tab-pix').classList.toggle('on',m==='pix');$('tab-card').classList.toggle('on',m==='card');
     $('box-card').classList.toggle('hide',m!=='card');
     if(m==='pix'){
-      $('howTitulo').textContent='Como pagar com Pix';
+      $('howTitulo').textContent='Como pagar com Pix';$('howRecb').classList.remove('hide');
       $('howPassos').innerHTML='<li>Toque em <b>Gerar Pix</b> no final da página</li><li>Copie o código e pague no app do seu banco (Pix Copia e Cola)</li><li>Pronto! O acesso é liberado na hora</li>';
     }else{
-      $('howTitulo').textContent='Como pagar com cartão de crédito';
+      $('howTitulo').textContent='Como pagar com cartão de crédito';$('howRecb').classList.add('hide');
       $('howPassos').innerHTML='<li>Preencha os dados do cartão acima</li><li>Toque em <b>Pagar</b> no final da página</li><li>Pronto! O acesso é liberado na hora</li>';
     }
     erro('');atualiza();
