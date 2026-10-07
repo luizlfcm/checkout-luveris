@@ -10,6 +10,8 @@ export const PRODUTOS = {
     redisPrefix: 'fdl_cliente:',
     tokenPrefix: 'FDL_',
     appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/',
+    emailFrom: 'Fábrica da Limpeza <noreply@mail.luverisgroup.com.br>',
+    cor: '#3A8A4E', bg: '#0D1410', rodape: 'João Silva - Engenheiro Químico - Fábrica da Limpeza',
     bumps: [
       {
         id: 'limp', flag: 'limp', preco: 14.90,
@@ -18,7 +20,7 @@ export const PRODUTOS = {
       },
       {
         id: 'form', flag: 'form', preco: 24.90,
-        nome: 'Fórmula Personalizada Premium',
+        nome: 'Fórmula Personalizada Premium', whatsapp: 'Ola Joao! Comprei a Formula Personalizada Premium.',
         desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu negócio. Prazo de até 3 dias úteis.',
       },
     ],
@@ -30,6 +32,8 @@ export const PRODUTOS = {
     redisPrefix: 'cliente:',
     tokenPrefix: 'FAP_',
     appUrl: 'https://formulaauto.luverisgroup.com.br/',
+    emailFrom: 'Formula Auto Pro <noreply@mail.luverisgroup.com.br>',
+    cor: '#E8720C', bg: '#0D0F12', rodape: 'João Silva - Engenheiro Químico - Fórmula Auto Pro',
     bumps: [
       {
         id: 'limp', flag: 'limp', preco: 13.90,
@@ -38,14 +42,14 @@ export const PRODUTOS = {
       },
       {
         id: 'form', flag: 'form', preco: 24.90,
-        nome: 'Fórmula Exclusiva',
+        nome: 'Fórmula Exclusiva', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.',
         desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu segmento. Prazo de até 3 dias úteis.',
       },
     ],
   },
 };
 
-// Cada bump pode ter `instrucoes` (texto simples) que vai no e-mail de entrega.
+// Bump com `whatsapp` = entrega manual: o e-mail leva o botão do WhatsApp (sem acesso no app).
 export function calcular(produtoId, bumpIds = []) {
   const p = PRODUTOS[produtoId];
   if (!p) return null;

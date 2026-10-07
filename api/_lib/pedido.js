@@ -5,10 +5,10 @@ import { createHash } from 'crypto';
 import { cmd, setFlag } from './redis.js';
 import { mpFetch } from './mp.js';
 import { PRODUTOS } from './produtos.js';
-import { enviarEntrega } from './email.js';
+import { enviarEntrega, enviarReembolso } from './email.js';
 
 const APROVADO = ['processed', 'accredited'];
-const REEMBOLSO = ['refunded', 'charged_back', 'chargeback', 'partially_refunded'];
+const REEMBOLSO = ['refunded', 'charged_back', 'chargeback']; // reembolso parcial NÃO remove acesso
 
 export const chaveRegistro = (id) => `chk_order:${id}`;
 
@@ -77,6 +77,13 @@ export async function processarPedido(orderId) {
     }
   } else if (status === 'reembolsado') {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, false);
+    const trava = await cmd(['SET', `chk_refmail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
+    if (trava) {
+      try {
+        const r = await enviarReembolso(reg);
+        if (!r.enviado) await cmd(['DEL', `chk_refmail:${orderId}`]);
+      } catch (e) { console.error('email reembolso', e); await cmd(['DEL', `chk_refmail:${orderId}`]).catch(() => {}); }
+    }
   }
   return { status, email: reg.email };
 }
