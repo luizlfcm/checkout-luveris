@@ -31,6 +31,8 @@ export default async function handler(req, res) {
   };
 
   if (metodo === 'pix') {
+    // Só para testes: com MP_MODO_TESTE=1 o Mercado Pago aprova o Pix sozinho (first_name APRO).
+    if (process.env.MP_MODO_TESTE === '1') orderBody.payer.first_name = 'APRO';
     orderBody.transactions.payments.push({
       amount: calc.valor,
       payment_method: { id: 'pix', type: 'bank_transfer' },
