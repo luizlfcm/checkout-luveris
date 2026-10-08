@@ -11,8 +11,8 @@ const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 
 function moldura(p, titulo, subtitulo, miolo, suporte = true) {
   const bloco = suporte ? `<div style="background:#1a1f26;border-radius:12px;padding:20px;text-align:center;margin-top:28px">
-<p style="color:#f2f4f6;font-size:15px;margin:0 0 6px">💬 <b>Tire suas dúvidas direto com o especialista (João Silva)</b></p>
-<p style="color:#8b95a1;font-size:13px;margin:0 0 14px">Fale pelo WhatsApp: (81) 3196-3052</p>
+<p style="color:#f2f4f6;font-size:15px;margin:0 0 6px">💬 <b>Dúvidas técnicas? Fale direto com o especialista (João Silva)</b></p>
+<p style="color:#8b95a1;font-size:13px;margin:0 0 14px">WhatsApp: (81) 3196-3052</p>
 <a href="${WA}?text=${encodeURIComponent(`Olá João! Comprei o ${p.nome} e tenho uma dúvida.`)}" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">Chamar no WhatsApp</a></div>` : '';
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f0f0f0;font-family:Arial,sans-serif">
@@ -22,12 +22,13 @@ function moldura(p, titulo, subtitulo, miolo, suporte = true) {
 <h1 style="color:${p.cor};font-size:22px;margin:8px 0 4px">${esc(titulo)}</h1>
 <p style="color:#aaa;font-size:13px;margin:0">${esc(subtitulo)}</p></td></tr>
 <tr><td style="background:#111418;padding:32px">${miolo}${bloco}</td></tr>
-<tr><td style="background:#080B0F;padding:20px 16px;text-align:center;border-radius:0 0 16px 16px">
-<img src="${LOGO}" width="64" height="64" alt="Luveris Mídia" style="display:block;margin:0 auto 8px;border-radius:12px">
-<p style="color:#cbd2d9;font-size:12px;font-weight:700;margin:0 0 4px">Luveris Mídia</p>
-<p style="color:#8b95a1;font-size:11px;line-height:1.6;margin:0">53.168.292 LUIZ FELIPE CORREA MIRANDA · CNPJ 53.168.292/0001-32<br>
-<a href="mailto:${CONTATO}" style="color:#8b95a1">${CONTATO}</a> · WhatsApp (81) 3196-3052</p>
-<p style="color:#4a5568;font-size:11px;margin:8px 0 0">${esc(p.rodape)}</p></td></tr>
+<tr><td style="background:#080B0F;padding:24px 16px;text-align:center;border-radius:0 0 16px 16px">
+<p style="color:#f2f4f6;font-size:15px;font-weight:700;margin:0 0 2px">Responsável técnico: João Silva</p>
+<p style="color:#aab3bd;font-size:12px;margin:0 0 20px">Engenheiro Químico · responsável pelo conteúdo de ${esc(p.nome)}</p>
+<img src="${LOGO}" width="76" height="76" alt="Luveris Mídia" style="display:block;margin:0 auto 8px;border-radius:10px">
+<p style="color:#6b7683;font-size:10.5px;line-height:1.6;margin:0">53.168.292 LUIZ FELIPE CORREA MIRANDA · CNPJ 53.168.292/0001-32<br>
+${suporte ? 'Garantia de 30 dias · ' : ''}Reembolso, pagamento e demais assuntos:<br>
+<a href="mailto:${CONTATO}" style="color:#6b7683">${CONTATO}</a></p></td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -71,7 +72,7 @@ export async function enviarEntrega(reg) {
   const text = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu pagamento foi confirmado (${[p.nome, ...extras.map((b) => b.nome)].join(', ')}).\n` +
     `Acesse ${p.appUrl} e faça login com o e-mail: ${reg.email}\n` +
     comZap.map((b) => `\n${b.nome}: envie as informações pelo WhatsApp ${WA}\n`).join('') +
-    `\n30 dias de garantia. Dúvidas? Fale com o especialista (João Silva) no WhatsApp (81) 3196-3052 ou responda este e-mail (${CONTATO}).\nLuveris Mídia - 53.168.292 LUIZ FELIPE CORREA MIRANDA - CNPJ 53.168.292/0001-32`;
+    `\n30 dias de garantia. Dúvidas técnicas: WhatsApp do especialista (João Silva) (81) 3196-3052. Reembolso e demais assuntos: ${CONTATO}.\nResponsável técnico: João Silva - 53.168.292 LUIZ FELIPE CORREA MIRANDA - CNPJ 53.168.292/0001-32`;
   const titulo = 'Acesso Liberado!';
   void comApp;
   return resend(p, reg.email, `${p.nome} - Acesso liberado!`, moldura(p, titulo, p.nome, miolo), text);
@@ -80,10 +81,11 @@ export async function enviarEntrega(reg) {
 export async function enviarReembolso(reg) {
   const p = PRODUTOS[reg.produto];
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
-  const miolo = `<p style="color:#f2f4f6;font-size:16px">Olá!</p>
+  const nomeCli = primeiroNome(reg.nome);
+  const miolo = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu reembolso de <strong>${esc(p.nome)}</strong> foi processado com sucesso. O acesso ao produto foi encerrado conforme solicitado.</p>
 <div style="background:#1a1f26;border-radius:10px;padding:14px;border-left:3px solid ${p.cor};margin-top:20px">
-<p style="color:#8b95a1;font-size:13px;margin:0">Se mudou de ideia ou tem alguma dúvida, responda este e-mail ou escreva para <a href="mailto:${CONTATO}" style="color:${p.cor}">${CONTATO}</a><br>ou fale pelo <a href="${WA}?text=${encodeURIComponent(`Olá! Tenho uma dúvida sobre o reembolso de ${p.nome}.`)}" style="color:${p.cor}">WhatsApp: (81) 3196-3052</a></p></div>`;
-  const text = `Olá! Seu reembolso de ${p.nome} foi processado. Dúvidas? Responda este e-mail (${CONTATO}) ou WhatsApp (81) 3196-3052`;
+<p style="color:#8b95a1;font-size:13px;margin:0">Se mudou de ideia ou tem alguma dúvida, responda este e-mail ou escreva para <a href="mailto:${CONTATO}" style="color:${p.cor}">${CONTATO}</a>.</p></div>`;
+  const text = `Olá! Seu reembolso de ${p.nome} foi processado. Dúvidas? Responda este e-mail (${CONTATO}).`;
   return resend(p, reg.email, `Reembolso confirmado — ${p.nome}`, moldura(p, 'Reembolso Confirmado', p.nome, miolo, false), text);
 }
