@@ -1,14 +1,14 @@
 // Avisa o dashboard de vendas (Ads x Faturamento) das vendas/reembolsos do checkout próprio.
 // Configuração (Vercel): DASHBOARD_URL (ex.: https://seu-dashboard.vercel.app) e
 // DASHBOARD_WEBHOOK_SECRET (o mesmo valor de CHECKOUT_WEBHOOK_SECRET no dashboard).
-// Nunca envia em modo de teste (preço de teste ou Pix de teste) para não sujar o dashboard.
+// Em modo de teste só envia se DASHBOARD_ACEITA_TESTE=1 (para validar a integração; apague depois). Nunca envia em modo de teste (preço de teste ou Pix de teste) para não sujar o dashboard.
 import { precoTeste } from './produtos.js';
 
 export async function notificarDashboard(evento, orderId, reg, itens) {
   const base = String(process.env.DASHBOARD_URL || '').trim().replace(/\/$/, '');
   const segredo = process.env.DASHBOARD_WEBHOOK_SECRET;
   if (!base || !segredo) return { enviado: false, motivo: 'dashboard não configurado', semTentar: true };
-  if (precoTeste() || process.env.MP_MODO_TESTE === '1') return { enviado: false, motivo: 'modo de teste', semTentar: true };
+  if ((precoTeste() || process.env.MP_MODO_TESTE === '1') && process.env.DASHBOARD_ACEITA_TESTE !== '1') return { enviado: false, motivo: 'modo de teste', semTentar: true };
   try {
     const r = await fetch(`${base}/api/webhooks/checkout`, {
       method: 'POST',

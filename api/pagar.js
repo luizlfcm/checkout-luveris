@@ -28,6 +28,7 @@ export default async function handler(req, res) {
     processing_mode: 'automatic',
     total_amount: calc.valor,
     external_reference: `${b.produto}_${Date.now()}`,
+    description: calc.itens.map((i) => i.nome).join(' + ').slice(0, 140),
     payer: { email },
     transactions: { payments: [] },
   };
