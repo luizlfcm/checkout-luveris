@@ -160,7 +160,7 @@ input:focus{outline:none;border-color:var(--blu)}
     <div class="foot">
       <b>Luveris Mídia</b><br>
       53.168.292 LUIZ FELIPE CORREA MIRANDA · CNPJ 53.168.292/0001-32<br>
-      Dúvidas? Fale conosco pelo <a href="https://wa.me/558131963052">WhatsApp (81) 3196-3052</a>
+      Dúvidas? Fale conosco pelo <a id="waFoot" href="https://wa.me/558131963052">WhatsApp (81) 3196-3052</a>
     </div>
   </div>
 
@@ -367,6 +367,7 @@ input:focus{outline:none;border-color:var(--blu)}
       if(!r.ok)throw 0; CFG=await r.json();
     }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
     if(CFG.teste){var tb=document.createElement('div');tb.style.cssText='background:#b00020;color:#fff;text-align:center;font-weight:800;padding:8px;font-size:15px';tb.textContent='⚠️ MODO DE TESTE DE PREÇO ATIVO — cobrança reduzida';document.body.insertBefore(tb,document.body.firstChild)}
+    $('waFoot').href='https://wa.me/558131963052?text='+encodeURIComponent('Olá! Tenho uma dúvida sobre o '+CFG.produto.nome+' antes de comprar.');
     document.title='Pagamento seguro — '+CFG.produto.nome;
     $('pNome').textContent=CFG.produto.nome;$('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
     if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}

@@ -13,7 +13,7 @@ function moldura(p, titulo, subtitulo, miolo, suporte = true) {
   const bloco = suporte ? `<div style="background:#1a1f26;border-radius:12px;padding:20px;text-align:center;margin-top:28px">
 <p style="color:#f2f4f6;font-size:15px;margin:0 0 6px">💬 <b>Tire suas dúvidas direto com o especialista (João Silva)</b></p>
 <p style="color:#8b95a1;font-size:13px;margin:0 0 14px">Fale pelo WhatsApp: (81) 3196-3052</p>
-<a href="${WA}" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">Chamar no WhatsApp</a></div>` : '';
+<a href="${WA}?text=${encodeURIComponent(`Olá João! Comprei o ${p.nome} e tenho uma dúvida.`)}" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">Chamar no WhatsApp</a></div>` : '';
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f0f0f0;font-family:Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 0">
@@ -83,7 +83,7 @@ export async function enviarReembolso(reg) {
   const miolo = `<p style="color:#f2f4f6;font-size:16px">Olá!</p>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu reembolso de <strong>${esc(p.nome)}</strong> foi processado com sucesso. O acesso ao produto foi encerrado conforme solicitado.</p>
 <div style="background:#1a1f26;border-radius:10px;padding:14px;border-left:3px solid ${p.cor};margin-top:20px">
-<p style="color:#8b95a1;font-size:13px;margin:0">Se mudou de ideia ou tem alguma dúvida, responda este e-mail ou escreva para <a href="mailto:${CONTATO}" style="color:${p.cor}">${CONTATO}</a><br>ou fale pelo <a href="${WA}" style="color:${p.cor}">WhatsApp: (81) 3196-3052</a></p></div>`;
+<p style="color:#8b95a1;font-size:13px;margin:0">Se mudou de ideia ou tem alguma dúvida, responda este e-mail ou escreva para <a href="mailto:${CONTATO}" style="color:${p.cor}">${CONTATO}</a><br>ou fale pelo <a href="${WA}?text=${encodeURIComponent(`Olá! Tenho uma dúvida sobre o reembolso de ${p.nome}.`)}" style="color:${p.cor}">WhatsApp: (81) 3196-3052</a></p></div>`;
   const text = `Olá! Seu reembolso de ${p.nome} foi processado. Dúvidas? Responda este e-mail (${CONTATO}) ou WhatsApp (81) 3196-3052`;
   return resend(p, reg.email, `Reembolso confirmado — ${p.nome}`, moldura(p, 'Reembolso Confirmado', p.nome, miolo, false), text);
 }
