@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     total_amount: calc.valor,
     external_reference: `${b.produto}_${Date.now()}`,
     description: calc.itens.map((i) => i.nome).join(' + ').slice(0, 140),
-    payer: { email },
+    payer: { email, ...(nome ? { first_name: nome.split(' ')[0], ...(nome.includes(' ') ? { last_name: nome.split(' ').slice(1).join(' ') } : {}) } : {}) },
     transactions: { payments: [] },
   };
 
@@ -47,7 +47,6 @@ export default async function handler(req, res) {
     const cpf = String(c.cpf || '').replace(/\D/g, '');
     if (!cpfValido(cpf)) return res.status(400).json({ error: 'CPF inválido. Confira os números.' });
     orderBody.payer.identification = { type: 'CPF', number: cpf };
-    if (c.nome) orderBody.payer.first_name = String(c.nome).slice(0, 60);
     orderBody.transactions.payments.push({
       amount: calc.valor,
       payment_method: { id: String(c.payment_method_id), type: 'credit_card', token: String(c.token), installments: 1 },
