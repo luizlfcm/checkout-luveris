@@ -1,10 +1,10 @@
-// Repassa eventos do navegador (PageView, InitiateCheckout, AddPaymentInfo) ao Meta pela
+// Repassa eventos do navegador (InitiateCheckout, AddPaymentInfo) ao Meta pela
 // API de Conversões, com o MESMO event_id do pixel do navegador (o Meta deduplica).
 // O Purchase é enviado em outro ponto (pedido.js), quando o pagamento é confirmado.
 import { createHash } from 'crypto';
 import { PRODUTOS } from './_lib/produtos.js';
 
-const PERMITIDOS = new Set(['PageView', 'InitiateCheckout', 'AddPaymentInfo']);
+const PERMITIDOS = new Set(['InitiateCheckout', 'AddPaymentInfo']);
 const sha = (v) => createHash('sha256').update(String(v).trim().toLowerCase()).digest('hex');
 
 export default async function handler(req, res) {
