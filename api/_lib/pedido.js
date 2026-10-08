@@ -75,21 +75,25 @@ export async function processarPedido(orderId) {
   if (status === 'aprovado') {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, true);
     const primeira = await cmd(['SET', `chk_paid:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
+    console.log('pedido: aprovado, acesso liberado', { orderId, produto: reg.produto, flags: reg.flags, primeiraConfirmacao: !!primeira });
     if (primeira) await capiPurchase(reg, orderId);
     // E-mail de entrega: uma única vez por pedido; se falhar, libera a trava para tentar de novo.
     const mailTrava = await cmd(['SET', `chk_mail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     if (mailTrava) {
       try {
         const r = await enviarEntrega(reg);
+        console.log('pedido: e-mail de entrega', { orderId, enviado: r.enviado, motivo: r.motivo });
         if (!r.enviado) await cmd(['DEL', `chk_mail:${orderId}`]);
       } catch (e) { console.error('email entrega', e); await cmd(['DEL', `chk_mail:${orderId}`]).catch(() => {}); }
     }
   } else if (status === 'reembolsado') {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, false);
+    console.log('pedido: reembolsado, acesso removido', { orderId, produto: reg.produto });
     const trava = await cmd(['SET', `chk_refmail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     if (trava) {
       try {
         const r = await enviarReembolso(reg);
+        console.log('pedido: e-mail de reembolso', { orderId, enviado: r.enviado, motivo: r.motivo });
         if (!r.enviado) await cmd(['DEL', `chk_refmail:${orderId}`]);
       } catch (e) { console.error('email reembolso', e); await cmd(['DEL', `chk_refmail:${orderId}`]).catch(() => {}); }
     }
