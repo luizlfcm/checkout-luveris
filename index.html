@@ -103,11 +103,12 @@ input:focus{outline:none;border-color:var(--blu)}
 
     <div class="card">
       <div class="step"><span class="n">1</span> Seus dados</div>
-      <div class="warn">⚠️ Atenção: confira bem o seu e-mail. É ele que libera o seu acesso e é para ele que enviamos o link.</div>
+      <div class="warn">⚠️ Atenção: digite o seu e-mail com cuidado. É ele que libera o seu acesso e é para ele que enviamos o link.</div>
+      <label for="nome">Seu primeiro nome</label>
+      <input id="nome" type="text" autocomplete="given-name" autocapitalize="words" placeholder="Como podemos te chamar?">
       <label for="email">Seu e-mail</label>
       <input id="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="exemplo@email.com">
-      <label for="email2">Digite o e-mail de novo</label>
-      <input id="email2" type="email" inputmode="email" autocomplete="off" autocapitalize="off" placeholder="Confirme seu e-mail">
+      <div class="warn" id="emailDica" style="display:none;margin-top:8px"></div>
     </div>
 
     <div class="card">
@@ -285,25 +286,36 @@ input:focus{outline:none;border-color:var(--blu)}
     if(m==='card'&&!fields.num)montaCampos();
   }
 
+  var DOM={'gmial.com':'gmail.com','gmal.com':'gmail.com','gamil.com':'gmail.com','gnail.com':'gmail.com','gmail.con':'gmail.com','gmail.com.br':'gmail.com','gmaill.com':'gmail.com','gmeil.com':'gmail.com','hotmial.com':'hotmail.com','hotmail.con':'hotmail.com','hotnail.com':'hotmail.com','hotmal.com':'hotmail.com','outlook.con':'outlook.com','outlok.com':'outlook.com','yahooo.com':'yahoo.com','yaho.com':'yahoo.com','yahoo.con':'yahoo.com','icloud.con':'icloud.com'};
+  function sugestao(a){var d=a.split('@')[1]||'';return DOM[d]?a.split('@')[0]+'@'+DOM[d]:''}
+  var dicaFeita='';
   function validaEmail(){
-    var a=$('email').value.trim().toLowerCase(),b=$('email2').value.trim().toLowerCase();
+    var a=$('email').value.trim().toLowerCase();
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(a)){erro('Confira o e-mail digitado.');$('email').focus();return null}
-    if(a!==b){erro('Os dois e-mails estão diferentes. Digite igualzinho nos dois campos.');$('email2').focus();return null}
+    var sg=sugestao(a);
+    if(sg&&dicaFeita!==a){
+      dicaFeita=a;var d=$('emailDica');d.style.display='block';
+      d.innerHTML='Você quis dizer <b>'+esc(sg)+'</b>? <a href="#" id="emailCorrige" style="color:#0b57d0">Sim, corrigir</a> · se está certo, toque em pagar de novo.';
+      $('emailCorrige').onclick=function(e){e.preventDefault();$('email').value=sg;d.style.display='none'};
+      erro('Confira se o e-mail está certo antes de continuar.');return null;
+    }
     return a;
   }
 
   async function pagar(){
     if(enviando)return; erro('');
+    var nome=$('nome').value.trim();
+    if(nome.length<2){erro('Digite o seu primeiro nome.');$('nome').focus();return}
     var email=validaEmail(); if(!email)return;
-    var corpo={produto:PID,bumps:Object.keys(bumpsSel).filter(function(k){return bumpsSel[k]}),email:email,metodo:metodo,saida:saida,fbp:cookie('_fbp'),fbc:cookie('_fbc')};
+    var corpo={produto:PID,bumps:Object.keys(bumpsSel).filter(function(k){return bumpsSel[k]}),nome:nome,email:email,metodo:metodo,saida:saida,fbp:cookie('_fbp'),fbc:cookie('_fbc')};
     enviando=true;$('btnPagar').disabled=true;var txt=$('btnPagar').textContent;$('btnPagar').textContent='Aguarde...';
     try{
       if(metodo==='card'){
-        var cpf=$('ccpf').value.replace(/\D/g,''),nome=$('cnome').value.trim();
-        if(!nome){erro('Digite o nome como está no cartão.');return}
+        var cpf=$('ccpf').value.replace(/\D/g,''),nomeCartao=$('cnome').value.trim();
+        if(!nomeCartao){erro('Digite o nome como está no cartão.');return}
         if(!pmId){erro('Confira o número do cartão.');return}
-        var tk=await mp.fields.createCardToken({cardholderName:nome,identificationType:'CPF',identificationNumber:cpf});
-        corpo.card={token:tk.id,payment_method_id:pmId,cpf:cpf,nome:nome};
+        var tk=await mp.fields.createCardToken({cardholderName:nomeCartao,identificationType:'CPF',identificationNumber:cpf});
+        corpo.card={token:tk.id,payment_method_id:pmId,cpf:cpf,nome:nomeCartao};
       }
       var r=await fetch('/api/pagar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(corpo)});
       var d=await r.json();

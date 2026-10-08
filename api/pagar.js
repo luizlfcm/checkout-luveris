@@ -18,7 +18,9 @@ export default async function handler(req, res) {
 
   const email = String(b.email || '').trim().toLowerCase();
   if (!EMAIL_RE.test(email) || email.length > 120) return res.status(400).json({ error: 'Confira o e-mail digitado.' });
-  const nome = String(b.nome || '').trim().slice(0, 80);
+  // Nome: o digitado no passo 1; se vazio, o do cartão. Limpo e com iniciais maiúsculas.
+  const nomeBruto = String(b.nome || (b.card && b.card.nome) || '').replace(/[^\p{L}\s'.-]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+  const nome = nomeBruto.toLowerCase().replace(/(^|\s)(\p{L})/gu, (m, a, c) => a + c.toUpperCase());
 
   const metodo = b.metodo === 'card' ? 'card' : 'pix';
   const orderBody = {
