@@ -16,6 +16,7 @@ URL: `https://<dominio>/api/mp-webhook` · evento: Order (Orders)
 ## Order bumps
 Edite `bumps` em `api/_lib/produtos.js`.
 - Teste de preço: `PRECO_TESTE_CENTAVOS` (ex.: 100 = R$ 1,00 por item). REMOVER após o teste.
+- Recuperação de vendas (DESLIGADA por padrão): `RECUPERACAO=1` liga os lembretes por e-mail (Pix pendente após ~25 min; cartão recusado após ~15 min); `RECUPERACAO_DIA2=1` adiciona o lembrete do dia seguinte. Usa o agendamento do Resend e cancela se o cliente pagar. Link "parar" em `/api/parar` (opcional: `RECUPERACAO_SEGREDO`). Vendas recuperadas vão marcadas ao dashboard.
 - Parcelamento no cartão: `MAX_PARCELAS` (padrão 3). Juros por conta do comprador, definidos pelo Mercado Pago; o preço do produto não muda.
 - Pop-up de saída: preço em `precoSaida` (api/_lib/produtos.js), imagem em `imagemSaida`; desconto só no produto principal.
 - Dashboard: `DASHBOARD_URL` e `DASHBOARD_WEBHOOK_SECRET` (mesmo valor de CHECKOUT_WEBHOOK_SECRET no dashboard). Não envia em modo de teste.

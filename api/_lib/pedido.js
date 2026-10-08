@@ -7,6 +7,7 @@ import { mpFetch } from './mp.js';
 import { PRODUTOS, calcular } from './produtos.js';
 import { notificarDashboard } from './dashboard.js';
 import { enviarEntrega, enviarReembolso } from './email.js';
+import { cancelarRecuperacao } from './recuperacao.js';
 
 const APROVADO = ['processed', 'accredited'];
 const REEMBOLSO = ['refunded', 'charged_back', 'chargeback']; // reembolso parcial NÃO remove acesso
@@ -78,7 +79,8 @@ const itensDoPedido = (reg) => reg.itens || calcular(reg.produto, reg.bumps || [
 async function avisarDashboard(evento, orderId, reg, chave) {
   const trava = await cmd(['SET', chave, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
   if (!trava) return;
-  const r = await notificarDashboard(evento, orderId, reg, itensDoPedido(reg));
+  const recuperada = evento === 'PURCHASE_APPROVED' && !!(await cmd(['GET', `chk_recup:${orderId}`]).catch(() => null));
+  const r = await notificarDashboard(evento, orderId, reg, itensDoPedido(reg), { recuperada });
   console.log('pedido: dashboard', { orderId, evento, enviado: r.enviado, motivo: r.motivo, status: r.status });
   if (!r.enviado && !r.semTentar) await cmd(['DEL', chave]).catch(() => {});
 }
@@ -99,6 +101,11 @@ export async function processarPedido(orderId) {
     const primeira = await cmd(['SET', `chk_paid:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     console.log('pedido: aprovado, acesso liberado', { orderId, produto: reg.produto, flags: reg.flags, primeiraConfirmacao: !!primeira });
     if (primeira) await capiPurchase(reg, orderId);
+    // Recuperação de vendas: cancela lembretes pendentes e registra se esta venda foi recuperada.
+    if (primeira) {
+      const rc = await cancelarRecuperacao(reg.produto, reg.email);
+      if (rc.recuperada) await cmd(['SET', `chk_recup:${orderId}`, '1', 'EX', String(60 * 60 * 24 * 90)]).catch(() => {});
+    }
     // E-mail de entrega: uma única vez por pedido; se falhar, libera a trava para tentar de novo.
     const mailTrava = await cmd(['SET', `chk_mail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     if (mailTrava) {

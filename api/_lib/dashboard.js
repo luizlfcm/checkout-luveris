@@ -4,7 +4,7 @@
 // Em modo de teste só envia se DASHBOARD_ACEITA_TESTE=1 (para validar a integração; apague depois). Nunca envia em modo de teste (preço de teste ou Pix de teste) para não sujar o dashboard.
 import { precoTeste } from './produtos.js';
 
-export async function notificarDashboard(evento, orderId, reg, itens) {
+export async function notificarDashboard(evento, orderId, reg, itens, extra = {}) {
   const base = String(process.env.DASHBOARD_URL || '').trim().replace(/\/$/, '');
   const segredo = process.env.DASHBOARD_WEBHOOK_SECRET;
   if (!base || !segredo) return { enviado: false, motivo: 'dashboard não configurado', semTentar: true };
@@ -15,7 +15,7 @@ export async function notificarDashboard(evento, orderId, reg, itens) {
       headers: { 'Content-Type': 'application/json', 'x-checkout-secret': segredo },
       body: JSON.stringify({
         evento, pedido: orderId, itens, email: reg.email, nome: reg.nome || '', metodo: reg.metodo || 'pix',
-        data: new Date().toISOString(),
+        data: new Date().toISOString(), recuperada: !!extra.recuperada,
       }),
       signal: AbortSignal.timeout(8000),
     });

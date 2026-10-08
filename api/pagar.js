@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { calcular } from './_lib/produtos.js';
 import { mpFetch, cpfValido, mensagemRecusa } from './_lib/mp.js';
 import { salvarRegistro, processarPedido, statusSimples } from './_lib/pedido.js';
+import { agendarRecuperacao } from './_lib/recuperacao.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -64,12 +65,13 @@ export default async function handler(req, res) {
   }
 
   const fwd = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-  await salvarRegistro(data.id, {
+  const reg = {
     produto: String(b.produto), email, nome, flags: calc.flags, bumps: calc.bumps, itens: calc.itens, valor: calc.valor, metodo, parcelas, desconto: calc.saida ? 'saida10' : '',
     fbp: b.fbp || '', fbc: b.fbc || '', ip: fwd, ua: String(req.headers['user-agent'] || '').slice(0, 250),
     url: String(req.headers.referer || '').slice(0, 250),
     criadoEm: new Date().toISOString(),
-  });
+  };
+  await salvarRegistro(data.id, reg);
 
   const pay = data.transactions?.payments?.[0] || {};
   const st = statusSimples(data);
@@ -80,12 +82,14 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, id: data.id, status: 'aprovado' });
     }
     if (st === 'falhou' || ['rejected', 'failed'].includes(String(pay.status).toLowerCase())) {
+      await agendarRecuperacao(reg, 'cartao'); // só age se RECUPERACAO=1
       return res.status(402).json({ error: mensagemRecusa(pay.status_detail) });
     }
     return res.status(200).json({ ok: true, id: data.id, status: 'pendente' }); // em análise: o polling acompanha
   }
 
   const pm = pay.payment_method || {};
+  await agendarRecuperacao(reg, 'pix', pm.qr_code || ''); // só age se RECUPERACAO=1
   return res.status(200).json({
     ok: true, id: data.id, status: 'pendente', valor: calc.valor,
     pix: { copiaECola: pm.qr_code || '', qrBase64: pm.qr_code_base64 || '', link: pm.ticket_url || '' },
