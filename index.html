@@ -124,11 +124,11 @@ input:focus{outline:none;border-color:var(--blu)}
           <div><label>Validade</label><div id="f-exp" class="field"></div></div>
           <div><label>Código (CVV)</label><div id="f-cvv" class="field"></div></div>
         </div>
-        <div id="parcBox" class="hide"><label for="parc">Parcelas</label><select id="parc" style="width:100%;height:54px;font-size:18px;padding:0 12px;border:2px solid var(--brd);border-radius:12px;background:#fff;color:var(--txt)"></select><div class="hint" id="parcNota" style="margin-top:6px"></div></div>
         <label for="cnome">Nome como está no cartão</label>
         <input id="cnome" type="text" autocomplete="cc-name" placeholder="NOME SOBRENOME">
         <label for="ccpf">CPF do titular</label>
         <input id="ccpf" type="tel" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="000.000.000-00">
+        <div id="parcBox"><label for="parc">Selecione o número de parcelas</label><select id="parc" style="width:100%;height:54px;font-size:18px;padding:0 12px;border:2px solid var(--brd);border-radius:12px;background:#fff;color:var(--txt)"></select><div class="hint" id="parcNota" style="margin-top:6px"></div></div>
         <div class="hint">🔒 Para compras no cartão de crédito, o CPF do titular deve ser informado, conforme as regras de pagamento com cartão. Ele é enviado direto ao Mercado Pago, com segurança. <b>No Pix, não pedimos CPF.</b></div>
       </div>
 
@@ -238,11 +238,13 @@ input:focus{outline:none;border-color:var(--blu)}
     $('pPreco').innerHTML=(saida&&CFG.produto.precoSaida?'<s style="color:#8a8f98;font-weight:400;font-size:.7em">'+brl(CFG.produto.preco)+'</s> ':'')+brl(precoBase())+' <small>à vista</small>';
     CFG.produto.bumps.forEach(function(b){if(bumpsSel[b.id])l+='<div class="l"><span>+ '+esc(b.nome)+'</span><span>'+brl(b.preco)+'</span></div>'});
     $('linhas').innerHTML=l;$('total').textContent=brl(total());
-    var np=parcSel(),po=parcOpc[np];
+    parcPadrao();var np=parcSel(),po=parcOpc[np];
     $('btnPagar').textContent=metodo==='pix'?'GERAR PIX — '+brl(total()):(np>1&&po?'PAGAR '+np+'x DE '+brl(po.parcela)+' NO CARTÃO':'PAGAR '+brl(total())+' NO CARTÃO');
     if(metodo==='card'&&mp&&bin&&parcTotal!==total())carregaParcelas();
   }
   var parcTotal=0;
+  // Sem cartão digitado ainda: mostra só "1x" (à vista), como a Hotmart; as demais opções chegam quando o cartão é reconhecido.
+  function parcPadrao(){if(Object.keys(parcOpc).length||!$('parc'))return;$('parc').innerHTML='<option value="1">1x de '+brl(total())+' (à vista)</option>';$('parcNota').textContent='Pagamento à vista, sem juros.'}
   function parcSel(){var e=$('parc');var n=e?parseInt(e.value,10):1;return n>=1&&n<=MAXP?n:1}
   // Parcelas: o Mercado Pago informa parcela e total (com juros) para o cartão digitado.
   function carregaParcelas(){
@@ -255,10 +257,10 @@ input:focus{outline:none;border-color:var(--blu)}
         parcOpc[n]={parcela:c.installment_amount,total:c.total_amount};
         h+='<option value="'+n+'">'+(n===1?'1x de '+brl(c.installment_amount)+' (à vista)':n+'x de '+brl(c.installment_amount)+' (total '+brl(c.total_amount)+')')+'</option>';
       });
-      if(!h){box.classList.add('hide');parcOpc={};return}
+      if(!h){parcOpc={};parcPadrao();return}
       $('parc').innerHTML=h;if(parcOpc[ant])$('parc').value=ant;
-      box.classList.remove('hide');parcNota();atualiza();
-    }).catch(function(){box.classList.add('hide');parcOpc={}});
+      parcNota();atualiza();
+    }).catch(function(){parcOpc={};parcPadrao()});
   }
   function parcNota(){var n=parcSel(),o=parcOpc[n];$('parcNota').textContent=n>1&&o?'Parcelado em '+n+'x com juros do cartão: total de '+brl(o.total)+'.':'Pagamento à vista, sem juros.'}
 
@@ -300,7 +302,7 @@ input:focus{outline:none;border-color:var(--blu)}
     fields.cvv=mp.fields.create('securityCode',{placeholder:'123',style:st}).mount('f-cvv');
     $('parc').onchange=function(){parcNota();atualiza()};
     fields.num.on('binChange',function(d){
-      var b=d&&d.bin; if(!b){bin='';pmId='';parcOpc={};parcTotal=0;$('parcBox').classList.add('hide');return}
+      var b=d&&d.bin; if(!b){bin='';pmId='';parcOpc={};parcTotal=0;atualiza();return}
       if(b===bin)return; bin=b;
       mp.getPaymentMethods({bin:b}).then(function(r){pmId=(r&&r.results&&r.results[0]&&r.results[0].id)||''}).catch(function(){pmId=''});
       carregaParcelas();
