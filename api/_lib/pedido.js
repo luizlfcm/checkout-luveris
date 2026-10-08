@@ -4,7 +4,8 @@
 import { createHash } from 'crypto';
 import { cmd, setFlag } from './redis.js';
 import { mpFetch } from './mp.js';
-import { PRODUTOS } from './produtos.js';
+import { PRODUTOS, calcular } from './produtos.js';
+import { notificarDashboard } from './dashboard.js';
 import { enviarEntrega, enviarReembolso } from './email.js';
 
 const APROVADO = ['processed', 'accredited'];
@@ -70,6 +71,18 @@ async function capiPurchase(reg, id) {
   }
 }
 
+// Itens do pedido para o dashboard (registros antigos, sem "itens", são recalculados).
+const itensDoPedido = (reg) => reg.itens || calcular(reg.produto, reg.bumps || [], reg.desconto === 'saida10')?.itens || [];
+
+// Avisa o dashboard uma única vez por pedido; se falhar, libera a trava para a próxima chamada tentar de novo.
+async function avisarDashboard(evento, orderId, reg, chave) {
+  const trava = await cmd(['SET', chave, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
+  if (!trava) return;
+  const r = await notificarDashboard(evento, orderId, reg, itensDoPedido(reg));
+  console.log('pedido: dashboard', { orderId, evento, enviado: r.enviado, motivo: r.motivo, status: r.status });
+  if (!r.enviado && !r.semTentar) await cmd(['DEL', chave]).catch(() => {});
+}
+
 export async function processarPedido(orderId) {
   const { ok, data: order } = await mpFetch(`/v1/orders/${encodeURIComponent(orderId)}`);
   if (!ok) throw new Error(`MP order ${orderId} indisponível`);
@@ -95,6 +108,7 @@ export async function processarPedido(orderId) {
         if (!r.enviado) await cmd(['DEL', `chk_mail:${orderId}`]);
       } catch (e) { console.error('email entrega', e); await cmd(['DEL', `chk_mail:${orderId}`]).catch(() => {}); }
     }
+    await avisarDashboard('PURCHASE_APPROVED', orderId, reg, `chk_dash:${orderId}`);
   } else if (status === 'reembolsado') {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, false);
     console.log('pedido: reembolsado, acesso removido', { orderId, produto: reg.produto });
@@ -106,6 +120,7 @@ export async function processarPedido(orderId) {
         if (!r.enviado) await cmd(['DEL', `chk_refmail:${orderId}`]);
       } catch (e) { console.error('email reembolso', e); await cmd(['DEL', `chk_refmail:${orderId}`]).catch(() => {}); }
     }
+    await avisarDashboard('PURCHASE_REFUNDED', orderId, reg, `chk_dashref:${orderId}`);
   }
   return { status, email: reg.email };
 }
