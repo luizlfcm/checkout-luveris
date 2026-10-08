@@ -23,6 +23,7 @@ export default async function handler(req, res) {
   const nome = nomeBruto.toLowerCase().replace(/(^|\s)(\p{L})/gu, (m, a, c) => a + c.toUpperCase());
 
   const metodo = b.metodo === 'card' ? 'card' : 'pix';
+  let parcelas = 1;
   const orderBody = {
     type: 'online',
     processing_mode: 'automatic',
@@ -44,12 +45,14 @@ export default async function handler(req, res) {
   } else {
     const c = b.card || {};
     if (!c.token || !c.payment_method_id) return res.status(400).json({ error: 'Dados do cartão incompletos.' });
+    const MAXP = Math.max(1, Math.min(12, parseInt(process.env.MAX_PARCELAS || '3', 10) || 3));
+    parcelas = Math.max(1, Math.min(MAXP, parseInt(c.installments, 10) || 1));
     const cpf = String(c.cpf || '').replace(/\D/g, '');
     if (!cpfValido(cpf)) return res.status(400).json({ error: 'CPF inválido. Confira os números.' });
     orderBody.payer.identification = { type: 'CPF', number: cpf };
     orderBody.transactions.payments.push({
       amount: calc.valor,
-      payment_method: { id: String(c.payment_method_id), type: 'credit_card', token: String(c.token), installments: 1 },
+      payment_method: { id: String(c.payment_method_id), type: 'credit_card', token: String(c.token), installments: parcelas },
     });
   }
 
@@ -62,7 +65,7 @@ export default async function handler(req, res) {
 
   const fwd = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
   await salvarRegistro(data.id, {
-    produto: String(b.produto), email, nome, flags: calc.flags, bumps: calc.bumps, itens: calc.itens, valor: calc.valor, metodo, desconto: calc.saida ? 'saida10' : '',
+    produto: String(b.produto), email, nome, flags: calc.flags, bumps: calc.bumps, itens: calc.itens, valor: calc.valor, metodo, parcelas, desconto: calc.saida ? 'saida10' : '',
     fbp: b.fbp || '', fbc: b.fbc || '', ip: fwd, ua: String(req.headers['user-agent'] || '').slice(0, 250),
     url: String(req.headers.referer || '').slice(0, 250),
     criadoEm: new Date().toISOString(),

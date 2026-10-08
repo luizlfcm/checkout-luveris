@@ -115,7 +115,7 @@ input:focus{outline:none;border-color:var(--blu)}
       <div class="step"><span class="n">2</span> Como prefere pagar?</div>
       <div class="tabs">
         <button type="button" class="tab on" id="tab-pix">Pix<small>Aprovação na hora</small></button>
-        <button type="button" class="tab" id="tab-card">Cartão de crédito<small>À vista</small></button>
+        <button type="button" class="tab" id="tab-card">Cartão de crédito<small>Em até 3x</small></button>
       </div>
 
       <div id="box-card" class="hide">
@@ -124,6 +124,7 @@ input:focus{outline:none;border-color:var(--blu)}
           <div><label>Validade</label><div id="f-exp" class="field"></div></div>
           <div><label>Código (CVV)</label><div id="f-cvv" class="field"></div></div>
         </div>
+        <div id="parcBox" class="hide"><label for="parc">Parcelas</label><select id="parc" style="width:100%;height:54px;font-size:18px;padding:0 12px;border:2px solid var(--brd);border-radius:12px;background:#fff;color:var(--txt)"></select><div class="hint" id="parcNota" style="margin-top:6px"></div></div>
         <label for="cnome">Nome como está no cartão</label>
         <input id="cnome" type="text" autocomplete="cc-name" placeholder="NOME SOBRENOME">
         <label for="ccpf">CPF do titular</label>
@@ -208,7 +209,7 @@ input:focus{outline:none;border-color:var(--blu)}
 <script>
 (function(){
   var PID=(location.pathname.replace(/^\/|\/$/g,'').split('/')[0])||new URLSearchParams(location.search).get('p')||'';
-  var CFG=null, mp=null, metodo='pix', fields={}, bin='', pmId='', orderId=null, polling=null, enviando=false, bumpsSel={}, saida=false, xoVisto=false;
+  var CFG=null, mp=null, metodo='pix', fields={}, bin='', pmId='', orderId=null, polling=null, enviando=false, bumpsSel={}, saida=false, xoVisto=false, MAXP=3, parcOpc={};
   var $=function(id){return document.getElementById(id)};
   var brl=function(v){return 'R$ '+Number(v).toFixed(2).replace('.',',')};
   function show(id){['tela-form','tela-pix','tela-ok'].forEach(function(t){$(t).classList.toggle('hide',t!==id)});window.scrollTo(0,0)}
@@ -237,8 +238,29 @@ input:focus{outline:none;border-color:var(--blu)}
     $('pPreco').innerHTML=(saida&&CFG.produto.precoSaida?'<s style="color:#8a8f98;font-weight:400;font-size:.7em">'+brl(CFG.produto.preco)+'</s> ':'')+brl(precoBase())+' <small>à vista</small>';
     CFG.produto.bumps.forEach(function(b){if(bumpsSel[b.id])l+='<div class="l"><span>+ '+esc(b.nome)+'</span><span>'+brl(b.preco)+'</span></div>'});
     $('linhas').innerHTML=l;$('total').textContent=brl(total());
-    $('btnPagar').textContent=metodo==='pix'?'GERAR PIX — '+brl(total()):'PAGAR '+brl(total())+' NO CARTÃO';
+    var np=parcSel(),po=parcOpc[np];
+    $('btnPagar').textContent=metodo==='pix'?'GERAR PIX — '+brl(total()):(np>1&&po?'PAGAR '+np+'x DE '+brl(po.parcela)+' NO CARTÃO':'PAGAR '+brl(total())+' NO CARTÃO');
+    if(metodo==='card'&&mp&&bin&&parcTotal!==total())carregaParcelas();
   }
+  var parcTotal=0;
+  function parcSel(){var e=$('parc');var n=e?parseInt(e.value,10):1;return n>=1&&n<=MAXP?n:1}
+  // Parcelas: o Mercado Pago informa parcela e total (com juros) para o cartão digitado.
+  function carregaParcelas(){
+    parcTotal=total();
+    var box=$('parcBox');
+    mp.getInstallments({amount:String(total()),bin:bin,paymentTypeId:'credit_card'}).then(function(r){
+      var pc=(r&&r[0]&&r[0].payer_costs)||[];parcOpc={};var h='',ant=parcSel();
+      pc.forEach(function(c){
+        var n=c.installments;if(n<1||n>MAXP)return;
+        parcOpc[n]={parcela:c.installment_amount,total:c.total_amount};
+        h+='<option value="'+n+'">'+(n===1?'1x de '+brl(c.installment_amount)+' (à vista)':n+'x de '+brl(c.installment_amount)+' (total '+brl(c.total_amount)+')')+'</option>';
+      });
+      if(!h){box.classList.add('hide');parcOpc={};return}
+      $('parc').innerHTML=h;if(parcOpc[ant])$('parc').value=ant;
+      box.classList.remove('hide');parcNota();atualiza();
+    }).catch(function(){box.classList.add('hide');parcOpc={}});
+  }
+  function parcNota(){var n=parcSel(),o=parcOpc[n];$('parcNota').textContent=n>1&&o?'Parcelado em '+n+'x com juros do cartão: total de '+brl(o.total)+'.':'Pagamento à vista, sem juros.'}
 
 
   // Pop-up de saída: oferece 10% no produto principal uma única vez por visita.
@@ -276,10 +298,12 @@ input:focus{outline:none;border-color:var(--blu)}
     fields.num=mp.fields.create('cardNumber',{placeholder:'0000 0000 0000 0000',style:st}).mount('f-num');
     fields.exp=mp.fields.create('expirationDate',{placeholder:'MM/AA',style:st}).mount('f-exp');
     fields.cvv=mp.fields.create('securityCode',{placeholder:'123',style:st}).mount('f-cvv');
+    $('parc').onchange=function(){parcNota();atualiza()};
     fields.num.on('binChange',function(d){
-      var b=d&&d.bin; if(!b){bin='';pmId='';return}
+      var b=d&&d.bin; if(!b){bin='';pmId='';parcOpc={};parcTotal=0;$('parcBox').classList.add('hide');return}
       if(b===bin)return; bin=b;
       mp.getPaymentMethods({bin:b}).then(function(r){pmId=(r&&r.results&&r.results[0]&&r.results[0].id)||''}).catch(function(){pmId=''});
+      carregaParcelas();
     });
   }
 
@@ -327,7 +351,7 @@ input:focus{outline:none;border-color:var(--blu)}
         if(!nomeCartao){erro('Digite o nome como está no cartão.');return}
         if(!pmId){erro('Confira o número do cartão.');return}
         var tk=await mp.fields.createCardToken({cardholderName:nomeCartao,identificationType:'CPF',identificationNumber:cpf});
-        corpo.card={token:tk.id,payment_method_id:pmId,cpf:cpf,nome:nomeCartao};
+        corpo.card={token:tk.id,payment_method_id:pmId,cpf:cpf,nome:nomeCartao,installments:parcSel()};
       }
       var r=await fetch('/api/pagar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(corpo)});
       var d=await r.json();
