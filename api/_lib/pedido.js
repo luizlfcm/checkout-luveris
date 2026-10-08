@@ -26,7 +26,9 @@ export function statusSimples(order) {
 }
 
 async function anotarCapi(id, info) {
-  try { await cmd(['SET', `chk_capi:${id}`, JSON.stringify({ ...info, quando: new Date().toISOString() }), 'EX', String(60 * 60 * 24 * 30)]); } catch (e) { /* só diagnóstico */ }
+  // Só guarda quando há algo a investigar: falha ou modo de teste. Vendas normais bem-sucedidas não deixam rastro.
+  if (info.resultado === 'enviado' && !info.modoTeste) return;
+  try { await cmd(['SET', `chk_capi:${id}`, JSON.stringify({ ...info, quando: new Date().toISOString() }), 'EX', String(60 * 60 * 24 * 7)]); } catch (e) { /* só diagnóstico */ }
 }
 
 async function capiPurchase(reg, id) {
