@@ -16,3 +16,4 @@ URL: `https://<dominio>/api/mp-webhook` · evento: Order (Orders)
 ## Order bumps
 Edite `bumps` em `api/_lib/produtos.js`.
 - Teste de preço: `PRECO_TESTE_CENTAVOS` (ex.: 100 = R$ 1,00 por item). REMOVER após o teste.
+- Pop-up de saída: preço em `precoSaida` (api/_lib/produtos.js), imagem em `imagemSaida`; desconto só no produto principal.

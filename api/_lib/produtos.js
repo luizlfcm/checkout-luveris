@@ -6,6 +6,7 @@ export const PRODUTOS = {
   fdl: {
     nome: 'Fábrica da Limpeza',
     preco: 43.90,
+    precoSaida: 39.50, imagemSaida: '/img/saida-fdl.webp', // pop-up de saída (10% off, só no produto principal)
     flag: 'base',
     redisPrefix: 'fdl_cliente:',
     tokenPrefix: 'FDL_',
@@ -30,6 +31,7 @@ export const PRODUTOS = {
   ap: {
     nome: 'Fórmula Auto Pro',
     preco: 41.90,
+    precoSaida: 37.70, imagemSaida: '/img/saida-ap.webp',
     flag: 'base',
     redisPrefix: 'cliente:',
     tokenPrefix: 'FAP_',
@@ -61,11 +63,11 @@ export function precoTeste() {
 }
 export const precoItem = (preco) => (precoTeste() ? precoTeste() / 100 : preco);
 
-export function calcular(produtoId, bumpIds = []) {
+export function calcular(produtoId, bumpIds = [], saida = false) {
   const p = PRODUTOS[produtoId];
   if (!p) return null;
   const escolhidos = p.bumps.filter((b) => bumpIds.includes(b.id));
   const flags = [p.flag, ...escolhidos.map((b) => b.flag)];
-  const centavos = Math.round(precoItem(p.preco) * 100) + escolhidos.reduce((s, b) => s + Math.round(precoItem(b.preco) * 100), 0);
-  return { produto: p, flags, centavos, valor: (centavos / 100).toFixed(2), bumps: escolhidos.map((b) => b.id), escolhidos };
+  const centavos = Math.round(precoItem(saida && p.precoSaida ? p.precoSaida : p.preco) * 100) + escolhidos.reduce((s, b) => s + Math.round(precoItem(b.preco) * 100), 0);
+  return { produto: p, saida: !!(saida && p.precoSaida), flags, centavos, valor: (centavos / 100).toFixed(2), bumps: escolhidos.map((b) => b.id), escolhidos };
 }

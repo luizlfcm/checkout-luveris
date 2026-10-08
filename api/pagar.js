@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
   const b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
 
-  const calc = calcular(String(b.produto || ''), Array.isArray(b.bumps) ? b.bumps : []);
+  const calc = calcular(String(b.produto || ''), Array.isArray(b.bumps) ? b.bumps : [], b.saida === true);
   if (!calc) return res.status(400).json({ error: 'Produto inválido.' });
 
   const email = String(b.email || '').trim().toLowerCase();
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 
   const fwd = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
   await salvarRegistro(data.id, {
-    produto: String(b.produto), email, nome, flags: calc.flags, bumps: calc.bumps, valor: calc.valor, metodo,
+    produto: String(b.produto), email, nome, flags: calc.flags, bumps: calc.bumps, valor: calc.valor, metodo, desconto: calc.saida ? 'saida10' : '',
     fbp: b.fbp || '', fbc: b.fbc || '', ip: fwd, ua: String(req.headers['user-agent'] || '').slice(0, 250),
     url: String(req.headers.referer || '').slice(0, 250),
     criadoEm: new Date().toISOString(),
