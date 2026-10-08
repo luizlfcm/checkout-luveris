@@ -216,6 +216,17 @@ input:focus{outline:none;border-color:var(--blu)}
   function erro(m){var e=$('erro');e.textContent=m||'';e.style.display=m?'block':'none'}
   function cookie(n){var m=document.cookie.match('(?:^|; )'+n+'=([^;]*)');return m?decodeURIComponent(m[1]):''}
   function px(ev,data,eid){try{if(window.fbq)fbq('track',ev,data||{},eid?{eventID:eid}:undefined)}catch(e){}}
+  function novoId(pre){return pre+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+  // Evento no pixel (navegador) + o mesmo evento pela API de Conversões (servidor), com o mesmo ID para deduplicar.
+  function evento(ev,data,extra){
+    var eid=novoId(ev.slice(0,2).toLowerCase());
+    px(ev,data,eid);
+    if(!CFG||!CFG.pixelId)return;
+    try{
+      var corpo=Object.assign({produto:PID,evento:ev,id:eid,url:location.href,valor:data&&data.value,fbp:cookie('_fbp'),fbc:cookie('_fbc')},extra||{});
+      fetch('/api/evento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(corpo),keepalive:true}).catch(function(){});
+    }catch(e){}
+  }
   function esc(t){return String(t).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]})}
 
   function precoBase(){return saida&&CFG.produto.precoSaida?CFG.produto.precoSaida:CFG.produto.preco}
@@ -253,8 +264,9 @@ input:focus{outline:none;border-color:var(--blu)}
   function initPixel(){
     if(!CFG.pixelId)return;
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init',CFG.pixelId);fbq('track','PageView');
-    px('InitiateCheckout',{value:total(),currency:'BRL',content_name:CFG.produto.nome});
+    fbq('init',CFG.pixelId);
+    evento('PageView');
+    evento('InitiateCheckout',{value:total(),currency:'BRL',content_name:CFG.produto.nome});
   }
 
   function montaCampos(){
@@ -321,7 +333,9 @@ input:focus{outline:none;border-color:var(--blu)}
       var d=await r.json();
       if(!r.ok){erro(d.error||'Não foi possível concluir. Tente novamente.');return}
       orderId=d.id;
-      px('AddPaymentInfo',{value:total(),currency:'BRL'});
+      // Correspondência avançada: com e-mail e nome em mãos, o pixel os envia (o Meta aplica o hash).
+      try{if(window.fbq&&CFG.pixelId)fbq('init',CFG.pixelId,{em:email,fn:(nome||'').split(' ')[0].toLowerCase()})}catch(e){}
+      evento('AddPaymentInfo',{value:total(),currency:'BRL'},{email:email,nome:nome});
       window._email=email;
       if(d.status==='aprovado'){sucesso(email);return}
       if(d.pix){

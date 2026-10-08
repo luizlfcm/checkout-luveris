@@ -49,6 +49,8 @@ async function capiPurchase(reg, id) {
         fbc: reg.fbc || undefined,
         client_ip_address: reg.ip || undefined,
         client_user_agent: reg.ua || undefined,
+        fn: reg.nome ? [sha(String(reg.nome).split(/\s+/)[0])] : undefined,
+        country: [sha('br')],
       },
       custom_data: { currency: 'BRL', value: Number(reg.valor), content_name: PRODUTOS[reg.produto]?.nome },
     }],
