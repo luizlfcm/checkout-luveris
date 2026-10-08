@@ -25,10 +25,14 @@ export function statusSimples(order) {
   return 'pendente';
 }
 
+async function anotarCapi(id, info) {
+  try { await cmd(['SET', `chk_capi:${id}`, JSON.stringify({ ...info, quando: new Date().toISOString() }), 'EX', String(60 * 60 * 24 * 30)]); } catch (e) { /* só diagnóstico */ }
+}
+
 async function capiPurchase(reg, id) {
   const pixel = process.env[`META_PIXEL_ID_${String(reg.produto).toUpperCase()}`] || process.env.META_PIXEL_ID;
   const tok = process.env[`META_CAPI_TOKEN_${String(reg.produto).toUpperCase()}`] || process.env.META_CAPI_TOKEN;
-  if (!pixel || !tok) { console.warn('capi: pixel/token ausente', { produto: reg.produto, temPixel: !!pixel, temToken: !!tok }); return; }
+  if (!pixel || !tok) { console.warn('capi: pixel/token ausente', { produto: reg.produto, temPixel: !!pixel, temToken: !!tok }); await anotarCapi(id, { resultado: 'nao_enviado', motivo: 'pixel ou token ausente', temPixel: !!pixel, temToken: !!tok }); return; }
   const sha = (v) => createHash('sha256').update(String(v).trim().toLowerCase()).digest('hex');
   const body = {
     data: [{
@@ -54,10 +58,11 @@ async function capiPurchase(reg, id) {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
     });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) console.error('capi: Meta recusou o Purchase', { produto: reg.produto, status: r.status, erro: j?.error?.message });
-    else console.log('capi: Purchase enviado', { produto: reg.produto, recebidos: j?.events_received });
+    if (!r.ok) { console.error('capi: Meta recusou o Purchase', { produto: reg.produto, status: r.status, erro: j?.error?.message }); await anotarCapi(id, { resultado: 'recusado', http: r.status, erro: j?.error?.message || '', produto: reg.produto, pixel }); }
+    else { console.log('capi: Purchase enviado', { produto: reg.produto, recebidos: j?.events_received }); await anotarCapi(id, { resultado: 'enviado', recebidos: j?.events_received, produto: reg.produto, pixel, modoTeste: !!testCode }); }
   } catch (e) {
     console.error('capi: falha de rede', e?.message);
+    await anotarCapi(id, { resultado: 'erro_rede', erro: String(e?.message || e) });
   }
 }
 
