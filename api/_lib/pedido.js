@@ -47,7 +47,8 @@ async function capiPurchase(reg, id) {
       custom_data: { currency: 'BRL', value: Number(reg.valor), content_name: PRODUTOS[reg.produto]?.nome },
     }],
   };
-  if (process.env.META_TEST_CODE) body.test_event_code = process.env.META_TEST_CODE;
+  const testCode = process.env[`META_TEST_CODE_${String(reg.produto).toUpperCase()}`] || process.env.META_TEST_CODE;
+  if (testCode) body.test_event_code = testCode;
   try {
     const r = await fetch(`https://graph.facebook.com/v19.0/${pixel}/events?access_token=${encodeURIComponent(tok)}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
