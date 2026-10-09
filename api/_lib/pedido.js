@@ -94,7 +94,7 @@ async function capiPurchase(reg, id) {
 }
 
 // Itens do pedido para o dashboard (registros antigos, sem "itens", são recalculados).
-const itensDoPedido = (reg) => reg.itens || calcular(reg.produto, reg.bumps || [], reg.desconto === 'saida10')?.itens || [];
+const itensDoPedido = (reg) => reg.itens || calcular(reg.produto, reg.bumps || [], reg.desconto === 'saida10', reg.avulso || '')?.itens || [];
 
 // Avisa o dashboard uma única vez por pedido; se falhar, libera a trava para a próxima chamada tentar de novo.
 async function avisarDashboard(evento, orderId, reg, chave) {
@@ -123,9 +123,10 @@ export async function processarPedido(orderId) {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, true);
     const primeira = await cmd(['SET', `chk_paid:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     console.log('pedido: aprovado, acesso liberado', { orderId, produto: reg.produto, flags: reg.flags, primeiraConfirmacao: !!primeira });
-    if (primeira) await capiPurchase(reg, orderId);
+    // Links avulsos (compra de dentro do app, de quem já é aluno) não vão para a API de Conversões da Meta, para não distorcer a otimização dos anúncios (CAPI_AVULSOS=1 liga).
+    if (primeira && (!reg.avulso || process.env.CAPI_AVULSOS === '1')) await capiPurchase(reg, orderId);
     // Recuperação de vendas: cancela lembretes pendentes e registra se esta venda foi recuperada.
-    if (primeira) {
+    if (primeira && !reg.avulso) {
       const rc = await cancelarRecuperacao(reg.produto, reg.email);
       if (rc.recuperada) await cmd(['SET', `chk_recup:${orderId}`, '1', 'EX', String(60 * 60 * 24 * 90)]).catch(() => {});
     }

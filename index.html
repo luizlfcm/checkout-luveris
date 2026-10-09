@@ -203,7 +203,7 @@ input:focus{outline:none;border-color:var(--blu)}
       <div class="big">✅</div>
       <h1>Pagamento confirmado!</h1>
       <p>Seu acesso já está liberado.</p>
-      <ol class="steps">
+      <ol class="steps" id="okPassos">
         <li>Toque no botão abaixo para abrir o aplicativo</li>
         <li>Entre com este e-mail:<br><b id="okEmail"></b></li>
       </ol>
@@ -222,7 +222,9 @@ input:focus{outline:none;border-color:var(--blu)}
 </div>
 <script>
 (function(){
-  var PID=(location.pathname.replace(/^\/|\/$/g,'').split('/')[0])||new URLSearchParams(location.search).get('p')||'';
+  var SEG=location.pathname.replace(/^\/|\/$/g,'').split('/'), QS=new URLSearchParams(location.search);
+  var PID=SEG[0]||QS.get('p')||'';
+  var ITEM=(SEG[1]||QS.get('i')||'').toLowerCase().replace(/[^a-z0-9_-]/g,'');
   var CFG=null, mp=null, metodo='pix', fields={}, bin='', pmId='', orderId=null, polling=null, enviando=false, bumpsSel={}, saida=false, xoVisto=false, MAXP=3, parcOpc={};
   var $=function(id){return document.getElementById(id)};
   var brl=function(v){return 'R$ '+Number(v).toFixed(2).replace('.',',')};
@@ -238,6 +240,7 @@ input:focus{outline:none;border-color:var(--blu)}
     px(ev,data,eid);
     if(!CFG||!CFG.pixelId)return;
     try{
+      if(ITEM)return;
       var corpo=Object.assign({produto:PID,evento:ev,id:eid,url:location.href,valor:data&&data.value,fbp:cookie('_fbp'),fbc:cookie('_fbc')},extra||{});
       fetch('/api/evento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(corpo),keepalive:true}).catch(function(){});
     }catch(e){}
@@ -359,7 +362,7 @@ input:focus{outline:none;border-color:var(--blu)}
     var nome=$('nome').value.trim();
     if(nome.length<2){erro('Digite o seu primeiro nome.');$('nome').focus();return}
     var email=validaEmail(); if(!email)return;
-    var corpo={produto:PID,bumps:Object.keys(bumpsSel).filter(function(k){return bumpsSel[k]}),nome:nome,email:email,metodo:metodo,saida:saida,fbp:cookie('_fbp'),fbc:cookie('_fbc')};
+    var corpo={produto:PID,avulso:ITEM,bumps:Object.keys(bumpsSel).filter(function(k){return bumpsSel[k]}),nome:nome,email:email,metodo:metodo,saida:saida,fbp:cookie('_fbp'),fbc:cookie('_fbc')};
     enviando=true;$('btnPagar').disabled=true;var txt=$('btnPagar').textContent;$('btnPagar').textContent='Aguarde...';
     try{
       if(metodo==='card'){
@@ -403,7 +406,16 @@ input:focus{outline:none;border-color:var(--blu)}
 
   function sucesso(email){
     px('Purchase',{value:total(),currency:'BRL',content_name:CFG.produto.nome},'purchase_'+orderId);
-    $('okEmail').textContent=email;$('btnApp').href=CFG.produto.appUrl;show('tela-ok');
+    $('okEmail').textContent=email;$('btnApp').href=CFG.produto.appUrl;
+    var av=CFG.produto.avulso;
+    if(av&&av.whatsapp){
+      $('okPassos').innerHTML='<li>Toque no botão abaixo e fale com o João no WhatsApp</li><li>Ele vai preparar o seu material e enviar para você</li>';
+      $('btnApp').textContent='Chamar o João no WhatsApp';
+      $('btnApp').href='https://wa.me/558131963052?text='+encodeURIComponent(av.whatsapp);
+    }else if(av){
+      $('okPassos').innerHTML='<li>Abra o seu aplicativo normalmente</li><li>Entre com este e-mail:<br><b>'+esc(email)+'</b></li>';
+    }
+    show('tela-ok');
   }
 
   function copiar(){
@@ -417,13 +429,19 @@ input:focus{outline:none;border-color:var(--blu)}
 
   async function init(){
     try{
-      var r=await fetch('/api/config?p='+encodeURIComponent(PID));
+      var r=await fetch('/api/config?p='+encodeURIComponent(PID)+(ITEM?'&i='+encodeURIComponent(ITEM):''));
       if(!r.ok)throw 0; CFG=await r.json();
     }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
     if(CFG.teste){var tb=document.createElement('div');tb.style.cssText='background:#b00020;color:#fff;text-align:center;font-weight:800;padding:8px;font-size:15px';tb.textContent='⚠️ MODO DE TESTE DE PREÇO ATIVO — cobrança reduzida';document.body.insertBefore(tb,document.body.firstChild)}
     $('waFoot').href='https://wa.me/558131963052?text='+encodeURIComponent('Olá! Tenho uma dúvida sobre o '+CFG.produto.nome+' antes de comprar.');
     document.title='Pagamento seguro — '+CFG.produto.nome;
     $('pNome').textContent=CFG.produto.nome;$('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
+    if(ITEM){
+      var q=QS.get('email'),qn=QS.get('nome');
+      if(q&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(q))$('email').value=q;
+      if(qn)$('nome').value=qn.slice(0,40);
+      document.querySelector('.warn').innerHTML='⚠️ Use o <b>mesmo e-mail com que você entra no aplicativo</b>. É ele que libera o seu acesso.';
+    }
     if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}
     if(CFG.produto.depoimentos&&CFG.produto.depoimentos.length){
       $('depLista').innerHTML=CFG.produto.depoimentos.map(function(d){

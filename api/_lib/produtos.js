@@ -20,6 +20,13 @@ export const PRODUTOS = {
       { texto: 'Boa tarde. Fiz esses aí… comprei essência de lavanda. Lavei minhas roupas, fez muita espuma e ficou cheirosa demais.' },
       { texto: 'Boa noite, passando pra avisar que essa ficou ótima, com um custo excelente e a limpeza também 👍👍👍' },
     ],
+    // Links de pagamento avulsos (/fdl/<id>): ofertas vendidas dentro do app, só o item (sem produto principal, sem bumps).
+    avulsos: [
+      { id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, nome: 'Ouro Automotivo — 15 Fórmulas', titulo: 'Ouro Automotivo — 15 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/bump-ouro.webp' },
+      { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 9.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '' },
+      { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 9.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '' },
+      { id: 'form', flag: 'form', hotmartId: 4447291, preco: 19.90, nome: 'Fórmula Personalizada Premium', titulo: 'Fórmula Personalizada Premium – Um Especialista Ajustando Sua Produção', imagem: '/img/bump-personalizada.webp', whatsapp: 'Ola Joao! Comprei a Formula Personalizada Premium.' },
+    ],
     bumps: [
       {
         id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 14.90, de: 58.70, imagem: '/img/bump-ouro.webp',
@@ -49,6 +56,12 @@ export const PRODUTOS = {
       { texto: 'Ficou top, melhorou muito a viscosidade. Muito obrigado.', detalhe: 'Fez 200 litros de shampoo' },
       { texto: 'Deu certo sim, achei que melhorou a viscosidade. Vou envasar agora.', data: '16/04/2026' },
     ],
+    // Links de pagamento avulsos (/ap/<id>): ofertas vendidas dentro do app, só o item (sem produto principal, sem bumps).
+    avulsos: [
+      { id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
+      { id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 9.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '' },
+      { id: 'form', flag: 'form', hotmartId: 7927025, preco: 19.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
+    ],
     bumps: [
       {
         id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 13.90, de: 54.76, imagem: '/img/bump-50formulas.webp',
@@ -72,9 +85,16 @@ export function precoTeste() {
 }
 export const precoItem = (preco) => (precoTeste() ? precoTeste() / 100 : preco);
 
-export function calcular(produtoId, bumpIds = [], saida = false) {
+export function calcular(produtoId, bumpIds = [], saida = false, avulsoId = '') {
   const p = PRODUTOS[produtoId];
   if (!p) return null;
+  if (avulsoId) {
+    // Link avulso: só o item pedido, com o preço do servidor (sem desconto de saída nem bumps).
+    const a = (p.avulsos || []).find((x) => x.id === avulsoId);
+    if (!a) return null;
+    const centavos = Math.round(precoItem(a.preco) * 100);
+    return { produto: p, avulso: a, saida: false, itens: [{ produto_id: a.hotmartId, nome: a.nome, valor: centavos / 100 }], flags: [a.flag], centavos, valor: (centavos / 100).toFixed(2), bumps: [], escolhidos: [] };
+  }
   const escolhidos = p.bumps.filter((b) => bumpIds.includes(b.id));
   const flags = [p.flag, ...escolhidos.map((b) => b.flag)];
   const centavos = Math.round(precoItem(saida && p.precoSaida ? p.precoSaida : p.preco) * 100) + escolhidos.reduce((s, b) => s + Math.round(precoItem(b.preco) * 100), 0);

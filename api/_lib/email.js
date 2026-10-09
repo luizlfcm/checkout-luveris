@@ -51,20 +51,23 @@ async function resend(p, to, subject, html, text, agendarEm = '') {
 export async function enviarEntrega(reg) {
   const p = PRODUTOS[reg.produto];
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
-  const extras = p.bumps.filter((b) => (reg.bumps || []).includes(b.id));
-  const comApp = [p.nome, ...extras.filter((b) => !b.whatsapp).map((b) => b.nome)];
-  const comZap = extras.filter((b) => b.whatsapp);
+  const av = reg.avulso ? (p.avulsos || []).find((a) => a.id === reg.avulso) : null; // compra avulsa (link dentro do app)
+  const extras = av ? [] : p.bumps.filter((b) => (reg.bumps || []).includes(b.id));
+  const comprados = av ? [av.nome] : [p.nome, ...extras.map((b) => b.nome)];
+  const comApp = av ? (av.whatsapp ? [] : [av.nome]) : [p.nome, ...extras.filter((b) => !b.whatsapp).map((b) => b.nome)];
+  const comZap = av ? (av.whatsapp ? [av] : []) : extras.filter((b) => b.whatsapp);
+  const soZap = !!(av && av.whatsapp); // entrega manual: sem botão do app
 
   const nomeCli = primeiroNome(reg.nome);
   let miolo = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu pagamento foi confirmado. Você comprou:</p>
-<ul style="color:#f2f4f6;font-size:15px;line-height:1.6">${[p.nome, ...extras.map((b) => b.nome)].map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
-<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para acessar, toque no botão abaixo e faça login com este e-mail:</p>
+<ul style="color:#f2f4f6;font-size:15px;line-height:1.6">${comprados.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
+${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para acessar, toque no botão abaixo e faça login com este e-mail:</p>
 <div style="background:#1a1f26;border-radius:10px;padding:16px;margin:16px 0;text-align:center">
 <p style="color:#aaa;font-size:12px;margin:0 0 6px">Seu e-mail de acesso</p>
 <p style="color:#fff;font-size:18px;font-weight:700;margin:0">${esc(reg.email)}</p></div>
 <p style="color:#8b95a1;font-size:13px">Este e-mail é sua chave de acesso. Guarde-o com cuidado.</p>
-<div style="text-align:center;margin:28px 0"><a href="${esc(p.appUrl)}" style="display:inline-block;background:${p.cor};color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Acessar agora</a></div>`;
+<div style="text-align:center;margin:28px 0"><a href="${esc(p.appUrl)}" style="display:inline-block;background:${p.cor};color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Acessar agora</a></div>`}`;
   for (const b of comZap) {
     miolo += `<div style="border-top:1px solid #1e2530;padding-top:20px;margin-top:8px">
 <p style="color:#f2f4f6;font-size:15px"><b>${esc(b.nome)}</b></p>
@@ -73,25 +76,26 @@ export async function enviarEntrega(reg) {
   }
   miolo += `<p style="color:#8b95a1;font-size:13px">🛡️ Você tem 30 dias de garantia.</p>`;
 
-  const text = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu pagamento foi confirmado (${[p.nome, ...extras.map((b) => b.nome)].join(', ')}).\n` +
-    `Acesse ${p.appUrl} e faça login com o e-mail: ${reg.email}\n` +
+  const text = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu pagamento foi confirmado (${comprados.join(', ')}).\n` +
+    (soZap ? '' : `Acesse ${p.appUrl} e faça login com o e-mail: ${reg.email}\n`) +
     comZap.map((b) => `\n${b.nome}: envie as informações pelo WhatsApp ${WA}\n`).join('') +
     `\n30 dias de garantia. Dúvidas técnicas: WhatsApp do especialista (João Silva) (81) 3196-3052. Reembolso e demais assuntos: ${CONTATO}.\nResponsável técnico: João Silva - 53.168.292 LUIZ FELIPE CORREA MIRANDA - CNPJ 53.168.292/0001-32`;
   const titulo = 'Acesso Liberado!';
   void comApp;
-  return resend(p, reg.email, `${p.nome} - Acesso liberado!`, moldura(p, titulo, p.nome, miolo), text);
+  return resend(p, reg.email, `${av ? av.nome : p.nome} - Acesso liberado!`, moldura(p, titulo, av ? av.nome : p.nome, miolo), text);
 }
 
 export async function enviarReembolso(reg) {
   const p = PRODUTOS[reg.produto];
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
   const nomeCli = primeiroNome(reg.nome);
+  const nomeCompra = (reg.avulso && (p.avulsos || []).find((a) => a.id === reg.avulso)?.nome) || p.nome;
   const miolo = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>
-<p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu reembolso de <strong>${esc(p.nome)}</strong> foi processado com sucesso. O acesso ao produto foi encerrado conforme solicitado.</p>
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu reembolso de <strong>${esc(nomeCompra)}</strong> foi processado com sucesso. O acesso ao produto foi encerrado conforme solicitado.</p>
 <div style="background:#1a1f26;border-radius:10px;padding:14px;border-left:3px solid ${p.cor};margin-top:20px">
 <p style="color:#8b95a1;font-size:13px;margin:0">Se mudou de ideia ou tem alguma dúvida, responda este e-mail ou escreva para <a href="mailto:${CONTATO}" style="color:${p.cor}">${CONTATO}</a>.</p></div>`;
-  const text = `Olá! Seu reembolso de ${p.nome} foi processado. Dúvidas? Responda este e-mail (${CONTATO}).`;
-  return resend(p, reg.email, `Reembolso confirmado — ${p.nome}`, moldura(p, 'Reembolso Confirmado', p.nome, miolo, false), text);
+  const text = `Olá! Seu reembolso de ${nomeCompra} foi processado. Dúvidas? Responda este e-mail (${CONTATO}).`;
+  return resend(p, reg.email, `Reembolso confirmado — ${nomeCompra}`, moldura(p, 'Reembolso Confirmado', nomeCompra, miolo, false), text);
 }
 
 // ---------- Recuperação de vendas (Pix pendente / cartão recusado) ----------

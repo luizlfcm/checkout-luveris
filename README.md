@@ -23,3 +23,9 @@ Edite `bumps` em `api/_lib/produtos.js`.
 - Status dos pedidos para a aba "Checkout" do dashboard: a cada mudança (Pix gerado, aprovado, recusado, expirado, cancelado, reembolsado) o checkout envia `ORDER_STATUS` ao dashboard (mesmas variáveis `DASHBOARD_URL` e `DASHBOARD_WEBHOOK_SECRET`; não envia em modo de teste). Se o envio falhar, a próxima consulta do pedido tenta de novo.
 - Cabeçalho "🔥 N ofertas exclusivas para você" no bloco dos bumps: ligado por padrão (`CHECKOUT_EXCLUSIVAS=0` volta ao "Aproveite e compre junto:").
 - Bloco "O que dizem os alunos" (DESLIGADO por padrão): `CHECKOUT_DEPOIMENTOS=1` liga. Os textos ficam em `depoimentos` de cada produto em `api/_lib/produtos.js` (sem nomes, fotos ou telefones; só ortografia ajustada). Só use texto de mensagens reais e autorizadas.
+
+## Links de pagamento avulsos (itens vendidos dentro dos apps)
+`/fdl/{limp|perf|leg|form}` e `/ap/{limp|leg|form}` cobram só aquele item (preços em `avulsos` de `api/_lib/produtos.js`).
+Opcional: `?email=...&nome=...` pré-preenche os dados. Sem pixel/CAPI de compra (ligue com `CAPI_AVULSOS=1`) e sem e-mails de recuperação.
+Itens com `whatsapp` (form) são entregues manualmente: o e-mail e a tela de sucesso levam ao WhatsApp. O comprador deve usar o MESMO e-mail do login no app.
+O dashboard precisa ter os IDs Hotmart do item na tabela `ofertas` (senão o webhook falha por chave estrangeira).
