@@ -425,7 +425,7 @@ input:focus{outline:none;border-color:var(--blu)}
     document.title='Pagamento seguro — '+CFG.produto.nome;
     $('pNome').textContent=CFG.produto.nome;$('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
     if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}
-    if(CFG.v2&&CFG.produto.depoimentos&&CFG.produto.depoimentos.length){
+    if(CFG.produto.depoimentos&&CFG.produto.depoimentos.length){
       $('depLista').innerHTML=CFG.produto.depoimentos.map(function(d){
         var meta=[d.detalhe,d.data].filter(Boolean).join(' · ');
         return '<div class="dep"><q>“'+esc(d.texto)+'”</q><span class="dm">Aluno(a) · mensagem no WhatsApp'+(meta?' · '+esc(meta):'')+'</span></div>'}).join('');
@@ -433,7 +433,7 @@ input:focus{outline:none;border-color:var(--blu)}
     }
     if(CFG.produto.bumps.length){
       $('bumpsWrap').classList.remove('hide');
-      if(CFG.v2){var n=CFG.produto.bumps.length;$('bumpsWrap').firstElementChild.outerHTML='<div class="exc"><span>🔥</span><span>'+n+(n>1?' ofertas exclusivas':' oferta exclusiva')+' para você</span></div><p class="excSub">Adicione ao seu pedido agora e economize.</p>'}
+      if(CFG.exclusivas){var n=CFG.produto.bumps.length;$('bumpsWrap').firstElementChild.outerHTML='<div class="exc"><span>🔥</span><span>'+n+(n>1?' ofertas exclusivas':' oferta exclusiva')+' para você</span></div><p class="excSub">Adicione ao seu pedido agora e economize.</p>'}
       CFG.produto.bumps.forEach(function(b){
         var off=b.de>b.preco?Math.round((1-b.preco/b.de)*100):0;
         var d=document.createElement('div');d.className='bump';
