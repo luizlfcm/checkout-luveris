@@ -15,6 +15,11 @@ export const PRODUTOS = {
     titulo: 'Fábrica da Limpeza Premium — +200 Fórmulas de Produtos de Limpeza Profissionais',
     imagem: '/img/fdl.webp',
     cor: '#3A8A4E', bg: '#0D1410', rodape: 'João Silva - Engenheiro Químico - Fábrica da Limpeza',
+    depoimentos: [
+      { texto: 'Fiz sua fórmula reduzida em 5 litros, ficou um espetáculo, muito rápido, mais econômico. Adorei muito. Sabão tradicional.' },
+      { texto: 'Boa tarde. Fiz esses aí… comprei essência de lavanda. Lavei minhas roupas, fez muita espuma e ficou cheirosa demais.' },
+      { texto: 'Boa noite, passando pra avisar que essa ficou ótima, com um custo excelente e a limpeza também 👍👍👍' },
+    ],
     bumps: [
       {
         id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 14.90, de: 58.70, imagem: '/img/bump-ouro.webp',
@@ -40,6 +45,10 @@ export const PRODUTOS = {
     titulo: 'Fórmula Auto Pro – 80 Fórmulas de Produtos Automotivos Profissionais',
     imagem: '/img/ap.webp',
     cor: '#E8720C', bg: '#0D0F12', rodape: 'João Silva - Engenheiro Químico - Fórmula Auto Pro',
+    depoimentos: [
+      { texto: 'Ficou top, melhorou muito a viscosidade. Muito obrigado.', detalhe: 'Fez 200 litros de shampoo' },
+      { texto: 'Deu certo sim, achei que melhorou a viscosidade. Vou envasar agora.', data: '16/04/2026' },
+    ],
     bumps: [
       {
         id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 13.90, de: 54.76, imagem: '/img/bump-50formulas.webp',

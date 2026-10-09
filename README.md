@@ -21,3 +21,5 @@ Edite `bumps` em `api/_lib/produtos.js`.
 - Pop-up de saída: preço em `precoSaida` (api/_lib/produtos.js), imagem em `imagemSaida`; desconto só no produto principal.
 - Dashboard: `DASHBOARD_URL` e `DASHBOARD_WEBHOOK_SECRET` (mesmo valor de CHECKOUT_WEBHOOK_SECRET no dashboard). Não envia em modo de teste.
 - Status dos pedidos para a aba "Checkout" do dashboard: a cada mudança (Pix gerado, aprovado, recusado, expirado, cancelado, reembolsado) o checkout envia `ORDER_STATUS` ao dashboard (mesmas variáveis `DASHBOARD_URL` e `DASHBOARD_WEBHOOK_SECRET`; não envia em modo de teste). Se o envio falhar, a próxima consulta do pedido tenta de novo.
+- Visual novo do checkout (DESLIGADO por padrão): `CHECKOUT_V2=1` troca "Aproveite e compre junto:" por "🔥 N ofertas exclusivas para você" e mostra o bloco "O que dizem os alunos" com mensagens reais de alunos (textos em `depoimentos` de cada produto em `api/_lib/produtos.js`; sem nomes, fotos ou telefones; só ortografia ajustada). Só use texto de mensagens reais e autorizadas.
+

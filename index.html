@@ -84,6 +84,13 @@ input:focus{outline:none;border-color:var(--blu)}
 .recb{background:#eaf4ff;border:2px solid #9cc7f5;border-radius:12px;padding:12px 14px;font-size:16px;line-height:1.4;color:#12395f;margin:12px 0;text-align:left}
 .aviso{background:#fff7d6;border:2px solid #f5c542;border-radius:12px;padding:12px;font-weight:700;font-size:16px;color:#6b4e00;margin:12px 0}
 .linkbtn{display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:14px;height:64px;border-radius:14px;background:linear-gradient(180deg,#22c55e,#128a3d);color:#fff;font-size:20px;font-weight:900}
+.exc{display:flex;align-items:center;justify-content:center;gap:10px;background:#16a34a;color:#fff;border-radius:12px;padding:14px 12px;font-size:21px;font-weight:900;margin:18px 0 8px;text-align:center}
+.excSub{font-size:17px;line-height:1.4;text-align:center;margin:0 4px 12px;color:#27303a}
+.deps{margin-top:6px}.deps h2{font-size:20px;font-weight:900;margin:0 0 4px}.deps .dsub{font-size:15px;color:var(--mut);margin:0 0 12px;line-height:1.4}
+.dep{background:#eef9e8;border:1px solid #cfe9c3;border-left:5px solid #16a34a;border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.dep q{display:block;quotes:none;font-size:18px;line-height:1.45;color:#1b2430}
+.dep .dm{display:block;margin-top:8px;font-size:14px;color:#566170;font-weight:700}
+.deps .dfim{font-size:13px;color:var(--mut);line-height:1.4;margin:4px 0 0}
 </style>
 </head>
 <body>
@@ -142,6 +149,13 @@ input:focus{outline:none;border-color:var(--blu)}
     <div id="bumpsWrap" class="hide">
       <div class="aprov">Aproveite e compre junto:</div>
       <div id="bumps"></div>
+    </div>
+
+    <div class="card deps hide" id="depWrap">
+      <h2>💬 O que dizem os alunos</h2>
+      <p class="dsub">Mensagens reais enviadas ao nosso suporte no WhatsApp.</p>
+      <div id="depLista"></div>
+      <p class="dfim">Nomes omitidos para proteger a privacidade dos alunos. Os resultados variam de pessoa para pessoa.</p>
     </div>
 
     <div class="card">
@@ -411,8 +425,15 @@ input:focus{outline:none;border-color:var(--blu)}
     document.title='Pagamento seguro — '+CFG.produto.nome;
     $('pNome').textContent=CFG.produto.nome;$('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
     if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}
+    if(CFG.v2&&CFG.produto.depoimentos&&CFG.produto.depoimentos.length){
+      $('depLista').innerHTML=CFG.produto.depoimentos.map(function(d){
+        var meta=[d.detalhe,d.data].filter(Boolean).join(' · ');
+        return '<div class="dep"><q>“'+esc(d.texto)+'”</q><span class="dm">Aluno(a) · mensagem no WhatsApp'+(meta?' · '+esc(meta):'')+'</span></div>'}).join('');
+      $('depWrap').classList.remove('hide');
+    }
     if(CFG.produto.bumps.length){
       $('bumpsWrap').classList.remove('hide');
+      if(CFG.v2){var n=CFG.produto.bumps.length;$('bumpsWrap').firstElementChild.outerHTML='<div class="exc"><span>🔥</span><span>'+n+(n>1?' ofertas exclusivas':' oferta exclusiva')+' para você</span></div><p class="excSub">Adicione ao seu pedido agora e economize.</p>'}
       CFG.produto.bumps.forEach(function(b){
         var off=b.de>b.preco?Math.round((1-b.preco/b.de)*100):0;
         var d=document.createElement('div');d.className='bump';
