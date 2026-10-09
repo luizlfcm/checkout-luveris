@@ -2,7 +2,7 @@
 import { randomUUID } from 'crypto';
 import { calcular } from './_lib/produtos.js';
 import { mpFetch, cpfValido, mensagemRecusa } from './_lib/mp.js';
-import { salvarRegistro, processarPedido, statusSimples } from './_lib/pedido.js';
+import { salvarRegistro, processarPedido, statusSimples, statusDetalhado, registrarStatus } from './_lib/pedido.js';
 import { agendarRecuperacao } from './_lib/recuperacao.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -75,6 +75,7 @@ export default async function handler(req, res) {
 
   const pay = data.transactions?.payments?.[0] || {};
   const st = statusSimples(data);
+  await registrarStatus(data.id, reg, statusDetalhado(data), pay.status_detail); // aba "Checkout" do dashboard
 
   if (metodo === 'card') {
     if (st === 'aprovado') {

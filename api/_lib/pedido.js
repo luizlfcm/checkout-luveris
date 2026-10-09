@@ -5,7 +5,7 @@ import { createHash } from 'crypto';
 import { cmd, setFlag } from './redis.js';
 import { mpFetch } from './mp.js';
 import { PRODUTOS, calcular } from './produtos.js';
-import { notificarDashboard } from './dashboard.js';
+import { notificarDashboard, notificarStatus } from './dashboard.js';
 import { enviarEntrega, enviarReembolso } from './email.js';
 import { cancelarRecuperacao } from './recuperacao.js';
 
@@ -25,6 +25,27 @@ export function statusSimples(order) {
   if (REEMBOLSO.includes(s)) return 'reembolsado';
   if (['canceled', 'cancelled', 'expired', 'failed', 'rejected'].includes(s)) return 'falhou';
   return 'pendente';
+}
+
+// Status detalhado para a aba "Checkout" do dashboard (statusSimples continua decidindo a liberação).
+export function statusDetalhado(order) {
+  const s = statusSimples(order);
+  if (s !== 'falhou') return s;
+  const o = String(order?.status || '').toLowerCase();
+  if (o === 'expired') return 'expirado';
+  if (o === 'canceled' || o === 'cancelled') return 'cancelado';
+  return 'recusado';
+}
+
+// Avisa o dashboard quando o status do pedido muda (uma vez por status; se o envio falhar, a próxima consulta tenta de novo).
+export async function registrarStatus(orderId, reg, status, detalhe = '') {
+  try {
+    const chave = `chk_st:${orderId}`;
+    if ((await cmd(['GET', chave])) === status) return;
+    const r = await notificarStatus(orderId, reg, itensDoPedido(reg), status, detalhe);
+    if (r.enviado) await cmd(['SET', chave, status, 'EX', String(60 * 60 * 24 * 90)]);
+    else if (!r.semTentar) console.warn('pedido: status não enviado ao dashboard', { orderId, status, motivo: r.motivo, http: r.status });
+  } catch (e) { console.error('pedido: registrarStatus', e?.message); }
 }
 
 async function anotarCapi(id, info) {
@@ -95,6 +116,8 @@ export async function processarPedido(orderId) {
   const reg = JSON.parse(raw);
   const produto = PRODUTOS[reg.produto];
   if (!produto) return { status, ignorado: true };
+
+  await registrarStatus(orderId, reg, statusDetalhado(order), order?.transactions?.payments?.[0]?.status_detail);
 
   if (status === 'aprovado') {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, true);
