@@ -24,6 +24,7 @@ export default function handler(req, res) {
     exclusivas: process.env.CHECKOUT_EXCLUSIVAS !== '0',
     publicKey: process.env.MP_PUBLIC_KEY || '',
     pixelId: process.env[`META_PIXEL_ID_${id.toUpperCase()}`] || process.env.META_PIXEL_ID || '',
+    clarityId: process.env[`CLARITY_ID_${id.toUpperCase()}`] || p.clarityId || '', // Microsoft Clarity (gravação de sessões); o ID não é segredo
     produto: { id, nome: p.titulo || p.nome, preco: precoItem(p.preco), precoSaida: p.precoSaida ? precoItem(p.precoSaida) : 0, imagemSaida: p.imagemSaida || '', appUrl: p.appUrl, imagem: p.imagem || '', depoimentos: process.env.CHECKOUT_DEPOIMENTOS === '1' ? (p.depoimentos || []) : [], bumps: p.bumps.map(({ id, nome, titulo, desc, preco, de, imagem }) => ({ id, nome: titulo || nome, desc, preco: precoItem(preco), de: de || 0, imagem: imagem || '' })) },
   });
 }

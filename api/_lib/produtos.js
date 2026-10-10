@@ -10,6 +10,7 @@ export const PRODUTOS = {
     flag: 'base',
     redisPrefix: 'fdl_cliente:',
     tokenPrefix: 'FDL_',
+    clarityId: '', // preencher com o ID do projeto Clarity da Fábrica da Limpeza
     appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/',
     emailFrom: 'Fábrica da Limpeza <noreply@mail.luverisgroup.com.br>',
     titulo: 'Fábrica da Limpeza Premium — +200 Fórmulas de Produtos de Limpeza Profissionais',
@@ -47,6 +48,7 @@ export const PRODUTOS = {
     flag: 'base',
     redisPrefix: 'cliente:',
     tokenPrefix: 'FAP_',
+    clarityId: 'yvjxh5bqh2',
     appUrl: 'https://formulaauto.luverisgroup.com.br/',
     emailFrom: 'Formula Auto Pro <noreply@mail.luverisgroup.com.br>',
     titulo: 'Fórmula Auto Pro – 80 Fórmulas de Produtos Automotivos Profissionais',
