@@ -8,6 +8,7 @@ import { PRODUTOS, calcular, alvoExtra, envId } from './produtos.js';
 import { notificarDashboard, notificarStatus } from './dashboard.js';
 import { enviarEntrega, enviarReembolso } from './email.js';
 import { cancelarRecuperacao } from './recuperacao.js';
+import { abrirJanela, cancelarUpsell } from './upgrade.js';
 
 const APROVADO = ['processed', 'accredited'];
 const REEMBOLSO = ['refunded', 'charged_back', 'chargeback']; // reembolso parcial NÃO remove acesso
@@ -131,6 +132,9 @@ export async function processarPedido(orderId) {
       const rc = await cancelarRecuperacao(reg.produto, reg.email);
       if (rc.recuperada) await cmd(['SET', `chk_recup:${orderId}`, '1', 'EX', String(60 * 60 * 24 * 90)]).catch(() => {});
     }
+    // Essencial: abre a janela do upgrade e agenda os e-mails do dia 1 e do dia 3; comprou o upgrade = cancela o que faltava.
+    if (primeira && !reg.avulso) await abrirJanela(reg);
+    if (primeira && reg.avulso === 'upg') await cancelarUpsell(reg.produto, reg.email);
     // E-mail de entrega: uma única vez por pedido; se falhar, libera a trava para tentar de novo.
     const mailTrava = await cmd(['SET', `chk_mail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     if (mailTrava) {
@@ -145,6 +149,7 @@ export async function processarPedido(orderId) {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, false);
     const extraR = alvoExtra(reg);
     if (extraR) await setFlag(extraR.produto, reg.email, reg.nome, extraR.flag, false);
+    if (!reg.avulso) await cancelarUpsell(reg.produto, reg.email);
     console.log('pedido: reembolsado, acesso removido', { orderId, produto: reg.produto });
     const trava = await cmd(['SET', `chk_refmail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     if (trava) {

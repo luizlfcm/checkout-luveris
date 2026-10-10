@@ -94,12 +94,27 @@ export const PRODUTOS = {
     titulo: 'Fórmula Auto Pro Essencial — 20 Receitas de Produtos Automotivos Passo a Passo',
     imagem: '/img/ap.webp',
     cor: '#E8720C', bg: '#0D0F12', rodape: 'João Silva - Engenheiro Químico - Fórmula Auto Pro',
+    // Oferta de upgrade (página de obrigado, e-mails e app): 60 fórmulas a mais pagando só a diferença, com prazo real de janelaH horas.
+    upsell: {
+      nome: 'Fórmula Auto Pro Completa', credito: 14.90, janelaH: 72,
+      kicker: 'Oferta exclusiva para quem acabou de entrar',
+      titulo: 'Você tem 20 receitas. Quem vende de verdade tem a linha inteira.',
+      lead: 'Com o Essencial você começa. Mas o cliente que compra todo mês quer variedade: shampoo, cera, pretinho, higienização... e o dono de frota quer produto para caminhão. Com a Fórmula Auto Pro Completa você atende os dois.',
+      bullets: [
+        '<b>80 fórmulas profissionais</b>: são <b>60 a mais</b> do que você já tem, para vender para mais tipos de cliente',
+        '<b>Linha Pesada (25 fórmulas)</b>: desengraxantes, limpa-baú, limpa-chassi, limpa-motor... para caminhões, frotas e oficinas, que compram em volume',
+        '<b>Mais opções em todas as categorias</b>: limpeza externa, acabamento e brilho, limpeza interna e aromatização',
+        '<b>PDF completo</b> do guia para baixar e consultar quando quiser',
+        '<b>4 ferramentas bônus</b>: Gerador de Rótulo, Precificação Automática, Calculadora de Lucro e Gerador de Ficha Técnica',
+      ],
+      cta: 'Sim, quero a Completa',
+    },
     depoimentos: [],
     avulsos: [
       { id: 'limp', flag: 'limp', hotmartId: 9100002, preco: 9.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
       { id: 'leg', flag: 'leg', hotmartId: 9100003, preco: 6.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '/img/bump-legalizacao-ap.webp' },
       // Upgrade: libera o Essencial como "Completa" (flag upg) e dá acesso à base do app completo (chave cliente:).
-      { id: 'upg', flag: 'upg', tambem: { produto: 'ap', flag: 'base' }, hotmartId: 9100004, preco: 27.00, nome: 'Upgrade para a Fórmula Auto Pro Completa', titulo: 'Upgrade — Fórmula Auto Pro Completa (80 fórmulas)', imagem: '/img/ap.webp', appUrl: 'https://formulaauto.luverisgroup.com.br/' },
+      { id: 'upg', flag: 'upg', tambem: { produto: 'ap', flag: 'base' }, hotmartId: 9100004, preco: 27.00, precoCheio: 41.90, janelaH: 72, nome: 'Upgrade para a Fórmula Auto Pro Completa', titulo: 'Upgrade — Fórmula Auto Pro Completa (80 fórmulas)', imagem: '/img/ap.webp', appUrl: 'https://formulaauto.luverisgroup.com.br/' },
     ],
     bumps: [
       {
@@ -127,12 +142,27 @@ export const PRODUTOS = {
     titulo: 'Fábrica da Limpeza Essencial — 20 Receitas de Produtos de Limpeza Passo a Passo',
     imagem: '/img/fdl.webp',
     cor: '#3A8A4E', bg: '#0D1410', rodape: 'João Silva - Engenheiro Químico - Fábrica da Limpeza',
+    // Oferta de upgrade (página de obrigado, e-mails e app): 110 fórmulas a mais pagando só a diferença, com prazo real de janelaH horas.
+    upsell: {
+      nome: 'Fábrica da Limpeza Completa', credito: 14.90, janelaH: 72,
+      kicker: 'Oferta exclusiva para quem acabou de entrar',
+      titulo: 'Você tem 20 receitas. Quem vende de verdade tem a linha inteira.',
+      lead: 'Com o Essencial você começa. Mas quem fatura com produtos de limpeza vende para a casa, o comércio e o condomínio, e cada cliente pede um produto diferente. Com a Fábrica da Limpeza Completa você atende todos.',
+      bullets: [
+        '<b>130 fórmulas profissionais</b>: são <b>110 a mais</b> do que você já tem, para vender para mais tipos de cliente',
+        '<b>30 Receitas Caseiras</b> de entrada, baratas de produzir, para começar vendendo na vizinhança',
+        '<b>Linha Especial Premium (20 fórmulas)</b>: perfumador de ambiente, linen spray, neutralizador de odor pet, limpa-colchão, linha para hotéis e Airbnb...',
+        '<b>Mais opções em todas as categorias</b>: multiuso, cozinha, roupas, banheiro e pisos',
+        '<b>PDF completo</b> do guia + <b>4 ferramentas bônus</b>: Gerador de Rótulo, Precificação Automática, Calculadora de Lucro e Gerador de Ficha Técnica',
+      ],
+      cta: 'Sim, quero a Completa',
+    },
     depoimentos: [],
     avulsos: [
       { id: 'limp', flag: 'limp', hotmartId: 9200002, preco: 9.90, nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/avulso-ouro.webp' },
       { id: 'perf', flag: 'perf', hotmartId: 9200003, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
       { id: 'leg', flag: 'leg', hotmartId: 9200004, preco: 6.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
-      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, nome: 'Upgrade para a Fábrica da Limpeza Completa', titulo: 'Upgrade — Fábrica da Limpeza Completa (130 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
+      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, precoCheio: 43.90, janelaH: 72, nome: 'Upgrade para a Fábrica da Limpeza Completa', titulo: 'Upgrade — Fábrica da Limpeza Completa (130 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
     ],
     bumps: [
       {
@@ -172,14 +202,14 @@ export function alvoExtra(reg) {
 // Chave das variáveis de ambiente (pixel/CAPI): o funil Essencial usa as do produto original.
 export const envId = (id) => String(PRODUTOS[id]?.pixelDe || id).toUpperCase();
 
-export function calcular(produtoId, bumpIds = [], saida = false, avulsoId = '') {
+export function calcular(produtoId, bumpIds = [], saida = false, avulsoId = '', precoAvulso = null) {
   const p = PRODUTOS[produtoId];
   if (!p) return null;
   if (avulsoId) {
     // Link avulso: só o item pedido, com o preço do servidor (sem desconto de saída nem bumps).
     const a = (p.avulsos || []).find((x) => x.id === avulsoId);
     if (!a) return null;
-    const centavos = Math.round(precoItem(a.preco) * 100);
+    const centavos = Math.round(precoItem(precoAvulso != null ? precoAvulso : a.preco) * 100);
     return { produto: p, avulso: a, saida: false, itens: [{ produto_id: a.hotmartId, nome: a.nome, valor: centavos / 100 }], flags: [a.flag], centavos, valor: (centavos / 100).toFixed(2), bumps: [], escolhidos: [] };
   }
   const escolhidos = p.bumps.filter((b) => bumpIds.includes(b.id));

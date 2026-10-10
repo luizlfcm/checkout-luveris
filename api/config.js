@@ -1,9 +1,10 @@
 // Dados públicos que o navegador precisa (Public Key NÃO é segredo).
 import { PRODUTOS, precoItem, precoTeste, envId } from './_lib/produtos.js';
+import { precoUpgrade } from './_lib/upgrade.js';
 
 // Cabeçalho "ofertas exclusivas": ligado por padrão (CHECKOUT_EXCLUSIVAS=0 desliga).
 // Mensagens reais de alunos: DESLIGADAS por padrão (CHECKOUT_DEPOIMENTOS=1 liga).
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const id = String(req.query.p || '');
   const p = PRODUTOS[id];
   if (!p) return res.status(404).json({ error: 'Produto não encontrado' });
@@ -13,9 +14,16 @@ export default function handler(req, res) {
     const a = (p.avulsos || []).find((x) => x.id === iid);
     if (!a) return res.status(404).json({ error: 'Item não encontrado' });
     res.setHeader('Cache-Control', 'no-store');
+    // Upgrade com janela: mostra o preço que vale para este e-mail agora (o servidor recalcula na hora de cobrar).
+    let precoMostrar = precoItem(a.preco), janela = null;
+    const em = String(req.query.e || '').trim().toLowerCase();
+    if (a.janelaH) {
+      const pu = await precoUpgrade(id, em).catch(() => null);
+      if (pu) { precoMostrar = precoItem(pu.preco); janela = { naJanela: pu.naJanela, expiraEm: pu.expiraEm, precoCheio: pu.precoCheio }; }
+    }
     return res.status(200).json({
       teste: !!precoTeste(), exclusivas: false, publicKey: process.env.MP_PUBLIC_KEY || '', pixelId: '',
-      produto: { id, nome: a.titulo || a.nome, preco: precoItem(a.preco), precoSaida: 0, imagemSaida: '', appUrl: a.appUrl || p.appUrl, imagem: a.imagem || p.imagem || '', depoimentos: [], bumps: [], avulso: { id: a.id, whatsapp: a.whatsapp || '' } },
+      produto: { id, nome: a.titulo || a.nome, preco: precoMostrar, janela, precoSaida: 0, imagemSaida: '', appUrl: a.appUrl || p.appUrl, imagem: a.imagem || p.imagem || '', depoimentos: [], bumps: [], avulso: { id: a.id, whatsapp: a.whatsapp || '' } },
     });
   }
   res.setHeader('Cache-Control', 'no-store');
@@ -25,6 +33,6 @@ export default function handler(req, res) {
     publicKey: process.env.MP_PUBLIC_KEY || '',
     pixelId: process.env[`META_PIXEL_ID_${envId(id)}`] || process.env.META_PIXEL_ID || '',
     clarityId: process.env[`CLARITY_ID_${id.toUpperCase()}`] || p.clarityId || '', // Microsoft Clarity (gravação de sessões); o ID não é segredo
-    produto: { id, nome: p.titulo || p.nome, preco: precoItem(p.preco), precoSaida: p.precoSaida ? precoItem(p.precoSaida) : 0, imagemSaida: p.imagemSaida || '', appUrl: p.appUrl, imagem: p.imagem || '', depoimentos: process.env.CHECKOUT_DEPOIMENTOS === '1' ? (p.depoimentos || []) : [], bumps: p.bumps.map(({ id, nome, titulo, desc, preco, de, imagem }) => ({ id, nome: titulo || nome, desc, preco: precoItem(preco), de: de || 0, imagem: imagem || '' })) },
+    produto: { id, nome: p.titulo || p.nome, preco: precoItem(p.preco), precoSaida: p.precoSaida ? precoItem(p.precoSaida) : 0, imagemSaida: p.imagemSaida || '', appUrl: p.appUrl, imagem: p.imagem || '', upsell: p.upsell ? { ...p.upsell, preco: (p.avulsos || []).find((x) => x.id === 'upg')?.preco, precoCheio: (p.avulsos || []).find((x) => x.id === 'upg')?.precoCheio } : null, depoimentos: process.env.CHECKOUT_DEPOIMENTOS === '1' ? (p.depoimentos || []) : [], bumps: p.bumps.map(({ id, nome, titulo, desc, preco, de, imagem }) => ({ id, nome: titulo || nome, desc, preco: precoItem(preco), de: de || 0, imagem: imagem || '' })) },
   });
 }

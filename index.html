@@ -71,6 +71,14 @@ input:focus{outline:none;border-color:var(--blu)}
 .code{word-break:break-all;font:13px/1.3 monospace;background:#f1f3f6;border-radius:10px;padding:10px;margin:10px 0;max-height:84px;overflow:auto}
 .btn2{width:100%;height:58px;border:2px solid var(--grn);background:#fff;color:var(--grd);border-radius:14px;font-size:18px;font-weight:800;cursor:pointer}
 .steps{padding-left:22px;margin:10px 0;text-align:left}.steps li{margin:6px 0}
+.up{border:3px solid var(--acc);border-radius:18px;background:#fff;padding:0;margin-top:18px;overflow:hidden;text-align:left;box-shadow:0 6px 26px rgba(249,115,22,.25)}
+.up .upt{background:linear-gradient(135deg,#c2570c,#f97316);color:#fff;padding:12px 16px;font-size:12px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;text-align:center}
+.up .upb{padding:18px 16px}.up h2{font-size:22px;line-height:1.2;font-weight:900;margin:0 0 10px}.up .lead{font-size:14.5px;line-height:1.6;color:var(--mut);margin:0 0 14px}
+.up ul{list-style:none;margin:0 0 16px;padding:0}.up li{position:relative;padding:0 0 10px 28px;font-size:14.5px;line-height:1.45}.up li:before{content:'✓';position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--grn);color:#fff;font-size:12px;font-weight:900;text-align:center;line-height:20px}
+.up .preco{background:#fff7ed;border:2px dashed var(--acc);border-radius:14px;padding:14px;text-align:center;margin:0 0 12px}.up .preco small{display:block;color:var(--mut);font-size:13px}.up .preco .v{font-size:42px;font-weight:900;color:var(--acd);line-height:1.1}
+.up .cd{text-align:center;font-size:13px;color:var(--mut);margin:0 0 12px}.up .cd b{display:block;font-size:26px;color:var(--red);font-variant-numeric:tabular-nums;letter-spacing:1px}
+.up .upbtn{display:flex;align-items:center;justify-content:center;text-decoration:none;min-height:62px;padding:8px 12px;border-radius:14px;background:linear-gradient(180deg,#f97316,#c2570c);color:#fff;font-size:18px;font-weight:900;text-align:center;box-shadow:0 4px 14px rgba(194,87,12,.4)}
+.up .gar{font-size:12.5px;color:var(--mut);text-align:center;margin:10px 0 0;line-height:1.5}.up .nao{display:block;text-align:center;font-size:13px;color:var(--mut);margin-top:12px;text-decoration:underline}
 .okk{text-align:center}.okk .big{font-size:56px}
 .wait{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--acc);margin-right:8px;animation:p 1s infinite}
 @keyframes p{50%{opacity:.25}}
@@ -210,6 +218,7 @@ input:focus{outline:none;border-color:var(--blu)}
       <a class="linkbtn" id="btnApp">Abrir meu aplicativo</a>
       <div class="aviso" style="margin-top:14px">✉️ Também enviamos o acesso para o seu e-mail. Se não encontrar, olhe a caixa de spam.</div>
     </div>
+    <div id="okUp"></div>
   </div>
 </div>
 
@@ -404,6 +413,31 @@ input:focus{outline:none;border-color:var(--blu)}
     },4000);
   }
 
+
+  function brlS(v){return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+  // Oferta de upgrade logo após o pagamento do Essencial (preço e prazo vêm do servidor; o cobrado é recalculado lá).
+  function ofertaUpgrade(email){
+    var u=CFG.produto.upsell,box=$('okUp');
+    if(!u||!box||ITEM)return;
+    var fim=Date.now()+(u.janelaH||72)*3600000,naJanela=true,preco=u.preco;
+    function desenha(){
+      var link='/'+PID+'/upg?email='+encodeURIComponent(email)+'&utm_source=checkout&utm_campaign=upg_obrigado';
+      var lis=u.bullets.map(function(b){return '<li>'+b+'</li>'}).join('');
+      box.innerHTML='<div class="up"><div class="upt">'+esc(u.kicker)+'</div><div class="upb"><h2>'+esc(u.titulo)+'</h2><p class="lead">'+esc(u.lead)+'</p><ul>'+lis+'</ul>'
+        +'<div class="preco"><small>'+esc(u.nome)+': <s>'+brlS(u.precoCheio)+'</s> − seu crédito de '+brlS(u.credito)+'</small><div class="v">'+brlS(preco)+'</div><small>pagamento único · acesso liberado no mesmo e-mail</small></div>'
+        +(naJanela?'<div class="cd">⏳ Seu crédito de '+brlS(u.credito)+' vale só por mais<b id="upCd">--:--:--</b></div>':'<div class="cd">O crédito expirou. A '+esc(u.nome)+' está no preço cheio.</div>')
+        +'<a class="upbtn" id="upBtn" href="'+link+'">'+esc(u.cta)+' por '+brlS(preco)+' →</a>'
+        +'<p class="gar">🛡️ Garantia de 30 dias também no upgrade. Pague com Pix ou cartão, com os dados já preenchidos.</p>'
+        +'<a class="nao" href="'+CFG.produto.appUrl+'">Não, obrigado. Quero só o meu acesso</a></div></div>';
+    }
+    function tick(){var el=$('upCd');if(!el)return;var r=Math.max(0,fim-Date.now());if(r<=0){naJanela=false;preco=u.precoCheio;desenha();return}
+      var h=Math.floor(r/3600000),m=Math.floor(r%3600000/60000),sg=Math.floor(r%60000/1000),z=function(n){return (n<10?'0':'')+n};el.textContent=z(h)+':'+z(m)+':'+z(sg)}
+    desenha();tick();setInterval(tick,1000);
+    fetch('/api/upgrade?p='+encodeURIComponent(PID)+'&email='+encodeURIComponent(email)).then(function(r){return r.json()}).then(function(d){
+      if(d&&d.expiraEm){fim=d.expiraEm;naJanela=!!d.naJanela;preco=d.preco;desenha();tick()}
+    }).catch(function(){});
+  }
+
   function sucesso(email){
     px('Purchase',{value:total(),currency:'BRL',content_name:CFG.produto.nome},'purchase_'+orderId);
     $('okEmail').textContent=email;$('btnApp').href=CFG.produto.appUrl;
@@ -416,6 +450,7 @@ input:focus{outline:none;border-color:var(--blu)}
       $('okPassos').innerHTML='<li>Abra o seu aplicativo normalmente</li><li>Entre com este e-mail:<br><b>'+esc(email)+'</b></li>';
     }
     show('tela-ok');
+    ofertaUpgrade(email);
   }
 
   function copiar(){
@@ -441,6 +476,13 @@ input:focus{outline:none;border-color:var(--blu)}
     if(qn)$('nome').value=qn.slice(0,40);
     if(ITEM){
       document.querySelector('.warn').innerHTML='⚠️ Use o <b>mesmo e-mail com que você entra no aplicativo</b>. É ele que libera o seu acesso.';
+      var jn=CFG.produto.janela;
+      if(jn&&jn.expiraEm){
+        var dt=new Date(jn.expiraEm).toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'});
+        var nt=document.createElement('div');nt.className='aviso';nt.style.marginTop='10px';
+        nt.innerHTML=jn.naJanela?('⏳ <b>Preço com o crédito do seu Essencial</b>, válido até '+esc(dt)+'. Depois volta a '+brl(jn.precoCheio)+'.'):('O prazo do crédito do Essencial terminou. Este é o preço cheio da versão Completa.');
+        document.querySelector('.warn').insertAdjacentElement('afterend',nt);
+      }
     }
     if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}
     if(CFG.produto.depoimentos&&CFG.produto.depoimentos.length){

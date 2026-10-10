@@ -2,7 +2,7 @@
 // API de Conversões, com o MESMO event_id do pixel do navegador (o Meta deduplica).
 // O Purchase é enviado em outro ponto (pedido.js), quando o pagamento é confirmado.
 import { createHash } from 'crypto';
-import { PRODUTOS } from './_lib/produtos.js';
+import { PRODUTOS, envId } from './_lib/produtos.js';
 
 const PERMITIDOS = new Set(['PageView', 'ViewContent', 'InitiateCheckout', 'AddPaymentInfo']);
 const sha = (v) => createHash('sha256').update(String(v).trim().toLowerCase()).digest('hex');
@@ -17,8 +17,8 @@ export default async function handler(req, res) {
     const eid = String(b.id || '');
     if (!p || !PERMITIDOS.has(evento) || !/^[A-Za-z0-9_-]{6,60}$/.test(eid)) return res.status(204).end();
 
-    const pixel = process.env[`META_PIXEL_ID_${id.toUpperCase()}`] || process.env.META_PIXEL_ID;
-    const tok = process.env[`META_CAPI_TOKEN_${id.toUpperCase()}`] || process.env.META_CAPI_TOKEN;
+    const pixel = process.env[`META_PIXEL_ID_${envId(id)}`] || process.env.META_PIXEL_ID;
+    const tok = process.env[`META_CAPI_TOKEN_${envId(id)}`] || process.env.META_CAPI_TOKEN;
     if (!pixel || !tok) return res.status(204).end();
 
     const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       evt.custom_data = { currency: 'BRL', value: valor, content_name: p.nome };
     }
     const body = { data: [evt] };
-    const testCode = process.env[`META_TEST_CODE_${id.toUpperCase()}`] || process.env.META_TEST_CODE;
+    const testCode = process.env[`META_TEST_CODE_${envId(id)}`] || process.env.META_TEST_CODE;
     if (testCode) body.test_event_code = testCode;
 
     const r = await fetch(`https://graph.facebook.com/v19.0/${pixel}/events?access_token=${encodeURIComponent(tok)}`, {

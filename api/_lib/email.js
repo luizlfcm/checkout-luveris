@@ -76,9 +76,11 @@ ${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para ace
 <div style="text-align:center;margin:20px 0"><a href="${WA}?text=${encodeURIComponent(b.whatsapp)}" style="display:inline-block;background:#25D366;color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Enviar mensagem no WhatsApp</a></div></div>`;
   }
   miolo += `<p style="color:#8b95a1;font-size:13px">🛡️ Você tem 30 dias de garantia.</p>`;
+  if (!av && p.upsell) miolo += blocoUpsell(p, reg, Date.now() + (upgDe(p).janelaH || 72) * 3600 * 1000, 'upg_entrega');
 
   const text = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu pagamento foi confirmado (${comprados.join(', ')}).\n` +
     (soZap ? '' : `Acesse ${appUrl} e faça login com o e-mail: ${reg.email}\n`) +
+    (!av && p.upsell ? textoUpsell(p, reg, Date.now() + (upgDe(p).janelaH || 72) * 3600 * 1000, 'upg_entrega') : '') +
     comZap.map((b) => `\n${b.nome}: envie as informações pelo WhatsApp ${WA}\n`).join('') +
     `\n30 dias de garantia. Dúvidas técnicas: WhatsApp do especialista (João Silva) (81) 3196-3052. Reembolso e demais assuntos: ${CONTATO}.\nResponsável técnico: João Silva - 53.168.292 LUIZ FELIPE CORREA MIRANDA - CNPJ 53.168.292/0001-32`;
   const titulo = 'Acesso Liberado!';
@@ -107,6 +109,62 @@ export function tokenParar(email) {
 }
 const urlParar = (email) => `${BASE}/api/parar?e=${encodeURIComponent(email)}&t=${tokenParar(email)}`;
 const brl = (v) => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+
+// ---------- Upgrade Essencial -> Completa (bloco na entrega + e-mails do dia 1 e do dia 3) ----------
+const brl2 = (v) => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const quandoBR = (ms) => {
+  const d = new Date(ms);
+  const dia = d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit' });
+  const hora = d.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+  return `${dia} às ${hora}`;
+};
+const linkUpg = (reg, campanha) => `${BASE}/${reg.produto}/upg?email=${encodeURIComponent(reg.email)}&utm_source=email&utm_medium=email&utm_campaign=${campanha}`;
+const upgDe = (p) => (p.avulsos || []).find((a) => a.id === 'upg');
+
+function blocoUpsell(p, reg, expiraEm, campanha, comTitulo = true) {
+  const u = p.upsell, a = upgDe(p);
+  const lis = u.bullets.map((b) => `<li style="margin:0 0 8px">${b}</li>`).join('');
+  return `<div style="border:2px solid ${p.cor};border-radius:14px;padding:22px 18px;margin:28px 0 8px;background:#0f1318">
+${comTitulo ? `<p style="color:${p.cor};font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 8px">${esc(u.kicker)}</p>
+<p style="color:#fff;font-size:20px;font-weight:800;line-height:1.25;margin:0 0 10px">${esc(u.titulo)}</p>
+<p style="color:#aab3bd;font-size:14px;line-height:1.7;margin:0 0 14px">${esc(u.lead)}</p>` : ''}
+<ul style="color:#e6ebf0;font-size:14px;line-height:1.55;padding-left:20px;margin:0 0 16px">${lis}</ul>
+<div style="background:#1a1f26;border-radius:10px;padding:14px;text-align:center;margin:0 0 14px">
+<p style="color:#aab3bd;font-size:13px;margin:0 0 4px">${esc(u.nome)}: <s>${brl2(a.precoCheio)}</s> menos seu crédito de ${brl2(u.credito)}</p>
+<p style="color:${p.cor};font-size:34px;font-weight:900;margin:0">${brl2(a.preco)}</p>
+<p style="color:#8b95a1;font-size:12px;margin:4px 0 0">pagamento único · garantia de 30 dias</p></div>
+<div style="text-align:center"><a href="${esc(linkUpg(reg, campanha))}" style="display:inline-block;background:${p.cor};color:#fff;padding:15px 28px;border-radius:12px;text-decoration:none;font-weight:800;font-size:15px">${esc(u.cta)} por ${brl2(a.preco)} →</a></div>
+<p style="color:#8b95a1;font-size:12px;line-height:1.6;text-align:center;margin:12px 0 0">⏳ Seu crédito vale até <b style="color:#e6ebf0">${esc(quandoBR(expiraEm))}</b>. Depois disso, a ${esc(u.nome)} volta a ${brl2(a.precoCheio)}.</p></div>`;
+}
+const textoUpsell = (p, reg, expiraEm, campanha) => {
+  const u = p.upsell, a = upgDe(p);
+  return `\n${u.titulo}\n${u.nome} por ${brl2(a.preco)} (crédito do Essencial já descontado; preço cheio ${brl2(a.precoCheio)}). Vale até ${quandoBR(expiraEm)}.\n${linkUpg(reg, campanha)}\n`;
+};
+
+// tipo: 'd1' (1 dia depois) ou 'd3' (6h antes de a janela fechar). Agendado no Resend; cancelado se a pessoa comprar/parar.
+export async function enviarUpsell(reg, tipo, { agendarEm = '', expiraEm = 0 } = {}) {
+  const p = PRODUTOS[reg.produto];
+  if (!p?.upsell) return { enviado: false, motivo: 'sem upsell' };
+  const a = upgDe(p), u = p.upsell;
+  const nomeCli = primeiroNome(reg.nome);
+  const ola = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>`;
+  const entrada = reg.produto === 'apess' ? 'Shampoo Automotivo Neutro (o de maior volume de venda da linha automotiva)' : 'Multiuso Tradicional (o produto mais vendido em qualquer linha de limpeza)';
+  const parar = `<p style="color:#8b95a1;font-size:12px;line-height:1.6;margin-top:24px">Não quer mais receber mensagens sobre esta oferta? <a href="${esc(urlParar(reg.email))}" style="color:#8b95a1">Clique aqui para parar</a>.</p>`;
+  let assunto, titulo, miolo, texto;
+  if (tipo === 'd1') {
+    assunto = 'Já fez sua primeira receita? (e um convite)'; titulo = 'Como está indo?';
+    miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Ontem você entrou no ${esc(p.nome)}. Um conselho de quem formula há mais de 10 anos: <b style="color:#fff">comece pequeno</b>. Faça um lote de teste de 1 litro com a receita de entrada, <b style="color:#fff">${esc(entrada)}</b>, e siga a ordem do modo de preparo. Foi assim que a maioria dos produtores começou.</p>
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">E um lembrete: o seu crédito de ${brl2(u.credito)} para a ${esc(u.nome)} segue valendo.</p>${blocoUpsell(p, reg, expiraEm, 'upg_d1', false)}${parar}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Como está indo? Comece com um lote de teste de 1 litro da receita de entrada: ${entrada}.${textoUpsell(p, reg, expiraEm, 'upg_d1')}Para parar de receber: ${urlParar(reg.email)}`;
+  } else {
+    assunto = `Seu crédito de ${brl2(u.credito)} termina hoje`; titulo = 'Última chamada do seu crédito';
+    miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Só um aviso rápido: <b style="color:#fff">seu crédito de ${brl2(u.credito)} termina hoje, às ${esc(new Date(expiraEm).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }))}</b>. Depois disso, a ${esc(u.nome)} volta ao preço cheio de ${brl2(a.precoCheio)}.</p>
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">Se você pretende vender de verdade, a linha completa é o que faz diferença: mais fórmulas, mais tipos de cliente e as ferramentas para precificar e rotular.</p>${blocoUpsell(p, reg, expiraEm, 'upg_d3', false)}${parar}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu crédito de ${brl2(u.credito)} termina hoje. Depois, a ${u.nome} volta a ${brl2(a.precoCheio)}.${textoUpsell(p, reg, expiraEm, 'upg_d3')}Para parar de receber: ${urlParar(reg.email)}`;
+  }
+  return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, `Olá João! Tenho uma dúvida sobre a ${u.nome}.`), texto, agendarEm);
+}
 
 // tipo: 'pix1' (Pix gerado e não pago), 'pix2' (dia seguinte), 'cartao' (pagamento recusado)
 export async function enviarRecuperacao(reg, tipo, { pix = '', agendarEm = '' } = {}) {

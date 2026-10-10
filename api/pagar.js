@@ -4,6 +4,7 @@ import { calcular } from './_lib/produtos.js';
 import { mpFetch, cpfValido, mensagemRecusa } from './_lib/mp.js';
 import { salvarRegistro, processarPedido, statusSimples, statusDetalhado, registrarStatus } from './_lib/pedido.js';
 import { agendarRecuperacao } from './_lib/recuperacao.js';
+import { precoUpgrade } from './_lib/upgrade.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -14,11 +15,16 @@ export default async function handler(req, res) {
   }
   const b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
 
-  const calc = calcular(String(b.produto || ''), Array.isArray(b.bumps) ? b.bumps : [], b.saida === true, String(b.avulso || ''));
+  let calc = calcular(String(b.produto || ''), Array.isArray(b.bumps) ? b.bumps : [], b.saida === true, String(b.avulso || ''));
   if (!calc) return res.status(400).json({ error: 'Produto inválido.' });
 
   const email = String(b.email || '').trim().toLowerCase();
   if (!EMAIL_RE.test(email) || email.length > 120) return res.status(400).json({ error: 'Confira o e-mail digitado.' });
+  // Upgrade com janela: o preço depende de quando o e-mail comprou o Essencial (decidido aqui, nunca pelo navegador).
+  if (calc.avulso?.janelaH) {
+    const pu = await precoUpgrade(String(b.produto), email);
+    calc = calcular(String(b.produto), [], false, String(b.avulso), pu.preco);
+  }
   // Nome: o digitado no passo 1; se vazio, o do cartão. Limpo e com iniciais maiúsculas.
   const nomeBruto = String(b.nome || (b.card && b.card.nome) || '').replace(/[^\p{L}\s'.-]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
   const nome = nomeBruto.toLowerCase().replace(/(^|\s)(\p{L})/gu, (m, a, c) => a + c.toUpperCase());
