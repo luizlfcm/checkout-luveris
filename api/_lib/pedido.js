@@ -49,8 +49,7 @@ export async function registrarStatus(orderId, reg, status, detalhe = '') {
 }
 
 async function anotarCapi(id, info) {
-  // Só guarda quando há algo a investigar: falha ou modo de teste. Vendas normais bem-sucedidas não deixam rastro.
-  if (info.resultado === 'enviado' && !info.modoTeste) return;
+  // Guarda por 7 dias o resultado do envio ao Meta de cada venda (chave chk_capi:<pedido> no Redis), para diagnóstico: os logs da Vercel só mostram 1 hora.
   try { await cmd(['SET', `chk_capi:${id}`, JSON.stringify({ ...info, quando: new Date().toISOString() }), 'EX', String(60 * 60 * 24 * 7)]); } catch (e) { /* só diagnóstico */ }
 }
 
