@@ -10,7 +10,7 @@ export const PRODUTOS = {
     flag: 'base',
     redisPrefix: 'fdl_cliente:',
     tokenPrefix: 'FDL_',
-    clarityId: '', // preencher com o ID do projeto Clarity da Fábrica da Limpeza
+    clarityId: 'yvjzyrj5l5',
     appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/',
     emailFrom: 'Fábrica da Limpeza <noreply@mail.luverisgroup.com.br>',
     titulo: 'Fábrica da Limpeza Premium — +200 Fórmulas de Produtos de Limpeza Profissionais',
