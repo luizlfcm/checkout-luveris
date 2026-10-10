@@ -277,7 +277,7 @@ input:focus{outline:none;border-color:var(--blu)}
   // Mini carta de vendas do order bump: 1ª linha = título, "✓" = benefícios, "⚡" = fecho, o resto = parágrafos. Sem quebra de linha = texto simples.
   function carta(t){
     var L=String(t||'').split('\n').map(function(x){return x.trim()}).filter(Boolean);
-    if(L.length<3)return '';
+    if(L.length<2)return '';
     var h='<div class="car"><div class="ch">'+esc(L[0])+'</div>',ul='';
     L.slice(1).forEach(function(x){
       if(x.charAt(0)==='✓'){ul+='<li>'+esc(x.slice(1).trim())+'</li>';return}
@@ -531,7 +531,7 @@ input:focus{outline:none;border-color:var(--blu)}
         d.innerHTML='<div class="top">'+(b.imagem?'<img src="'+esc(b.imagem)+'" alt="">':'')+
           '<div><div class="bt">'+esc(b.nome)+'</div>'+(carta(b.desc)?'':'<div class="bd">'+esc(b.desc)+'</div>')+
           '<div class="bp">'+(b.de>b.preco?'<s>'+brl(b.de)+'</s><span class="off">'+off+'% OFF</span>':'')+'<b>'+brl(b.preco)+'</b></div></div></div>'+carta(b.desc)+
-          '<label class="bar"><input type="checkbox"><span>Sim! Quero adicionar ao meu pedido</span></label>';
+          '<label class="bar"><input type="checkbox"><span>'+esc(b.cta||'Sim! Quero adicionar ao meu pedido')+'</span></label>';
         d.querySelector('input').addEventListener('change',function(e){bumpsSel[b.id]=e.target.checked;d.classList.toggle('sel',e.target.checked);atualiza()});
         $('bumps').appendChild(d);
       });
