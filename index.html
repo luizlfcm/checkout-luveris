@@ -241,6 +241,17 @@ input:focus{outline:none;border-color:var(--blu)}
   function fatal(m){$('erroFatal').textContent=m;$('erroFatal').classList.remove('hide')}
   function erro(m){var e=$('erro');e.textContent=m||'';e.style.display=m?'block':'none'}
   function cookie(n){var m=document.cookie.match('(?:^|; )'+n+'=([^;]*)');return m?decodeURIComponent(m[1]):''}
+  // Origem do clique (anúncio/conjunto/canal): lê da URL, guarda no aparelho e manda junto com o pedido.
+  // O fbclid também vira cookie _fbc quando o navegador (ex.: iOS / navegador do Instagram) não grava o do Meta.
+  var ATR=(function(){
+    var K=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','src','sck','fbclid'], o={}, st={};
+    try{st=JSON.parse(sessionStorage.getItem('chk_atr')||localStorage.getItem('chk_atr')||'{}')||{}}catch(e){}
+    K.forEach(function(k){var v=QS.get(k); if(v&&v.length<250&&!/\{\{.*\}\}/.test(v)) o[k]=v; else if(st[k]) o[k]=st[k]});
+    var r=st.ref||''; if(!r&&document.referrer){try{var h=new URL(document.referrer).hostname; if(h&&h!==location.hostname) r=h}catch(e){}} if(r) o.ref=r;
+    try{var j=JSON.stringify(o); sessionStorage.setItem('chk_atr',j); localStorage.setItem('chk_atr',j)}catch(e){}
+    return o;
+  })();
+  function fbcVal(){var c=cookie('_fbc'); if(c) return c; return ATR.fbclid?('fb.1.'+Date.now()+'.'+ATR.fbclid):''}
   function px(ev,data,eid){try{if(window.fbq)fbq('track',ev,data||{},eid?{eventID:eid}:undefined)}catch(e){}}
   function novoId(pre){return pre+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
   // Evento no pixel (navegador) + o mesmo evento pela API de Conversões (servidor), com o mesmo ID para deduplicar.
@@ -250,7 +261,7 @@ input:focus{outline:none;border-color:var(--blu)}
     if(!CFG||!CFG.pixelId)return;
     try{
       if(ITEM)return;
-      var corpo=Object.assign({produto:PID,evento:ev,id:eid,url:location.href,valor:data&&data.value,fbp:cookie('_fbp'),fbc:cookie('_fbc')},extra||{});
+      var corpo=Object.assign({produto:PID,evento:ev,id:eid,url:location.href,valor:data&&data.value,fbp:cookie('_fbp'),fbc:fbcVal()},extra||{});
       fetch('/api/evento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(corpo),keepalive:true}).catch(function(){});
     }catch(e){}
   }
@@ -371,7 +382,7 @@ input:focus{outline:none;border-color:var(--blu)}
     var nome=$('nome').value.trim();
     if(nome.length<2){erro('Digite o seu primeiro nome.');$('nome').focus();return}
     var email=validaEmail(); if(!email)return;
-    var corpo={produto:PID,avulso:ITEM,bumps:Object.keys(bumpsSel).filter(function(k){return bumpsSel[k]}),nome:nome,email:email,metodo:metodo,saida:saida,fbp:cookie('_fbp'),fbc:cookie('_fbc')};
+    var corpo={produto:PID,avulso:ITEM,bumps:Object.keys(bumpsSel).filter(function(k){return bumpsSel[k]}),nome:nome,email:email,metodo:metodo,saida:saida,fbp:cookie('_fbp'),fbc:fbcVal(),atrib:ATR};
     enviando=true;$('btnPagar').disabled=true;var txt=$('btnPagar').textContent;$('btnPagar').textContent='Aguarde...';
     try{
       if(metodo==='card'){

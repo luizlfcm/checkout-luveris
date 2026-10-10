@@ -71,9 +71,18 @@ export default async function handler(req, res) {
   }
 
   const fwd = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  // Origem do clique (UTM / fbclid): só texto curto e limpo.
+  const atrib = {};
+  for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id', 'src', 'sck', 'fbclid', 'ref']) {
+    const v = String(b.atrib?.[k] ?? '').replace(/[\u0000-\u001f]/g, '').trim().slice(0, 200);
+    if (v) atrib[k] = v;
+  }
+  // iOS / navegador do Instagram nem sempre grava o cookie _fbc: reconstrói a partir do fbclid.
+  const fbcFinal = b.fbc || (atrib.fbclid ? `fb.1.${Date.now()}.${atrib.fbclid}` : '');
   const reg = {
+    atrib,
     produto: String(b.produto), avulso: calc.avulso ? calc.avulso.id : '', email, nome, flags: calc.flags, bumps: calc.bumps, itens: calc.itens, valor: calc.valor, metodo, parcelas, desconto: calc.saida ? 'saida10' : '',
-    fbp: b.fbp || '', fbc: b.fbc || '', ip: fwd, ua: String(req.headers['user-agent'] || '').slice(0, 250),
+    fbp: b.fbp || '', fbc: fbcFinal, ip: fwd, ua: String(req.headers['user-agent'] || '').slice(0, 250),
     url: String(req.headers.referer || '').slice(0, 250),
     criadoEm: new Date().toISOString(),
   };

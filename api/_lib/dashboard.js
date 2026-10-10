@@ -27,7 +27,7 @@ async function enviar(corpo, timeoutMs = 8000) {
 export function notificarDashboard(evento, orderId, reg, itens, extra = {}) {
   return enviar({
     evento, pedido: orderId, itens, email: reg.email, nome: reg.nome || '', metodo: reg.metodo || 'pix',
-    data: new Date().toISOString(), recuperada: !!extra.recuperada,
+    data: new Date().toISOString(), recuperada: !!extra.recuperada, atrib: reg.atrib || {},
   });
 }
 
@@ -38,6 +38,6 @@ export function notificarStatus(orderId, reg, itens, status, detalhe = '') {
     evento: 'ORDER_STATUS', pedido: orderId, status, detalhe: String(detalhe || '').slice(0, 80),
     produto: reg.produto, itens, valor: Number(reg.valor), parcelas: reg.parcelas || 1,
     email: reg.email, nome: reg.nome || '', metodo: reg.metodo || 'pix',
-    criadoEm: reg.criadoEm || new Date().toISOString(), data: new Date().toISOString(),
+    criadoEm: reg.criadoEm || new Date().toISOString(), data: new Date().toISOString(), atrib: reg.atrib || {},
   }, 2500);
 }
