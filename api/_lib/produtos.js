@@ -92,7 +92,7 @@ export const PRODUTOS = {
     appUrl: process.env.APP_URL_APESS || 'https://formulaautoessencial.luverisgroup.com.br/',
     emailFrom: 'Formula Auto Pro <noreply@mail.luverisgroup.com.br>',
     titulo: 'Fórmula Auto Pro Essencial — 20 Receitas de Produtos Automotivos Passo a Passo',
-    imagem: '/img/ap.webp',
+    imagem: '/img/apess.webp',
     cor: '#E8720C', bg: '#0D0F12', rodape: 'João Silva - Engenheiro Químico - Fórmula Auto Pro',
     // Oferta de upgrade (página de obrigado, e-mails e app): 60 fórmulas a mais pagando só a diferença, com prazo real de janelaH horas.
     upsell: {
