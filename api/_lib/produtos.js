@@ -140,7 +140,7 @@ export const PRODUTOS = {
     appUrl: process.env.APP_URL_FDLESS || 'https://fabricadalimpezaessencial.luverisgroup.com.br/',
     emailFrom: 'Fábrica da Limpeza <noreply@mail.luverisgroup.com.br>',
     titulo: 'Fábrica da Limpeza Essencial — 20 Receitas de Produtos de Limpeza Passo a Passo',
-    imagem: '/img/fdl.webp',
+    imagem: '/img/fdless.webp',
     cor: '#3A8A4E', bg: '#0D1410', rodape: 'João Silva - Engenheiro Químico - Fábrica da Limpeza',
     // Oferta de upgrade (página de obrigado, e-mails e app): 110 fórmulas a mais pagando só a diferença, com prazo real de janelaH horas.
     upsell: {
