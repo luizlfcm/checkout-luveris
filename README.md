@@ -35,7 +35,7 @@ Produtos `apess` (Fórmula Auto Pro Essencial) e `fdless` (Fábrica da Limpeza E
 - Apps próprios (repos `app-auto-pro-essencial` / `app-fabrica-da-limpeza-essencial`), chaves Upstash `apess:<email>` / `fdless:<email>`.
 - Bumps: AP = 50 Fórmulas de Limpeza (9,90) + Guia de Legalização (6,90); FDL = Perfumes (6,90) + Legalização (6,90) + Ouro Automotivo (9,90).
 - Links dos itens bloqueados dentro do app: `/apess/limp`, `/apess/leg`, `/fdless/limp|perf|leg`. Upgrade para a Completa (paga a diferença): `/apess/upg` (R$ 27,00) e `/fdless/upg` (R$ 29,00): grava `upg` no Essencial **e** `base` no app completo (`cliente:` / `fdl_cliente:`); reembolso remove os dois.
-- Pixel/CAPI/Clarity reaproveitam os do produto original (`pixelDe`): não precisa criar variáveis novas. URL dos apps: `APP_URL_APESS` / `APP_URL_FDLESS` (padrão `autoessencial.` / `limpezaessencial.luverisgroup.com.br`).
+- Pixel/CAPI/Clarity reaproveitam os do produto original (`pixelDe`): não precisa criar variáveis novas. URL dos apps: `APP_URL_APESS` / `APP_URL_FDLESS` (padrão `formulaautoessencial.` / `fabricadalimpezaessencial.luverisgroup.com.br`).
 - IDs de oferta no dashboard: só Front e Upsell são novos (AP: 9100001 front, 9100004 upg; FDL: 9200001 front, 9200005 upg). Os order bumps reaproveitam os IDs que já existem (AP: 7927216 limp, 7927079 leg; FDL: 5959285 Ouro, 5959154 perfumes, 6000725 leg). SQL em `dashboard/migrations/2026-10-ofertas-essencial.sql`.
 
 ### Upgrade com janela de 72 h (Essencial → Completa)
