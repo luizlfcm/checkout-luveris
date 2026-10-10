@@ -118,12 +118,12 @@ export const PRODUTOS = {
     ],
     bumps: [
       {
-        id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, imagem: '/img/bump-50formulas.webp',
+        id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, de: 42.70, imagem: '/img/bump-50formulas.webp',
         nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos',
         desc: 'Dobre seu catálogo sem comprar outro curso: 50 fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão do Fórmula Auto Pro, prontas para produzir e vender.',
       },
       {
-        id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 6.90, imagem: '/img/bump-legalizacao-ap.webp',
+        id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 6.90, de: 29.80, imagem: '/img/bump-legalizacao-ap.webp',
         nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo',
         desc: 'Venda sem medo: o passo a passo para estar na lei (CNPJ, vigilância sanitária, rotulagem e mais), em 9 capítulos objetivos.',
       },
@@ -166,17 +166,17 @@ export const PRODUTOS = {
     ],
     bumps: [
       {
-        id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, imagem: '/img/avulso-perfumes.webp',
+        id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, de: 27.90, imagem: '/img/avulso-perfumes.webp',
         nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico',
         desc: '30 receitas de fragrâncias de ambiente de alta fixação, para vender produtos com cheiro de loja cara.',
       },
       {
-        id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 6.90, imagem: '/img/avulso-legalizacao-fdl.webp',
+        id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 6.90, de: 29.80, imagem: '/img/avulso-legalizacao-fdl.webp',
         nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida',
         desc: 'Venda sem medo: o passo a passo para estar na lei (CNPJ, vigilância sanitária, rotulagem e mais), em 9 capítulos objetivos.',
       },
       {
-        id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, imagem: '/img/bump-ouro.webp',
+        id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, de: 39.70, imagem: '/img/bump-ouro.webp',
         nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais',
         desc: 'Amplie sua linha sem comprar outro curso: 30 fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza.',
       },
