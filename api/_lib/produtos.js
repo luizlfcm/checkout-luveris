@@ -22,9 +22,9 @@ export const PRODUTOS = {
     ],
     // Links de pagamento avulsos (/fdl/<id>): ofertas vendidas dentro do app, só o item (sem produto principal, sem bumps).
     avulsos: [
-      { id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 14.90, nome: 'Ouro Automotivo — 15 Fórmulas', titulo: 'Ouro Automotivo — 15 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/bump-ouro.webp' },
-      { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '' },
-      { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 13.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '' },
+      { id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 14.90, nome: 'Ouro Automotivo — 15 Fórmulas', titulo: 'Ouro Automotivo — 15 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/avulso-ouro.webp' },
+      { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
+      { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 13.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
       { id: 'form', flag: 'form', hotmartId: 4447291, preco: 24.90, nome: 'Fórmula Personalizada Premium', titulo: 'Fórmula Personalizada Premium – Um Especialista Ajustando Sua Produção', imagem: '/img/bump-personalizada.webp', whatsapp: 'Ola Joao! Comprei a Formula Personalizada Premium.' },
     ],
     bumps: [
