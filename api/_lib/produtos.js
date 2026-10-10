@@ -120,12 +120,12 @@ export const PRODUTOS = {
       {
         id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, de: 24.70, imagem: '/img/bump-50formulas.webp',
         nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos',
-        desc: 'Dobre seu catálogo sem comprar outro curso: 50 fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão do Fórmula Auto Pro, prontas para produzir e vender.',
+        desc: 'Dobre o que você vende para o mesmo cliente\nQuem cuida do carro também compra produto de limpeza para a casa, a lavanderia e o trabalho. As 20 fórmulas automotivas atendem o carro. Estas 50 atendem todo o resto.\n✓ 50 fórmulas prontas: lavanderia, cozinha, banheiro, pisos, multiuso e vidros, e industrial\n✓ Quantidades, modo de preparo e diluição certa de cada produto\n✓ Cuidados e erros comuns, para o produto sair certo de primeira\n✓ Sugestão de fragrância, cor, embalagem e como vender\n⚡ Entra no mesmo acesso do Essencial: sem esperar nada, é só abrir o app.',
       },
       {
         id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 6.90, de: 17.20, imagem: '/img/bump-legalizacao-ap.webp',
         nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo',
-        desc: 'Venda sem medo: o passo a passo para estar na lei (CNPJ, vigilância sanitária, rotulagem e mais), em 9 capítulos objetivos.',
+        desc: 'Venda sem medo de multa ou fiscalização\nA dúvida que mais trava quem quer vender produto de limpeza é: "será que eu posso mesmo vender isso?". Muita gente fica meses parada, ou vende no escuro e corre risco. Este guia mostra o caminho certo, em linguagem simples.\n✓ Quais produtos você pode vender e quais exigem registro\n✓ Notificação na ANVISA, passo a passo\n✓ Rótulo certo desde o primeiro lote\n✓ Responsável técnico, abertura da empresa, licença sanitária e AFE\n✓ Checklist final e plano de 30 dias para começar do jeito certo\n⚡ 9 capítulos diretos ao ponto: você lê em uma tarde e começa com segurança.',
       },
     ],
   },
@@ -168,17 +168,17 @@ export const PRODUTOS = {
       {
         id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, de: 16.90, imagem: '/img/avulso-perfumes.webp',
         nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico',
-        desc: '30 receitas de fragrâncias de ambiente de alta fixação, para vender produtos com cheiro de loja cara.',
+        desc: 'Cheiro de loja cara, por poucos reais o litro\nPerfume de ambiente vende pela primeira impressão, e é isso que estas 30 receitas entregam: fragrâncias de alta fixação, em 5 famílias, com cara de produto premium.\n✓ 30 receitas: amadeirados, florais, doces e gourmand, cítricos e âmbar\n✓ Custo estimado de R$ 1,05 a R$ 1,75 por litro, com preço de venda sugerido de R$ 16,50 a R$ 30,00 (estimativa em cada receita)\n✓ Preparo passo a passo, com dicas de fixação e embalagem\n✓ Funciona como produto de entrada ou como complemento da sua linha\n⚡ Quem já vai produzir limpeza aproveita a mesma bancada e os mesmos clientes.',
       },
       {
         id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 6.90, de: 17.20, imagem: '/img/avulso-legalizacao-fdl.webp',
         nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida',
-        desc: 'Venda sem medo: o passo a passo para estar na lei (CNPJ, vigilância sanitária, rotulagem e mais), em 9 capítulos objetivos.',
+        desc: 'Venda sem medo de multa ou fiscalização\nA dúvida que mais trava quem quer vender produto de limpeza é: "será que eu posso mesmo vender isso?". Muita gente fica meses parada, ou vende no escuro e corre risco. Este guia mostra o caminho certo, em linguagem simples.\n✓ Quais produtos você pode vender e quais exigem registro\n✓ Notificação na ANVISA, passo a passo\n✓ Rótulo certo desde o primeiro lote\n✓ Responsável técnico, abertura da empresa, licença sanitária e AFE\n✓ Checklist final e plano de 30 dias para começar do jeito certo\n⚡ 9 capítulos diretos ao ponto: você lê em uma tarde e começa com segurança.',
       },
       {
         id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, de: 24.70, imagem: '/img/bump-ouro.webp',
         nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais',
-        desc: 'Amplie sua linha sem comprar outro curso: 30 fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza.',
+        desc: 'Atenda também quem lava e cuida do carro\nLava-jato, estética automotiva e dono de carro compram o ano todo e valorizam brilho e cheiro de carro novo. Com a mesma estrutura que você já vai montar para a limpeza, dá para vender uma linha automotiva completa.\n✓ 30 fórmulas automotivas profissionais, prontas para produzir\n✓ Limpeza externa, rodas e pneus, acabamento e brilho, limpeza interna e aromatização\n✓ Quantidades, preparo e diluição de cada produto, sem achismo\n✓ Cuidados e erros comuns, para o resultado sair profissional\n⚡ Mesmo padrão da Fábrica da Limpeza: é só seguir a fórmula e produzir.',
       },
     ],
   },

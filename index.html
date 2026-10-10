@@ -50,6 +50,13 @@ input:focus{outline:none;border-color:var(--blu)}
 .bump .bp s{color:#8a93a0;font-size:15px}
 .bump .off{background:#16a34a;color:#fff;font-size:13px;font-weight:800;border-radius:6px;padding:2px 7px;margin:0 6px}
 .bump .bp{display:flex;align-items:center;flex-wrap:wrap;gap:4px 0}.bump .bp s,.bump .bp b,.bump .off{white-space:nowrap}.bump .bp b{font-size:22px;color:var(--grd)}
+.bump .car{padding:0 16px 14px;font-size:15px;line-height:1.5;color:#374151}
+.bump .car .ch{font-weight:800;font-size:17px;line-height:1.3;color:var(--grd);margin-bottom:6px}
+.bump .car p{margin:0 0 8px}
+.bump .car ul{list-style:none;margin:0 0 8px;padding:0}
+.bump .car li{position:relative;padding-left:24px;margin:0 0 5px}
+.bump .car li::before{content:"✓";position:absolute;left:0;top:0;color:#16a34a;font-weight:900}
+.bump .car .cf{background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;font-weight:700;color:#9a3412;font-size:14px}
 .bump .bar{display:flex;gap:12px;align-items:center;background:#e6f8ec;padding:14px 16px;font-weight:800;cursor:pointer;font-size:17px;margin:0;border-top:1px solid #bfe9cd}
 .bump .bar input{width:28px;height:28px;flex:none;accent-color:#16a34a}
 .bump.sel{border-color:var(--acc);box-shadow:0 2px 12px rgba(249,115,22,.3)}.bump.sel .bar{background:#fff1e3;border-top-color:#fbd5ae}
@@ -267,6 +274,19 @@ input:focus{outline:none;border-color:var(--blu)}
   }
   function esc(t){return String(t).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]})}
 
+  // Mini carta de vendas do order bump: 1ª linha = título, "✓" = benefícios, "⚡" = fecho, o resto = parágrafos. Sem quebra de linha = texto simples.
+  function carta(t){
+    var L=String(t||'').split('\n').map(function(x){return x.trim()}).filter(Boolean);
+    if(L.length<3)return '';
+    var h='<div class="car"><div class="ch">'+esc(L[0])+'</div>',ul='';
+    L.slice(1).forEach(function(x){
+      if(x.charAt(0)==='✓'){ul+='<li>'+esc(x.slice(1).trim())+'</li>';return}
+      if(ul){h+='<ul>'+ul+'</ul>';ul=''}
+      h+=x.charAt(0)==='⚡'?'<div class="cf">'+esc(x.slice(1).trim())+'</div>':'<p>'+esc(x)+'</p>';
+    });
+    if(ul)h+='<ul>'+ul+'</ul>';
+    return h+'</div>';
+  }
   function precoBase(){return saida&&CFG.produto.precoSaida?CFG.produto.precoSaida:CFG.produto.preco}
   function total(){var t=Math.round(precoBase()*100);CFG.produto.bumps.forEach(function(b){if(bumpsSel[b.id])t+=Math.round(b.preco*100)});return t/100}
   function atualiza(){
@@ -509,8 +529,8 @@ input:focus{outline:none;border-color:var(--blu)}
         var off=b.de>b.preco?Math.round((1-b.preco/b.de)*100):0;
         var d=document.createElement('div');d.className='bump';
         d.innerHTML='<div class="top">'+(b.imagem?'<img src="'+esc(b.imagem)+'" alt="">':'')+
-          '<div><div class="bt">'+esc(b.nome)+'</div><div class="bd">'+esc(b.desc)+'</div>'+
-          '<div class="bp">'+(b.de>b.preco?'<s>'+brl(b.de)+'</s><span class="off">'+off+'% OFF</span>':'')+'<b>'+brl(b.preco)+'</b></div></div></div>'+
+          '<div><div class="bt">'+esc(b.nome)+'</div>'+(carta(b.desc)?'':'<div class="bd">'+esc(b.desc)+'</div>')+
+          '<div class="bp">'+(b.de>b.preco?'<s>'+brl(b.de)+'</s><span class="off">'+off+'% OFF</span>':'')+'<b>'+brl(b.preco)+'</b></div></div></div>'+carta(b.desc)+
           '<label class="bar"><input type="checkbox"><span>Sim! Quero adicionar ao meu pedido</span></label>';
         d.querySelector('input').addEventListener('change',function(e){bumpsSel[b.id]=e.target.checked;d.classList.toggle('sel',e.target.checked);atualiza()});
         $('bumps').appendChild(d);
