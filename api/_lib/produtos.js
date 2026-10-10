@@ -22,10 +22,10 @@ export const PRODUTOS = {
     ],
     // Links de pagamento avulsos (/fdl/<id>): ofertas vendidas dentro do app, só o item (sem produto principal, sem bumps).
     avulsos: [
-      { id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, nome: 'Ouro Automotivo — 15 Fórmulas', titulo: 'Ouro Automotivo — 15 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/bump-ouro.webp' },
-      { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 9.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '' },
-      { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 9.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '' },
-      { id: 'form', flag: 'form', hotmartId: 4447291, preco: 19.90, nome: 'Fórmula Personalizada Premium', titulo: 'Fórmula Personalizada Premium – Um Especialista Ajustando Sua Produção', imagem: '/img/bump-personalizada.webp', whatsapp: 'Ola Joao! Comprei a Formula Personalizada Premium.' },
+      { id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 14.90, nome: 'Ouro Automotivo — 15 Fórmulas', titulo: 'Ouro Automotivo — 15 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/bump-ouro.webp' },
+      { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '' },
+      { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 13.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '' },
+      { id: 'form', flag: 'form', hotmartId: 4447291, preco: 24.90, nome: 'Fórmula Personalizada Premium', titulo: 'Fórmula Personalizada Premium – Um Especialista Ajustando Sua Produção', imagem: '/img/bump-personalizada.webp', whatsapp: 'Ola Joao! Comprei a Formula Personalizada Premium.' },
     ],
     bumps: [
       {
@@ -58,9 +58,9 @@ export const PRODUTOS = {
     ],
     // Links de pagamento avulsos (/ap/<id>): ofertas vendidas dentro do app, só o item (sem produto principal, sem bumps).
     avulsos: [
-      { id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
-      { id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 9.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '' },
-      { id: 'form', flag: 'form', hotmartId: 7927025, preco: 19.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
+      { id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 13.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
+      { id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 13.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '/img/bump-legalizacao-ap.webp' },
+      { id: 'form', flag: 'form', hotmartId: 7927025, preco: 24.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
     ],
     bumps: [
       {
