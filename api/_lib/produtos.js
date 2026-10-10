@@ -111,19 +111,19 @@ export const PRODUTOS = {
     },
     depoimentos: [],
     avulsos: [
-      { id: 'limp', flag: 'limp', hotmartId: 9100002, preco: 9.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
-      { id: 'leg', flag: 'leg', hotmartId: 9100003, preco: 6.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '/img/bump-legalizacao-ap.webp' },
+      { id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
+      { id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 6.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '/img/bump-legalizacao-ap.webp' },
       // Upgrade: libera o Essencial como "Completa" (flag upg) e dá acesso à base do app completo (chave cliente:).
       { id: 'upg', flag: 'upg', tambem: { produto: 'ap', flag: 'base' }, hotmartId: 9100004, preco: 27.00, precoCheio: 41.90, janelaH: 72, nome: 'Upgrade para a Fórmula Auto Pro Completa', titulo: 'Upgrade — Fórmula Auto Pro Completa (80 fórmulas)', imagem: '/img/ap.webp', appUrl: 'https://formulaauto.luverisgroup.com.br/' },
     ],
     bumps: [
       {
-        id: 'limp', flag: 'limp', hotmartId: 9100002, preco: 9.90, imagem: '/img/bump-50formulas.webp',
+        id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, imagem: '/img/bump-50formulas.webp',
         nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos',
         desc: 'Dobre seu catálogo sem comprar outro curso: 50 fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão do Fórmula Auto Pro, prontas para produzir e vender.',
       },
       {
-        id: 'leg', flag: 'leg', hotmartId: 9100003, preco: 6.90, imagem: '/img/bump-legalizacao-ap.webp',
+        id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 6.90, imagem: '/img/bump-legalizacao-ap.webp',
         nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo',
         desc: 'Venda sem medo: o passo a passo para estar na lei (CNPJ, vigilância sanitária, rotulagem e mais), em 9 capítulos objetivos.',
       },
@@ -159,24 +159,24 @@ export const PRODUTOS = {
     },
     depoimentos: [],
     avulsos: [
-      { id: 'limp', flag: 'limp', hotmartId: 9200002, preco: 9.90, nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/avulso-ouro.webp' },
-      { id: 'perf', flag: 'perf', hotmartId: 9200003, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
-      { id: 'leg', flag: 'leg', hotmartId: 9200004, preco: 6.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
+      { id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/avulso-ouro.webp' },
+      { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
+      { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 6.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
       { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, precoCheio: 43.90, janelaH: 72, nome: 'Upgrade para a Fábrica da Limpeza Completa', titulo: 'Upgrade — Fábrica da Limpeza Completa (130 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
     ],
     bumps: [
       {
-        id: 'perf', flag: 'perf', hotmartId: 9200003, preco: 6.90, imagem: '/img/avulso-perfumes.webp',
+        id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, imagem: '/img/avulso-perfumes.webp',
         nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico',
         desc: '30 receitas de fragrâncias de ambiente de alta fixação, para vender produtos com cheiro de loja cara.',
       },
       {
-        id: 'leg', flag: 'leg', hotmartId: 9200004, preco: 6.90, imagem: '/img/avulso-legalizacao-fdl.webp',
+        id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 6.90, imagem: '/img/avulso-legalizacao-fdl.webp',
         nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida',
         desc: 'Venda sem medo: o passo a passo para estar na lei (CNPJ, vigilância sanitária, rotulagem e mais), em 9 capítulos objetivos.',
       },
       {
-        id: 'limp', flag: 'limp', hotmartId: 9200002, preco: 9.90, imagem: '/img/bump-ouro.webp',
+        id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, imagem: '/img/bump-ouro.webp',
         nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais',
         desc: 'Amplie sua linha sem comprar outro curso: 30 fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza.',
       },

@@ -36,7 +36,7 @@ Produtos `apess` (Fórmula Auto Pro Essencial) e `fdless` (Fábrica da Limpeza E
 - Bumps: AP = 50 Fórmulas de Limpeza (9,90) + Guia de Legalização (6,90); FDL = Perfumes (6,90) + Legalização (6,90) + Ouro Automotivo (9,90).
 - Links dos itens bloqueados dentro do app: `/apess/limp`, `/apess/leg`, `/fdless/limp|perf|leg`. Upgrade para a Completa (paga a diferença): `/apess/upg` (R$ 27,00) e `/fdless/upg` (R$ 29,00): grava `upg` no Essencial **e** `base` no app completo (`cliente:` / `fdl_cliente:`); reembolso remove os dois.
 - Pixel/CAPI/Clarity reaproveitam os do produto original (`pixelDe`): não precisa criar variáveis novas. URL dos apps: `APP_URL_APESS` / `APP_URL_FDLESS` (padrão `autoessencial.` / `limpezaessencial.luverisgroup.com.br`).
-- IDs internos de oferta (cadastrar em `ofertas` no dashboard): AP 9100001 (front), 9100002 (limp), 9100003 (leg), 9100004 (upg); FDL 9200001 (front), 9200002 (limp), 9200003 (perf), 9200004 (leg), 9200005 (upg).
+- IDs de oferta no dashboard: só Front e Upsell são novos (AP: 9100001 front, 9100004 upg; FDL: 9200001 front, 9200005 upg). Os order bumps reaproveitam os IDs que já existem (AP: 7927216 limp, 7927079 leg; FDL: 5959285 Ouro, 5959154 perfumes, 6000725 leg). SQL em `dashboard/migrations/2026-10-ofertas-essencial.sql`.
 
 ### Upgrade com janela de 72 h (Essencial → Completa)
 - Ao confirmar o pagamento do Essencial abre-se a janela (`chk_upg:<produto>:<email>`): dentro de 72 h o upgrade custa R$ 27,00 (AP) / R$ 29,00 (FDL); depois, o preço cheio da Completa (R$ 41,90 / R$ 43,90). O preço é sempre calculado no servidor (`api/_lib/upgrade.js`); `GET /api/upgrade?p=apess&email=` informa preço e prazo ao app.
