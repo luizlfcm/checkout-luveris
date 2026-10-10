@@ -59,6 +59,7 @@ export async function enviarEntrega(reg) {
   const soZap = !!(av && av.whatsapp); // entrega manual: sem botão do app
 
   const nomeCli = primeiroNome(reg.nome);
+  const appUrl = (av && av.appUrl) || p.appUrl;
   let miolo = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu pagamento foi confirmado. Você comprou:</p>
 <ul style="color:#f2f4f6;font-size:15px;line-height:1.6">${comprados.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
@@ -67,7 +68,7 @@ ${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para ace
 <p style="color:#aaa;font-size:12px;margin:0 0 6px">Seu e-mail de acesso</p>
 <p style="color:#fff;font-size:18px;font-weight:700;margin:0">${esc(reg.email)}</p></div>
 <p style="color:#8b95a1;font-size:13px">Este e-mail é sua chave de acesso. Guarde-o com cuidado.</p>
-<div style="text-align:center;margin:28px 0"><a href="${esc(p.appUrl)}" style="display:inline-block;background:${p.cor};color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Acessar agora</a></div>`}`;
+<div style="text-align:center;margin:28px 0"><a href="${esc(appUrl)}" style="display:inline-block;background:${p.cor};color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Acessar agora</a></div>`}`;
   for (const b of comZap) {
     miolo += `<div style="border-top:1px solid #1e2530;padding-top:20px;margin-top:8px">
 <p style="color:#f2f4f6;font-size:15px"><b>${esc(b.nome)}</b></p>
@@ -77,7 +78,7 @@ ${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para ace
   miolo += `<p style="color:#8b95a1;font-size:13px">🛡️ Você tem 30 dias de garantia.</p>`;
 
   const text = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu pagamento foi confirmado (${comprados.join(', ')}).\n` +
-    (soZap ? '' : `Acesse ${p.appUrl} e faça login com o e-mail: ${reg.email}\n`) +
+    (soZap ? '' : `Acesse ${appUrl} e faça login com o e-mail: ${reg.email}\n`) +
     comZap.map((b) => `\n${b.nome}: envie as informações pelo WhatsApp ${WA}\n`).join('') +
     `\n30 dias de garantia. Dúvidas técnicas: WhatsApp do especialista (João Silva) (81) 3196-3052. Reembolso e demais assuntos: ${CONTATO}.\nResponsável técnico: João Silva - 53.168.292 LUIZ FELIPE CORREA MIRANDA - CNPJ 53.168.292/0001-32`;
   const titulo = 'Acesso Liberado!';

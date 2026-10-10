@@ -436,10 +436,10 @@ input:focus{outline:none;border-color:var(--blu)}
     $('waFoot').href='https://wa.me/558131963052?text='+encodeURIComponent('Olá! Tenho uma dúvida sobre o '+CFG.produto.nome+' antes de comprar.');
     document.title='Pagamento seguro — '+CFG.produto.nome;
     $('pNome').textContent=CFG.produto.nome;$('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
+    var q=QS.get('email'),qn=QS.get('nome');
+    if(q&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(q))$('email').value=q;
+    if(qn)$('nome').value=qn.slice(0,40);
     if(ITEM){
-      var q=QS.get('email'),qn=QS.get('nome');
-      if(q&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(q))$('email').value=q;
-      if(qn)$('nome').value=qn.slice(0,40);
       document.querySelector('.warn').innerHTML='⚠️ Use o <b>mesmo e-mail com que você entra no aplicativo</b>. É ele que libera o seu acesso.';
     }
     if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}

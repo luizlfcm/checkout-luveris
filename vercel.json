@@ -3,7 +3,11 @@
     { "source": "/fdl", "destination": "/index.html" },
     { "source": "/ap", "destination": "/index.html" },
     { "source": "/fdl/:item", "destination": "/index.html" },
-    { "source": "/ap/:item", "destination": "/index.html" }
+    { "source": "/ap/:item", "destination": "/index.html" },
+    { "source": "/apess", "destination": "/index.html" },
+    { "source": "/fdless", "destination": "/index.html" },
+    { "source": "/apess/:item", "destination": "/index.html" },
+    { "source": "/fdless/:item", "destination": "/index.html" }
   ],
   "headers": [
     { "source": "/(.*)", "headers": [

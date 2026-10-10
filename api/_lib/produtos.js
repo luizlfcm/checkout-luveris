@@ -77,6 +77,81 @@ export const PRODUTOS = {
       },
     ],
   },
+
+  // ─── Funil "Essencial" (R$ 14,90): entrada barata + bumps + upgrade para a versão Completa pagando a diferença ───
+  // Apps próprios (chaves Upstash próprias). Pixel/CAPI/Clarity reaproveitam os do produto original (pixelDe).
+  // IDs 91xxxxx/92xxxxx são internos (cadastre em "ofertas" no dashboard).
+  apess: {
+    nome: 'Fórmula Auto Pro Essencial',
+    preco: 14.90, hotmartId: 9100001,
+    flag: 'base',
+    redisPrefix: 'apess:',
+    tokenPrefix: 'APE_',
+    pixelDe: 'ap',
+    clarityId: 'yvjxh5bqh2',
+    appUrl: process.env.APP_URL_APESS || 'https://autoessencial.luverisgroup.com.br/',
+    emailFrom: 'Formula Auto Pro <noreply@mail.luverisgroup.com.br>',
+    titulo: 'Fórmula Auto Pro Essencial — 20 Receitas de Produtos Automotivos Passo a Passo',
+    imagem: '/img/ap.webp',
+    cor: '#E8720C', bg: '#0D0F12', rodape: 'João Silva - Engenheiro Químico - Fórmula Auto Pro',
+    depoimentos: [],
+    avulsos: [
+      { id: 'limp', flag: 'limp', hotmartId: 9100002, preco: 9.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
+      { id: 'leg', flag: 'leg', hotmartId: 9100003, preco: 6.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '/img/bump-legalizacao-ap.webp' },
+      // Upgrade: libera o Essencial como "Completa" (flag upg) e dá acesso à base do app completo (chave cliente:).
+      { id: 'upg', flag: 'upg', tambem: { produto: 'ap', flag: 'base' }, hotmartId: 9100004, preco: 27.00, nome: 'Upgrade para a Fórmula Auto Pro Completa', titulo: 'Upgrade — Fórmula Auto Pro Completa (80 fórmulas)', imagem: '/img/ap.webp', appUrl: 'https://formulaauto.luverisgroup.com.br/' },
+    ],
+    bumps: [
+      {
+        id: 'limp', flag: 'limp', hotmartId: 9100002, preco: 9.90, imagem: '/img/bump-50formulas.webp',
+        nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos',
+        desc: 'Dobre seu catálogo sem comprar outro curso: 50 fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão do Fórmula Auto Pro, prontas para produzir e vender.',
+      },
+      {
+        id: 'leg', flag: 'leg', hotmartId: 9100003, preco: 6.90, imagem: '/img/bump-legalizacao-ap.webp',
+        nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo',
+        desc: 'Venda sem medo: o passo a passo para estar na lei (CNPJ, vigilância sanitária, rotulagem e mais), em 9 capítulos objetivos.',
+      },
+    ],
+  },
+  fdless: {
+    nome: 'Fábrica da Limpeza Essencial',
+    preco: 14.90, hotmartId: 9200001,
+    flag: 'base',
+    redisPrefix: 'fdless:',
+    tokenPrefix: 'FES_',
+    pixelDe: 'fdl',
+    clarityId: 'yvjzyrj5l5',
+    appUrl: process.env.APP_URL_FDLESS || 'https://limpezaessencial.luverisgroup.com.br/',
+    emailFrom: 'Fábrica da Limpeza <noreply@mail.luverisgroup.com.br>',
+    titulo: 'Fábrica da Limpeza Essencial — 20 Receitas de Produtos de Limpeza Passo a Passo',
+    imagem: '/img/fdl.webp',
+    cor: '#3A8A4E', bg: '#0D1410', rodape: 'João Silva - Engenheiro Químico - Fábrica da Limpeza',
+    depoimentos: [],
+    avulsos: [
+      { id: 'limp', flag: 'limp', hotmartId: 9200002, preco: 9.90, nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/avulso-ouro.webp' },
+      { id: 'perf', flag: 'perf', hotmartId: 9200003, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
+      { id: 'leg', flag: 'leg', hotmartId: 9200004, preco: 6.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
+      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, nome: 'Upgrade para a Fábrica da Limpeza Completa', titulo: 'Upgrade — Fábrica da Limpeza Completa (130 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
+    ],
+    bumps: [
+      {
+        id: 'perf', flag: 'perf', hotmartId: 9200003, preco: 6.90, imagem: '/img/avulso-perfumes.webp',
+        nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico',
+        desc: '30 receitas de fragrâncias de ambiente de alta fixação, para vender produtos com cheiro de loja cara.',
+      },
+      {
+        id: 'leg', flag: 'leg', hotmartId: 9200004, preco: 6.90, imagem: '/img/avulso-legalizacao-fdl.webp',
+        nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida',
+        desc: 'Venda sem medo: o passo a passo para estar na lei (CNPJ, vigilância sanitária, rotulagem e mais), em 9 capítulos objetivos.',
+      },
+      {
+        id: 'limp', flag: 'limp', hotmartId: 9200002, preco: 9.90, imagem: '/img/bump-ouro.webp',
+        nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais',
+        desc: 'Amplie sua linha sem comprar outro curso: 30 fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza.',
+      },
+    ],
+  },
 };
 
 // Bump com `whatsapp` = entrega manual: o e-mail leva o botão do WhatsApp (sem acesso no app).
@@ -86,6 +161,16 @@ export function precoTeste() {
   return n >= 1 && n <= 1000 ? n : 0;
 }
 export const precoItem = (preco) => (precoTeste() ? precoTeste() / 100 : preco);
+
+// Venda que também mexe em OUTRO app (upgrade): { produto: <objeto do catálogo>, flag } ou null.
+export function alvoExtra(reg) {
+  const p = PRODUTOS[reg.produto];
+  const a = reg.avulso ? (p?.avulsos || []).find((x) => x.id === reg.avulso) : null;
+  const t = a?.tambem && PRODUTOS[a.tambem.produto];
+  return t ? { produto: t, flag: a.tambem.flag } : null;
+}
+// Chave das variáveis de ambiente (pixel/CAPI): o funil Essencial usa as do produto original.
+export const envId = (id) => String(PRODUTOS[id]?.pixelDe || id).toUpperCase();
 
 export function calcular(produtoId, bumpIds = [], saida = false, avulsoId = '') {
   const p = PRODUTOS[produtoId];

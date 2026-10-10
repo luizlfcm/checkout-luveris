@@ -4,7 +4,7 @@
 import { createHash } from 'crypto';
 import { cmd, setFlag } from './redis.js';
 import { mpFetch } from './mp.js';
-import { PRODUTOS, calcular } from './produtos.js';
+import { PRODUTOS, calcular, alvoExtra, envId } from './produtos.js';
 import { notificarDashboard, notificarStatus } from './dashboard.js';
 import { enviarEntrega, enviarReembolso } from './email.js';
 import { cancelarRecuperacao } from './recuperacao.js';
@@ -54,8 +54,8 @@ async function anotarCapi(id, info) {
 }
 
 async function capiPurchase(reg, id) {
-  const pixel = process.env[`META_PIXEL_ID_${String(reg.produto).toUpperCase()}`] || process.env.META_PIXEL_ID;
-  const tok = process.env[`META_CAPI_TOKEN_${String(reg.produto).toUpperCase()}`] || process.env.META_CAPI_TOKEN;
+  const pixel = process.env[`META_PIXEL_ID_${envId(reg.produto)}`] || process.env.META_PIXEL_ID;
+  const tok = process.env[`META_CAPI_TOKEN_${envId(reg.produto)}`] || process.env.META_CAPI_TOKEN;
   if (!pixel || !tok) { console.warn('capi: pixel/token ausente', { produto: reg.produto, temPixel: !!pixel, temToken: !!tok }); await anotarCapi(id, { resultado: 'nao_enviado', motivo: 'pixel ou token ausente', temPixel: !!pixel, temToken: !!tok }); return; }
   const sha = (v) => createHash('sha256').update(String(v).trim().toLowerCase()).digest('hex');
   const body = {
@@ -77,7 +77,7 @@ async function capiPurchase(reg, id) {
       custom_data: { currency: 'BRL', value: Number(reg.valor), content_name: PRODUTOS[reg.produto]?.nome },
     }],
   };
-  const testCode = process.env[`META_TEST_CODE_${String(reg.produto).toUpperCase()}`] || process.env.META_TEST_CODE;
+  const testCode = process.env[`META_TEST_CODE_${envId(reg.produto)}`] || process.env.META_TEST_CODE;
   if (testCode) body.test_event_code = testCode;
   try {
     const r = await fetch(`https://graph.facebook.com/v19.0/${pixel}/events?access_token=${encodeURIComponent(tok)}`, {
@@ -120,6 +120,8 @@ export async function processarPedido(orderId) {
 
   if (status === 'aprovado') {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, true);
+    const extra = alvoExtra(reg); // upgrade: libera também a base do app completo
+    if (extra) await setFlag(extra.produto, reg.email, reg.nome, extra.flag, true);
     const primeira = await cmd(['SET', `chk_paid:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     console.log('pedido: aprovado, acesso liberado', { orderId, produto: reg.produto, flags: reg.flags, primeiraConfirmacao: !!primeira });
     // Links avulsos (compra de dentro do app, de quem já é aluno) não vão para a API de Conversões da Meta, para não distorcer a otimização dos anúncios (CAPI_AVULSOS=1 liga).
@@ -141,6 +143,8 @@ export async function processarPedido(orderId) {
     await avisarDashboard('PURCHASE_APPROVED', orderId, reg, `chk_dash:${orderId}`);
   } else if (status === 'reembolsado') {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, false);
+    const extraR = alvoExtra(reg);
+    if (extraR) await setFlag(extraR.produto, reg.email, reg.nome, extraR.flag, false);
     console.log('pedido: reembolsado, acesso removido', { orderId, produto: reg.produto });
     const trava = await cmd(['SET', `chk_refmail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     if (trava) {

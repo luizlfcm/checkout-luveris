@@ -1,5 +1,5 @@
 // Dados públicos que o navegador precisa (Public Key NÃO é segredo).
-import { PRODUTOS, precoItem, precoTeste } from './_lib/produtos.js';
+import { PRODUTOS, precoItem, precoTeste, envId } from './_lib/produtos.js';
 
 // Cabeçalho "ofertas exclusivas": ligado por padrão (CHECKOUT_EXCLUSIVAS=0 desliga).
 // Mensagens reais de alunos: DESLIGADAS por padrão (CHECKOUT_DEPOIMENTOS=1 liga).
@@ -15,7 +15,7 @@ export default function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json({
       teste: !!precoTeste(), exclusivas: false, publicKey: process.env.MP_PUBLIC_KEY || '', pixelId: '',
-      produto: { id, nome: a.titulo || a.nome, preco: precoItem(a.preco), precoSaida: 0, imagemSaida: '', appUrl: p.appUrl, imagem: a.imagem || p.imagem || '', depoimentos: [], bumps: [], avulso: { id: a.id, whatsapp: a.whatsapp || '' } },
+      produto: { id, nome: a.titulo || a.nome, preco: precoItem(a.preco), precoSaida: 0, imagemSaida: '', appUrl: a.appUrl || p.appUrl, imagem: a.imagem || p.imagem || '', depoimentos: [], bumps: [], avulso: { id: a.id, whatsapp: a.whatsapp || '' } },
     });
   }
   res.setHeader('Cache-Control', 'no-store');
@@ -23,7 +23,7 @@ export default function handler(req, res) {
     teste: !!precoTeste(),
     exclusivas: process.env.CHECKOUT_EXCLUSIVAS !== '0',
     publicKey: process.env.MP_PUBLIC_KEY || '',
-    pixelId: process.env[`META_PIXEL_ID_${id.toUpperCase()}`] || process.env.META_PIXEL_ID || '',
+    pixelId: process.env[`META_PIXEL_ID_${envId(id)}`] || process.env.META_PIXEL_ID || '',
     clarityId: process.env[`CLARITY_ID_${id.toUpperCase()}`] || p.clarityId || '', // Microsoft Clarity (gravação de sessões); o ID não é segredo
     produto: { id, nome: p.titulo || p.nome, preco: precoItem(p.preco), precoSaida: p.precoSaida ? precoItem(p.precoSaida) : 0, imagemSaida: p.imagemSaida || '', appUrl: p.appUrl, imagem: p.imagem || '', depoimentos: process.env.CHECKOUT_DEPOIMENTOS === '1' ? (p.depoimentos || []) : [], bumps: p.bumps.map(({ id, nome, titulo, desc, preco, de, imagem }) => ({ id, nome: titulo || nome, desc, preco: precoItem(preco), de: de || 0, imagem: imagem || '' })) },
   });

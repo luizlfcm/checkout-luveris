@@ -29,3 +29,11 @@ Edite `bumps` em `api/_lib/produtos.js`.
 Opcional: `?email=...&nome=...` pré-preenche os dados. Sem pixel/CAPI de compra (ligue com `CAPI_AVULSOS=1`) e sem e-mails de recuperação.
 Itens com `whatsapp` (form) são entregues manualmente: o e-mail e a tela de sucesso levam ao WhatsApp. O comprador deve usar o MESMO e-mail do login no app.
 O dashboard precisa ter os IDs Hotmart do item na tabela `ofertas` (senão o webhook falha por chave estrangeira).
+
+## Funil Essencial (R$ 14,90) — `/apess` e `/fdless`
+Produtos `apess` (Fórmula Auto Pro Essencial) e `fdless` (Fábrica da Limpeza Essencial) em `api/_lib/produtos.js`.
+- Apps próprios (repos `app-auto-pro-essencial` / `app-fabrica-da-limpeza-essencial`), chaves Upstash `apess:<email>` / `fdless:<email>`.
+- Bumps: AP = 50 Fórmulas de Limpeza (9,90) + Guia de Legalização (6,90); FDL = Perfumes (6,90) + Legalização (6,90) + Ouro Automotivo (9,90).
+- Links dos itens bloqueados dentro do app: `/apess/limp`, `/apess/leg`, `/fdless/limp|perf|leg`. Upgrade para a Completa (paga a diferença): `/apess/upg` (R$ 27,00) e `/fdless/upg` (R$ 29,00): grava `upg` no Essencial **e** `base` no app completo (`cliente:` / `fdl_cliente:`); reembolso remove os dois.
+- Pixel/CAPI/Clarity reaproveitam os do produto original (`pixelDe`): não precisa criar variáveis novas. URL dos apps: `APP_URL_APESS` / `APP_URL_FDLESS` (padrão `autoessencial.` / `limpezaessencial.luverisgroup.com.br`).
+- IDs internos de oferta (cadastrar em `ofertas` no dashboard): AP 9100001 (front), 9100002 (limp), 9100003 (leg), 9100004 (upg); FDL 9200001 (front), 9200002 (limp), 9200003 (perf), 9200004 (leg), 9200005 (upg).
