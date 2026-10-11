@@ -145,14 +145,14 @@ export const PRODUTOS = {
     titulo: 'Fábrica da Limpeza Essencial — 20 Receitas de Produtos de Limpeza Passo a Passo',
     imagem: '/img/fdless.webp',
     cor: '#3A8A4E', bg: '#0D1410', rodape: 'João Silva - Engenheiro Químico - Fábrica da Limpeza',
-    // Oferta de upgrade (página de obrigado, e-mails e app): 110 fórmulas a mais pagando só a diferença, com prazo real de janelaH horas.
+    // Oferta de upgrade (página de obrigado, e-mails e app): 180 fórmulas a mais pagando só a diferença, com prazo real de janelaH horas.
     upsell: {
       nome: 'Fábrica da Limpeza Completa', credito: 14.90, janelaH: 72,
       kicker: 'Oferta exclusiva para quem acabou de entrar',
       titulo: 'Você tem 20 receitas. Quem vende de verdade tem a linha inteira.',
       lead: 'Com o Essencial você começa. Mas quem fatura com produtos de limpeza vende para a casa, o comércio e o condomínio, e cada cliente pede um produto diferente. Com a Fábrica da Limpeza Completa você atende todos.',
       bullets: [
-        '<b>130 fórmulas profissionais</b>: são <b>110 a mais</b> do que você já tem, para vender para mais tipos de cliente',
+        '<b>200 fórmulas profissionais</b>: são <b>180 a mais</b> do que você já tem, para vender para mais tipos de cliente',
         '<b>30 Receitas Caseiras</b> de entrada, baratas de produzir, para começar vendendo na vizinhança',
         '<b>Linha Especial Premium (20 fórmulas)</b>: perfumador de ambiente, linen spray, neutralizador de odor pet, limpa-colchão, linha para hotéis e Airbnb...',
         '<b>Mais opções em todas as categorias</b>: multiuso, cozinha, roupas, banheiro e pisos',
@@ -166,7 +166,7 @@ export const PRODUTOS = {
       { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
       { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 6.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
       { id: 'form', flag: 'form', hotmartId: 4447291, preco: 24.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
-      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, precoCheio: 43.90, janelaH: 72, nome: 'Upgrade para a Fábrica da Limpeza Completa', titulo: 'Upgrade — Fábrica da Limpeza Completa (130 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
+      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, precoCheio: 43.90, janelaH: 72, nome: 'Upgrade para a Fábrica da Limpeza Completa', titulo: 'Upgrade — Fábrica da Limpeza Completa (200 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
     ],
     bumps: [
       {
