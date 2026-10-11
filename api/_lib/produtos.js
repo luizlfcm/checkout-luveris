@@ -158,7 +158,7 @@ export const PRODUTOS = {
       extra: 'O acesso completo também inclui PDF para download, glossário de 61 insumos, lista de fornecedores de insumos e embalagens com abrangência nacional, precificação e suporte direto com João Silva, Engenheiro Químico.',
       bullets: [
         '<b>200 fórmulas profissionais em sete categorias:</b> amplie suas opções com ingredientes, proporções e preparo explicado.',
-        '<b>30 Receitas Caseiras:</b> explore mais opções de preparos para o dia a dia.',
+        '<b>50 Receitas Caseiras:</b> explore mais opções de preparos para o dia a dia.',
         '<b>20 fórmulas da Linha Especial Premium:</b> opções como perfumador de ambiente, linen spray, neutralizador de odor pet e limpa-colchão.',
         '<b>Gerador de modelo de rótulo com IA, ficha técnica e calculadora de resultados:</b> organize informações dos produtos e compare receitas e despesas do seu planejamento.',
       ],
