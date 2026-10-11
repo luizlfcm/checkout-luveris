@@ -42,34 +42,35 @@ tr:last-child td{border-bottom:0}
 .faq p{color:var(--mut);margin:8px 0 0}
 .rod{color:#6b7683;font-size:11.5px;text-align:center;margin-top:34px;line-height:1.6}
 .hide{display:none}
+.acesso{background:var(--card);border:1px solid #1f6b3f;border-radius:var(--r);padding:18px 16px;text-align:center;margin:0 0 26px}
+.acesso .ck{color:#4ade80;font-weight:800;font-size:19px;margin-bottom:6px}.acesso p{color:var(--mut);font-size:14.5px;margin:0 0 10px}
+.acesso .em{background:var(--card2);border-radius:10px;padding:11px;color:#fff;font-weight:700;font-size:16px;word-break:break-all;margin-bottom:12px}
+.acesso .btn2{display:block;background:#22c55e;color:#04130a;text-decoration:none;font-weight:900;font-size:17px;padding:15px;border-radius:12px}
+.acesso small{display:block;color:#8b95a1;font-size:12px;margin-top:10px}
+.ben{margin-bottom:20px}
 </style>
 </head>
 <body>
-<div class="ok" id="ok">✅ <b>Pagamento confirmado!</b> Seu acesso já está liberado em <b id="okEmail"></b>. <a id="okApp" href="#">Abrir meu app</a></div>
 <div class="wrap" id="pg">
+  <div class="acesso">
+    <div class="ck">✅ Pagamento confirmado!</div>
+    <p>Seu acesso já está liberado. Entre com este e-mail:</p>
+    <div class="em" id="okEmail"></div>
+    <a class="btn2" id="okApp" href="#">Acessar meu app</a>
+    <small>Também enviamos o acesso por e-mail.</small>
+  </div>
   <div class="kick" id="kick"></div>
   <h1 id="tit"></h1>
   <p class="lead" id="lead"></p>
-  <div class="cd" id="cd">⏳ Seu crédito vale só por mais<b id="cdT">--:--:--</b></div>
-  <img class="hero" id="hero" alt="" hidden>
-  <h2>O que você leva a mais</h2>
   <ul class="ben" id="ben"></ul>
-  <h2>Essencial × Completa</h2>
-  <table><thead><tr><th></th><th id="thE">Essencial</th><th id="thC">Completa</th></tr></thead><tbody id="cmp"></tbody></table>
+  <div class="cd" id="cd">⏳ Seu crédito vale só por mais<b id="cdT">--:--:--</b></div>
   <div class="box">
     <small id="pNome"></small><br>
     <small>de <s id="pCheio"></s> menos seu crédito de <span id="pCred"></span></small>
     <div class="v" id="pV"></div>
-    <small>pagamento único · acesso no mesmo e-mail · garantia de 30 dias</small>
+    <small>pagamento único · garantia de 30 dias</small>
     <a class="btn" id="btn" href="#">Sim, quero a Completa →</a>
     <p class="gar">🔒 Pix ou cartão, com os seus dados já preenchidos</p>
-  </div>
-  <h2>Dúvidas rápidas</h2>
-  <div class="faq">
-    <details><summary>Eu perco o que já comprei?</summary><p>Não. O Essencial continua seu. O upgrade só adiciona o restante da linha, e você paga apenas a diferença.</p></details>
-    <details><summary>Como recebo o acesso?</summary><p>Na hora, no mesmo e-mail da sua compra. Você abre o app completo e entra com ele.</p></details>
-    <details><summary>E se eu não gostar?</summary><p>Você tem 30 dias de garantia também no upgrade. Se não fizer sentido, devolvemos o valor.</p></details>
-    <details><summary>Por que esse preço só agora?</summary><p>O crédito do Essencial é um benefício de quem acabou de entrar e vale por tempo limitado. Depois, a Completa volta ao preço cheio.</p></details>
   </div>
   <a class="nao" id="nao" href="#">Não, obrigado. Quero só o meu acesso</a>
   <p class="rod">53.168.292 LUIZ FELIPE CORREA MIRANDA · CNPJ 53.168.292/0001-32<br>Responsável técnico: João Silva · Engenheiro Químico<br>Dúvidas e reembolso: contato@luverisgroup.com.br</p>
@@ -114,13 +115,10 @@ tr:last-child td{border-bottom:0}
     var P=CFG.produto,root=document.documentElement.style;
     if(P.cor)root.setProperty('--acc',P.cor);if(P.bg)root.setProperty('--bg',P.bg);
     document.title=u.nome+' — oferta exclusiva';
-    $('okEmail').textContent=EMAIL||'seu e-mail';$('okApp').href=P.appUrl;$('nao').href=P.appUrl;
-    if(!EMAIL)$('ok').classList.add('hide');
+    $('okEmail').textContent=EMAIL||'o e-mail da sua compra';$('okApp').href=P.appUrl;$('nao').href=P.appUrl;
     $('kick').textContent=u.kicker;$('tit').innerHTML=esc(u.titulo).replace(/(Quem vende de verdade[^.]*\.)/,'<em>$1</em>');$('lead').textContent=u.lead;
-    if(P.imagemUp){var h=$('hero');h.src=P.imagemUp;h.hidden=false}
-    $('ben').innerHTML=u.bullets.map(function(b){return '<li>'+b+'</li>'}).join('');
-    $('cmp').innerHTML=(CMP[PID]||[]).map(function(l){return '<tr><td>'+l[0]+'</td><td'+(l[1]==='–'?' class="no"':'')+'>'+l[1]+'</td><td>'+l[2]+'</td></tr>'}).join('');
-    $('thC').textContent='Completa';$('pNome').textContent=u.nome;$('pCred').textContent=brl(u.credito);
+    $('ben').innerHTML=u.bullets.slice(0,3).map(function(b){return '<li>'+b+'</li>'}).join('');
+    $('pNome').textContent=u.nome;$('pCred').textContent=brl(u.credito);
     fim=Date.now()+(u.janelaH||72)*3600000;preco=u.preco;
     try{var d=await (await fetch('/api/upgrade?p='+encodeURIComponent(PID)+'&email='+encodeURIComponent(EMAIL))).json();
       if(d&&d.expiraEm){fim=d.expiraEm;naJanela=!!d.naJanela;preco=d.preco}}catch(e){}
