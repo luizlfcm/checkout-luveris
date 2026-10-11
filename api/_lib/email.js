@@ -150,20 +150,29 @@ export async function enviarUpsell(reg, tipo, { agendarEm = '', expiraEm = 0 } =
   const nomeCli = primeiroNome(reg.nome);
   const ola = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>`;
   const entrada = reg.produto === 'apess' ? 'Shampoo Automotivo Neutro (o de maior volume de venda da linha automotiva)' : 'Multiuso Tradicional (o produto mais vendido em qualquer linha de limpeza)';
-  const parar = `<p style="color:#8b95a1;font-size:12px;line-height:1.6;margin-top:24px">Não quer mais receber mensagens sobre esta oferta? <a href="${esc(urlParar(reg.email))}" style="color:#8b95a1">Clique aqui para parar</a>.</p>`;
+  const parar = `<p style="color:#8b95a1;font-size:12px;line-height:1.6;margin-top:24px">Não quer mais receber mensagens sobre estas ofertas? <a href="${esc(urlParar(reg.email))}" style="color:#8b95a1">Clique aqui para parar</a>.</p>`;
   let assunto, titulo, miolo, texto;
   if (tipo === 'd1') {
     assunto = 'Já fez sua primeira receita? (e um convite)'; titulo = 'Como está indo?';
     miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Ontem você entrou no ${esc(p.nome)}. Um conselho de quem formula há mais de 10 anos: <b style="color:#fff">comece pequeno</b>. Faça um lote de teste de 1 litro com a receita de entrada, <b style="color:#fff">${esc(entrada)}</b>, e siga a ordem do modo de preparo. Foi assim que a maioria dos produtores começou.</p>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">E um lembrete: o seu crédito de ${brl2(u.credito)} para a ${esc(u.nome)} segue valendo.</p>${blocoUpsell(p, reg, expiraEm, 'upg_d1', false)}${parar}`;
     texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Como está indo? Comece com um lote de teste de 1 litro da receita de entrada: ${entrada}.${textoUpsell(p, reg, expiraEm, 'upg_d1')}Para parar de receber: ${urlParar(reg.email)}`;
+  } else if (tipo === 'ex') {
+    const f = (p.avulsos || []).find((x) => x.id === 'form');
+    const linkEx = `${BASE}/${reg.produto}/form?email=${encodeURIComponent(reg.email)}&utm_source=email&utm_medium=email&utm_campaign=exclusiva_d5`;
+    assunto = 'Uma fórmula feita só para o seu negócio'; titulo = 'Fórmula Exclusiva';
+    miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Já se passaram alguns dias desde que você entrou no ${esc(p.nome)}. Se alguma das receitas ficou perto do que você quer vender, mas não exatamente, <b style="color:#fff">existe um caminho mais rápido</b>.</p>
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">Na <b style="color:#fff">Fórmula Exclusiva</b>, o especialista (engenheiro químico) cria de <b style="color:#fff">3 a 5 fórmulas pensadas para o seu negócio</b>: o seu público, a sua região, o seu custo e o seu diferencial. Você conta o que precisa pelo WhatsApp e recebe tudo pronto em <b style="color:#fff">até 3 dias úteis</b>.</p>
+<div style="background:#1a1f26;border-radius:10px;padding:14px;text-align:center;margin:18px 0"><p style="color:${p.cor};font-size:34px;font-weight:900;margin:0">${brl2(f.preco)}</p><p style="color:#8b95a1;font-size:12px;margin:4px 0 0">pagamento único · garantia de 30 dias</p></div>
+<div style="text-align:center"><a href="${esc(linkEx)}" style="display:inline-block;background:${p.cor};color:#fff;padding:15px 28px;border-radius:12px;text-decoration:none;font-weight:800;font-size:15px">Quero minha Fórmula Exclusiva →</a></div>${parar}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Na Fórmula Exclusiva o especialista cria de 3 a 5 fórmulas feitas para o seu negócio, entregues pelo WhatsApp em até 3 dias úteis, por ${brl2(f.preco)}: ${linkEx}\nPara parar de receber: ${urlParar(reg.email)}`;
   } else {
     assunto = `Seu crédito de ${brl2(u.credito)} termina hoje`; titulo = 'Última chamada do seu crédito';
     miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Só um aviso rápido: <b style="color:#fff">seu crédito de ${brl2(u.credito)} termina hoje, às ${esc(new Date(expiraEm).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }))}</b>. Depois disso, a ${esc(u.nome)} volta ao preço cheio de ${brl2(a.precoCheio)}.</p>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Se você pretende vender de verdade, a linha completa é o que faz diferença: mais fórmulas, mais tipos de cliente e as ferramentas para precificar e rotular.</p>${blocoUpsell(p, reg, expiraEm, 'upg_d3', false)}${parar}`;
     texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu crédito de ${brl2(u.credito)} termina hoje. Depois, a ${u.nome} volta a ${brl2(a.precoCheio)}.${textoUpsell(p, reg, expiraEm, 'upg_d3')}Para parar de receber: ${urlParar(reg.email)}`;
   }
-  return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, `Olá João! Tenho uma dúvida sobre a ${u.nome}.`), texto, agendarEm);
+  return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, tipo === 'ex' ? 'Olá João! Tenho uma dúvida sobre a Fórmula Exclusiva.' : `Olá João! Tenho uma dúvida sobre a ${u.nome}.`), texto, agendarEm);
 }
 
 // tipo: 'pix1' (Pix gerado e não pago), 'pix2' (dia seguinte), 'cartao' (pagamento recusado)

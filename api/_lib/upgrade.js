@@ -33,30 +33,37 @@ export async function abrirJanela(reg) {
     if (!ja) return; // janela já aberta (ex.: segunda compra): mantém a primeira
     if (!ativo() || await cmd(['GET', chaveParar(email)])) return;
     const inicio = Date.now();
-    const plano = [{ tipo: 'd1', quando: inicio + 24 * HORA }, { tipo: 'd3', quando: inicio + 66 * HORA }]; // d3 sai 6h antes de fechar
+    // d3 sai 6h antes de fechar a janela; 'ex' (Fórmula Exclusiva) só sai no dia 5, depois que a janela do upgrade já fechou, para não competir com ele.
+    const plano = [{ tipo: 'd1', quando: inicio + 24 * HORA }, { tipo: 'd3', quando: inicio + 66 * HORA }];
+    if ((PRODUTOS[reg.produto].avulsos || []).some((a) => a.id === 'form')) plano.push({ tipo: 'ex', quando: inicio + 120 * HORA });
     const itens = [];
     for (const e of plano) {
       const r = await enviarUpsell(reg, e.tipo, { agendarEm: new Date(e.quando).toISOString(), expiraEm: inicio + (avulsoUpg(reg.produto).janelaH || 72) * HORA });
       if (r.enviado && r.id) itens.push({ id: r.id, quando: e.quando, tipo: e.tipo });
     }
-    await cmd(['SET', chaveMails(reg.produto, email), JSON.stringify({ itens }), 'EX', String(60 * 60 * 24 * 6)]);
+    await cmd(['SET', chaveMails(reg.produto, email), JSON.stringify({ itens }), 'EX', String(60 * 60 * 24 * 8)]);
     console.log('upgrade: janela aberta', { produto: reg.produto, emails: itens.map((i) => i.tipo) });
   } catch (e) { console.error('upgrade: falha ao abrir janela', e?.message); }
 }
 
 // Cancela os e-mails que ainda não saíram (comprou o upgrade, pediu reembolso ou clicou em "parar").
-export async function cancelarUpsell(produtoId, email) {
+// tipos: se informado, cancela só esses (ex.: comprou o upgrade -> cancela d1/d3 mas mantém a oferta da Fórmula Exclusiva).
+export async function cancelarUpsell(produtoId, email, tipos = null) {
   try {
     const raw = await cmd(['GET', chaveMails(produtoId, email)]);
     if (!raw) return;
     const key = process.env.RESEND_API_KEY;
-    for (const it of JSON.parse(raw).itens || []) {
+    const todos = JSON.parse(raw).itens || [];
+    const restantes = [];
+    for (const it of todos) {
+      if (tipos && !tipos.includes(it.tipo)) { restantes.push(it); continue; }
       if (it.quando <= Date.now() || !key) continue;
       await fetch(`https://api.resend.com/emails/${encodeURIComponent(it.id)}/cancel`, { method: 'POST', headers: { Authorization: `Bearer ${key}` } })
         .then(async (r) => { if (!r.ok) console.error('upgrade: cancelar falhou', r.status); })
         .catch((e) => console.error('upgrade: cancelar erro', e?.message));
     }
-    await cmd(['DEL', chaveMails(produtoId, email)]);
+    if (restantes.length) await cmd(['SET', chaveMails(produtoId, email), JSON.stringify({ itens: restantes }), 'EX', String(60 * 60 * 24 * 8)]);
+    else await cmd(['DEL', chaveMails(produtoId, email)]);
   } catch (e) { console.error('upgrade: falha ao cancelar', e?.message); }
 }
 export const cancelarTodosUpsell = async (email) => { for (const id of Object.keys(PRODUTOS)) if (PRODUTOS[id].upsell) await cancelarUpsell(id, email); };
