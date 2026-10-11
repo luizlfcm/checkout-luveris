@@ -70,7 +70,7 @@ tr:last-child td{border-bottom:0}
   <h1 id="tit"></h1>
   <p class="lead" id="lead"></p>
   <p class="lead2" id="lead2"></p>
-  <h2>O que você recebe com a ampliação:</h2>
+  <h2 id="h2b"></h2>
   <ul class="ben" id="ben"></ul>
   <p class="extra" id="extra"></p>
   <div class="box">
@@ -126,9 +126,9 @@ tr:last-child td{border-bottom:0}
     if(P.cor)root.setProperty('--acc',P.cor);if(P.bg)root.setProperty('--bg',P.bg);
     document.title=u.nome+' — oferta exclusiva';
     $('okEmail').textContent=EMAIL||'o e-mail da sua compra';$('okApp').href=P.appUrl;$('nao').href=P.appUrl;
-    $('kick').textContent=u.kicker;$('lead').textContent=u.lead;$('lead2').innerHTML='São <b>'+u.fMais+' fórmulas adicionais</b>, além de recursos para organizar seus produtos e planejar preços.';$('okNome').textContent=P.nome.replace(/ — .*/,'');
+    $('kick').textContent=u.kicker;$('lead').textContent=u.lead;$('lead2').innerHTML=u.lead2||'';$('h2b').textContent=u.h2||'';$('okNome').textContent=P.nome.replace(/ — .*/,'');
     $('ben').innerHTML=u.bullets.slice(0,4).map(function(b){return '<li>'+b+'</li>'}).join('');
-    $('extra').textContent='O acesso completo também inclui PDF para download, glossário de insumos, lista de fornecedores, precificação automática e suporte direto com João Silva, Engenheiro Químico.';
+    $('extra').textContent=u.extra||'';
     fim=Date.now()+(u.janelaH||72)*3600000;preco=u.preco;
     try{var d=await (await fetch('/api/upgrade?p='+encodeURIComponent(PID)+'&email='+encodeURIComponent(EMAIL))).json();
       if(d&&d.expiraEm){fim=d.expiraEm;naJanela=!!d.naJanela;preco=d.preco}}catch(e){}
