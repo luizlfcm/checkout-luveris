@@ -481,12 +481,7 @@ input:focus{outline:none;border-color:var(--blu)}
       $('okPassos').innerHTML='<li>Abra o seu aplicativo normalmente</li><li>Entre com este e-mail:<br><b>'+esc(email)+'</b></li>';
     }
     show('tela-ok');
-    // Essencial: depois do Purchase, leva para a página da oferta do upgrade (a tela de obrigado continua sendo o plano B).
-    if(CFG.produto.upsell&&!ITEM&&!QS.get('semoferta')){
-      var box=$('okUp');if(box)box.innerHTML='<p style="text-align:center;font-weight:700;padding:14px">Abrindo sua oferta exclusiva…</p>';
-      setTimeout(function(){location.href='/'+PID+'/oferta?email='+encodeURIComponent(email)},1500);
-      setTimeout(function(){ofertaUpgrade(email)},6000);
-    }else ofertaUpgrade(email);
+    ofertaUpgrade(email);
   }
 
   function copiar(){

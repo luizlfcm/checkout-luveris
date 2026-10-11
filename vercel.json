@@ -1,7 +1,5 @@
 {
   "rewrites": [
-    { "source": "/apess/oferta", "destination": "/oferta.html" },
-    { "source": "/fdless/oferta", "destination": "/oferta.html" },
     { "source": "/fdl", "destination": "/index.html" },
     { "source": "/ap", "destination": "/index.html" },
     { "source": "/fdl/:item", "destination": "/index.html" },
