@@ -96,16 +96,15 @@ export const PRODUTOS = {
     cor: '#E8720C', bg: '#0D0F12', rodape: 'João Silva - Engenheiro Químico - Fórmula Auto Pro',
     // Oferta de upgrade (página de obrigado, e-mails e app): 60 fórmulas a mais pagando só a diferença, com prazo real de janelaH horas.
     upsell: {
-      nome: 'Fórmula Auto Pro Completa', credito: 14.90, janelaH: 72,
-      kicker: 'Oferta exclusiva para quem acabou de entrar',
-      titulo: 'Você tem 20 receitas. Quem vende de verdade tem a linha inteira.',
-      lead: 'Com o Essencial você começa. Mas o cliente que compra todo mês quer variedade: shampoo, cera, pretinho, higienização... e o dono de frota quer produto para caminhão. Com a Fórmula Auto Pro Completa você atende os dois.',
+      nome: 'Fórmula Auto Pro Completa', credito: 14.90, janelaH: 72, fTotal: 80, fMais: 60, linha: 'automotivas',
+      kicker: 'Uma opção para ampliar o que você acabou de adquirir',
+      titulo: 'Passe de 20 para 80 fórmulas automotivas por mais R$ 27.',
+      lead: 'Você já garantiu sua seleção inicial com o Essencial. Se quer mais opções de produtos para desenvolver sua linha automotiva, pode ampliar agora para a Fórmula Auto Pro Completa.',
       bullets: [
-        '<b>80 fórmulas profissionais</b>: são <b>60 a mais</b> do que você já tem, para vender para mais tipos de cliente',
-        '<b>Linha Pesada (25 fórmulas)</b>: desengraxantes, limpa-baú, limpa-chassi, limpa-motor... para caminhões, frotas e oficinas, que compram em volume',
-        '<b>Mais opções em todas as categorias</b>: limpeza externa, acabamento e brilho, limpeza interna e aromatização',
-        '<b>PDF completo</b> do guia para baixar e consultar quando quiser',
-        '<b>4 ferramentas bônus</b>: Gerador de Rótulo, Precificação Automática, Calculadora de Lucro e Gerador de Ficha Técnica',
+        '<b>80 fórmulas profissionais no total:</b> mais opções de shampoos, ceras, polimentos, limpeza, proteção e aromatização.',
+        '<b>Gerador de rótulo com IA:</b> crie modelos para organizar e apresentar as informações dos seus produtos.',
+        '<b>Gerador de ficha técnica:</b> reúna as informações das fórmulas em documentos para consulta.',
+        '<b>Calculadora de lucro:</b> simule receitas e custos para planejar sua produção e seus preços.',
       ],
       cta: 'Sim, quero a Completa',
     },
@@ -147,10 +146,10 @@ export const PRODUTOS = {
     cor: '#3A8A4E', bg: '#0D1410', rodape: 'João Silva - Engenheiro Químico - Fábrica da Limpeza',
     // Oferta de upgrade (página de obrigado, e-mails e app): 180 fórmulas a mais pagando só a diferença, com prazo real de janelaH horas.
     upsell: {
-      nome: 'Fábrica da Limpeza Completa', credito: 14.90, janelaH: 72,
-      kicker: 'Oferta exclusiva para quem acabou de entrar',
-      titulo: 'Você tem 20 receitas. Quem vende de verdade tem a linha inteira.',
-      lead: 'Com o Essencial você começa. Mas quem fatura com produtos de limpeza vende para a casa, o comércio e o condomínio, e cada cliente pede um produto diferente. Com a Fábrica da Limpeza Completa você atende todos.',
+      nome: 'Fábrica da Limpeza Completa', credito: 14.90, janelaH: 72, fTotal: 200, fMais: 180, linha: 'de limpeza',
+      kicker: 'Uma opção para ampliar o que você acabou de adquirir',
+      titulo: 'Passe de 20 para 200 fórmulas de limpeza por mais R$ 29.',
+      lead: 'Você já garantiu sua seleção inicial com o Essencial. Se quer mais opções de produtos para desenvolver sua linha de limpeza, pode ampliar agora para a Fábrica da Limpeza Completa.',
       bullets: [
         '<b>200 fórmulas profissionais</b>: são <b>180 a mais</b> do que você já tem, para vender para mais tipos de cliente',
         '<b>30 Receitas Caseiras</b> de entrada, baratas de produzir, para começar vendendo na vizinhança',

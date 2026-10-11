@@ -47,33 +47,43 @@ tr:last-child td{border-bottom:0}
 .acesso .em{background:var(--card2);border-radius:10px;padding:11px;color:#fff;font-weight:700;font-size:16px;word-break:break-all;margin-bottom:12px}
 .acesso .btn2{display:block;background:#22c55e;color:#04130a;text-decoration:none;font-weight:900;font-size:17px;padding:15px;border-radius:12px}
 .acesso small{display:block;color:#8b95a1;font-size:12px;margin-top:10px}
-.ben{margin-bottom:20px}
+.ben{margin-bottom:14px}.lead2{color:var(--mut);text-align:center;margin:-8px 0 8px;font-size:16px}.lead2 b{color:#fff}
+.extra{color:var(--mut);font-size:14px;margin:0 0 20px}
+.pt{width:100%;border-collapse:collapse;font-size:15px;margin:6px 0 10px}.pt td,.pt td:last-child{background:none;padding:7px 4px;color:var(--mut);text-align:left;border:0}.pt td:last-child{text-align:right;font-weight:700;color:#fff}
+.pt tr.tot td{font-size:18px;color:#fff;border-top:1px solid var(--brd);padding-top:12px}.pt tr.tot td:last-child{color:var(--acc);font-size:34px;font-weight:900}
+.box .cr{color:#fff;font-weight:700;margin:0 0 8px}.prazo{color:#8b95a1;font-size:12.5px;line-height:1.6;margin:10px 0 0}
+.garn{text-align:center;color:#8b95a1;font-size:13px;margin:6px 0 0}
+.acesso .btn2{background:transparent;border:2px solid #22c55e;color:#4ade80;font-size:15px;padding:12px}
+.box{text-align:center}.box h2,.wrap h2{margin:22px 0 12px}
 </style>
 </head>
 <body>
 <div class="wrap" id="pg">
   <div class="acesso">
     <div class="ck">✅ Pagamento confirmado!</div>
-    <p>Seu acesso já está liberado. Entre com este e-mail:</p>
+    <p>Seu acesso ao <span id="okNome"></span> já está liberado. Entre com o mesmo e-mail usado na compra.</p>
     <div class="em" id="okEmail"></div>
-    <a class="btn2" id="okApp" href="#">Acessar meu app</a>
-    <small>Também enviamos o acesso por e-mail.</small>
+    <a class="btn2" id="okApp" href="#">Acessar meu Essencial</a>
+    <small>Também enviamos as instruções de acesso por e-mail.</small>
   </div>
   <div class="kick" id="kick"></div>
   <h1 id="tit"></h1>
   <p class="lead" id="lead"></p>
+  <p class="lead2" id="lead2"></p>
+  <h2>O que você recebe com a ampliação:</h2>
   <ul class="ben" id="ben"></ul>
-  <div class="cd" id="cd">⏳ Seu crédito vale só por mais<b id="cdT">--:--:--</b></div>
+  <p class="extra" id="extra"></p>
   <div class="box">
-    <small id="pNome"></small><br>
-    <small>de <s id="pCheio"></s> menos seu crédito de <span id="pCred"></span></small>
-    <div class="v" id="pV"></div>
-    <small>pagamento único · garantia de 30 dias</small>
-    <a class="btn" id="btn" href="#">Sim, quero a Completa →</a>
-    <p class="gar">🔒 Pix ou cartão, com os seus dados já preenchidos</p>
+    <p class="cr">Sua compra do Essencial entra como crédito no upgrade.</p>
+    <table class="pt" id="pt"></table>
+    <small id="pMicro">pagamento único · acesso vitalício + atualizações · garantia de 30 dias</small>
+    <a class="btn" id="btn" href="#">Sim, quero ampliar →</a>
+    <p class="gar">Pagamento por Pix ou cartão.</p>
+    <p class="prazo" id="prazo"></p>
   </div>
-  <a class="nao" id="nao" href="#">Não, obrigado. Quero só o meu acesso</a>
-  <p class="rod">53.168.292 LUIZ FELIPE CORREA MIRANDA · CNPJ 53.168.292/0001-32<br>Responsável técnico: João Silva · Engenheiro Químico<br>Dúvidas e reembolso: contato@luverisgroup.com.br</p>
+  <a class="nao" id="nao" href="#">Continuar com minhas 20 fórmulas</a>
+  <p class="garn">Seu acesso ao Essencial está garantido, mesmo que você não aceite esta oferta.</p>
+  <p class="rod">53.168.292 LUIZ FELIPE CORREA MIRANDA · CNPJ 53.168.292/0001-32<br>Responsável técnico: João Silva · Engenheiro Químico · CREA 214587/D<br>Dúvidas e reembolso: contato@luverisgroup.com.br</p>
 </div>
 <script>
 (function(){
@@ -103,22 +113,22 @@ tr:last-child td{border-bottom:0}
   }
   function link(){return '/'+PID+'/upg?email='+encodeURIComponent(EMAIL)+'&utm_source=checkout&utm_medium=pagina&utm_campaign=upg_oferta'}
   function pinta(){
-    $('pV').textContent=brl(preco);$('pCheio').textContent=brl(u.precoCheio);
-    $('btn').textContent=u.cta+' por '+brl(preco)+' →';
-    $('cd').innerHTML=naJanela?'⏳ Seu crédito de '+brl(u.credito)+' vale só por mais<b id="cdT">--:--:--</b>':'O crédito expirou. A '+esc(u.nome)+' está no preço cheio.';
+    var tt=naJanela?'Passe de 20 para '+u.fTotal+' fórmulas '+u.linha+' por mais '+brl(preco)+'.':'Passe de 20 para '+u.fTotal+' fórmulas '+u.linha+'.';
+    $('tit').textContent=tt;
+    $('pt').innerHTML=naJanela?'<tr><td>Valor da versão Completa</td><td>'+brl(u.precoCheio)+'</td></tr><tr><td>Crédito do Essencial já pago</td><td>− '+brl(u.credito)+'</td></tr><tr class="tot"><td>Você paga agora para ampliar</td><td>'+brl(preco)+'</td></tr>':'<tr class="tot"><td>Versão Completa</td><td>'+brl(preco)+'</td></tr>';
+    $('btn').textContent='Sim, quero ampliar para '+u.fTotal+' fórmulas por '+brl(preco)+' →';
+    $('prazo').textContent=naJanela?'Seu crédito de '+brl(u.credito)+' fica disponível por 72 horas após a confirmação da compra do Essencial.':'O prazo do crédito de '+brl(u.credito)+' terminou. A versão Completa está no valor de '+brl(u.precoCheio)+'.';
   }
-  function tick(){var el=$('cdT');if(!el)return;var r=Math.max(0,fim-Date.now());
-    if(r<=0&&naJanela){naJanela=false;preco=u.precoCheio;pinta();return}
-    var h=Math.floor(r/3600000),m=Math.floor(r%3600000/60000),s=Math.floor(r%60000/1000),z=function(n){return(n<10?'0':'')+n};el.textContent=z(h)+':'+z(m)+':'+z(s)}
+  function tick(){var r=Math.max(0,fim-Date.now());if(r<=0&&naJanela){naJanela=false;preco=u.precoCheio;pinta()}}
   async function init(){
     try{var r=await fetch('/api/config?p='+encodeURIComponent(PID));CFG=await r.json();u=CFG.produto.upsell;if(!u)throw 0}catch(e){location.replace('/'+PID);return}
     var P=CFG.produto,root=document.documentElement.style;
     if(P.cor)root.setProperty('--acc',P.cor);if(P.bg)root.setProperty('--bg',P.bg);
     document.title=u.nome+' — oferta exclusiva';
     $('okEmail').textContent=EMAIL||'o e-mail da sua compra';$('okApp').href=P.appUrl;$('nao').href=P.appUrl;
-    $('kick').textContent=u.kicker;$('tit').innerHTML=esc(u.titulo).replace(/(Quem vende de verdade[^.]*\.)/,'<em>$1</em>');$('lead').textContent=u.lead;
-    $('ben').innerHTML=u.bullets.slice(0,3).map(function(b){return '<li>'+b+'</li>'}).join('');
-    $('pNome').textContent=u.nome;$('pCred').textContent=brl(u.credito);
+    $('kick').textContent=u.kicker;$('lead').textContent=u.lead;$('lead2').innerHTML='São <b>'+u.fMais+' fórmulas adicionais</b>, além de recursos para organizar seus produtos e planejar preços.';$('okNome').textContent=P.nome.replace(/ — .*/,'');
+    $('ben').innerHTML=u.bullets.slice(0,4).map(function(b){return '<li>'+b+'</li>'}).join('');
+    $('extra').textContent='O acesso completo também inclui PDF para download, glossário de insumos, lista de fornecedores, precificação automática e suporte direto com João Silva, Engenheiro Químico.';
     fim=Date.now()+(u.janelaH||72)*3600000;preco=u.preco;
     try{var d=await (await fetch('/api/upgrade?p='+encodeURIComponent(PID)+'&email='+encodeURIComponent(EMAIL))).json();
       if(d&&d.expiraEm){fim=d.expiraEm;naJanela=!!d.naJanela;preco=d.preco}}catch(e){}
