@@ -253,6 +253,7 @@ input:focus{outline:none;border-color:var(--blu)}
   var ATR=(function(){
     var K=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','src','sck','fbclid'], o={}, st={};
     try{st=JSON.parse(sessionStorage.getItem('chk_atr')||localStorage.getItem('chk_atr')||'{}')||{}}catch(e){}
+    if(QS.get('utm_source')==='app') st={}; // compra de dentro do app: não herda a campanha antiga guardada no navegador
     K.forEach(function(k){var v=QS.get(k); if(v&&v.length<250&&!/\{\{.*\}\}/.test(v)) o[k]=v; else if(st[k]) o[k]=st[k]});
     var r=st.ref||''; if(!r&&document.referrer){try{var h=new URL(document.referrer).hostname; if(h&&h!==location.hostname) r=h}catch(e){}} if(r) o.ref=r;
     try{var j=JSON.stringify(o); sessionStorage.setItem('chk_atr',j); localStorage.setItem('chk_atr',j)}catch(e){}

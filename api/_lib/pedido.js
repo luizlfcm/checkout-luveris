@@ -97,11 +97,30 @@ async function capiPurchase(reg, id) {
 const itensDoPedido = (reg) => reg.itens || calcular(reg.produto, reg.bumps || [], reg.desconto === 'saida10', reg.avulso || '')?.itens || [];
 
 // Avisa o dashboard uma única vez por pedido; se falhar, libera a trava para a próxima chamada tentar de novo.
+// Guarda a origem do PRIMEIRO pedido aprovado do e-mail (só de compra pelo funil, nunca de link avulso do app) e devolve a etiqueta desta venda.
+async function origemDoCliente(orderId, reg) {
+  try {
+    const email = String(reg.email || '').trim().toLowerCase();
+    if (!email) return {};
+    const chave = `chk_orig:${email}`;
+    if (!reg.avulso) await cmd(['SET', chave, JSON.stringify({ pedido: orderId, produto: reg.produto, atrib: reg.atrib || {}, data: new Date().toISOString() }), 'NX']).catch(() => {});
+    const raw = await cmd(['GET', chave]).catch(() => null);
+    const orig = raw ? JSON.parse(raw) : null;
+    const outroPedido = !!orig && orig.pedido !== orderId;
+    const tipoApp = reg.avulso ? String(reg.avulso) : '';
+    const recompra = !tipoApp && outroPedido;
+    return { tipoApp, recompra, atribCliente: (tipoApp || recompra) && outroPedido ? (orig.atrib || {}) : {} };
+  } catch (e) { return {}; }
+}
+
 async function avisarDashboard(evento, orderId, reg, chave) {
   const trava = await cmd(['SET', chave, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
   if (!trava) return;
   const recuperada = evento === 'PURCHASE_APPROVED' && !!(await cmd(['GET', `chk_recup:${orderId}`]).catch(() => null));
-  const r = await notificarDashboard(evento, orderId, reg, itensDoPedido(reg), { recuperada });
+  // Venda dentro do app (link avulso) ou recompra de quem já comprou: etiqueta + origem do 1º pedido do cliente (campanha/anúncio que o trouxe).
+  let origem = {};
+  if (evento === 'PURCHASE_APPROVED') origem = await origemDoCliente(orderId, reg);
+  const r = await notificarDashboard(evento, orderId, reg, itensDoPedido(reg), { recuperada, ...origem });
   console.log('pedido: dashboard', { orderId, evento, enviado: r.enviado, motivo: r.motivo, status: r.status });
   if (!r.enviado && !r.semTentar) await cmd(['DEL', chave]).catch(() => {});
 }

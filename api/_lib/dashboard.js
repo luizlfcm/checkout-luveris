@@ -28,6 +28,7 @@ export function notificarDashboard(evento, orderId, reg, itens, extra = {}) {
   return enviar({
     evento, pedido: orderId, itens, email: reg.email, nome: reg.nome || '', metodo: reg.metodo || 'pix',
     data: new Date().toISOString(), recuperada: !!extra.recuperada, atrib: reg.atrib || {},
+    tipoApp: extra.tipoApp || '', recompra: !!extra.recompra, atribCliente: extra.atribCliente || {},
   });
 }
 
