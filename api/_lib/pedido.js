@@ -9,6 +9,7 @@ import { notificarDashboard, notificarStatus } from './dashboard.js';
 import { enviarEntrega, enviarReembolso } from './email.js';
 import { cancelarRecuperacao } from './recuperacao.js';
 import { abrirJanela, cancelarUpsell } from './upgrade.js';
+import { espelharNoCompleto } from './espelho.js';
 
 const APROVADO = ['processed', 'accredited'];
 const REEMBOLSO = ['refunded', 'charged_back', 'chargeback']; // reembolso parcial NÃO remove acesso
@@ -142,6 +143,7 @@ export async function processarPedido(orderId) {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, true);
     const extra = alvoExtra(reg); // upgrade: libera também a base do app completo
     if (extra) await setFlag(extra.produto, reg.email, reg.nome, extra.flag, true);
+    await espelharNoCompleto(produto, reg, true); // upgrade: leva os extras do Essencial para o app Completa; depois do upgrade, compras novas também
     const primeira = await cmd(['SET', `chk_paid:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     console.log('pedido: aprovado, acesso liberado', { orderId, produto: reg.produto, flags: reg.flags, primeiraConfirmacao: !!primeira });
     // Links avulsos (compra de dentro do app, de quem já é aluno) não vão para a API de Conversões da Meta, para não distorcer a otimização dos anúncios (CAPI_AVULSOS=1 liga).
@@ -169,6 +171,7 @@ export async function processarPedido(orderId) {
     for (const flag of reg.flags) await setFlag(produto, reg.email, reg.nome, flag, false);
     const extraR = alvoExtra(reg);
     if (extraR) await setFlag(extraR.produto, reg.email, reg.nome, extraR.flag, false);
+    await espelharNoCompleto(produto, reg, false);
     if (!reg.avulso) await cancelarUpsell(reg.produto, reg.email);
     console.log('pedido: reembolsado, acesso removido', { orderId, produto: reg.produto });
     const trava = await cmd(['SET', `chk_refmail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
