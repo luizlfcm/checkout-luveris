@@ -121,6 +121,8 @@ const quandoBR = (ms) => {
 };
 const linkUpg = (reg, campanha) => `${BASE}/${reg.produto}/upg?email=${encodeURIComponent(reg.email)}&utm_source=email&utm_medium=email&utm_campaign=${campanha}`;
 const upgDe = (p) => (p.avulsos || []).find((a) => a.id === 'upg');
+// Prévia do app completo (abre com o upgrade com crédito + contador; ver apps Completa). Link secundário, nunca no lugar do botão de compra.
+const linkPrevia = (p, reg, campanha) => `${upgDe(p).appUrl || ''}?preview=1&from=ess&email=${encodeURIComponent(reg.email)}&utm_source=email&utm_medium=email&utm_campaign=previa_${campanha}`;
 
 function blocoUpsell(p, reg, expiraEm, campanha, comTitulo = true) {
   const u = p.upsell, a = upgDe(p);
@@ -135,11 +137,12 @@ ${comTitulo ? `<p style="color:${p.cor};font-size:11px;font-weight:800;letter-sp
 <p style="color:${p.cor};font-size:34px;font-weight:900;margin:0">${brl2(a.preco)}</p>
 <p style="color:#8b95a1;font-size:12px;margin:4px 0 0">pagamento único · garantia de 30 dias</p></div>
 <div style="text-align:center"><a href="${esc(linkUpg(reg, campanha))}" style="display:inline-block;background:${p.cor};color:#fff;padding:15px 28px;border-radius:12px;text-decoration:none;font-weight:800;font-size:15px">${esc(u.cta)} por ${brl2(a.preco)} →</a></div>
-<p style="color:#8b95a1;font-size:12px;line-height:1.6;text-align:center;margin:12px 0 0">⏳ Seu crédito vale até <b style="color:#e6ebf0">${esc(quandoBR(expiraEm))}</b>. Depois disso, a ${esc(u.nome)} volta a ${brl2(a.precoCheio)}.</p></div>`;
+<p style="color:#8b95a1;font-size:12px;line-height:1.6;text-align:center;margin:12px 0 0">⏳ Seu crédito vale até <b style="color:#e6ebf0">${esc(quandoBR(expiraEm))}</b>. Depois disso, a ${esc(u.nome)} volta a ${brl2(a.precoCheio)}.</p>
+<p style="text-align:center;margin:14px 0 0"><a href="${esc(linkPrevia(p, reg, campanha))}" style="color:#aab3bd;font-size:13px;text-decoration:underline">👀 Quer ver por dentro antes? Veja a prévia grátis da ${esc(u.nome)}</a></p></div>`;
 }
 const textoUpsell = (p, reg, expiraEm, campanha) => {
   const u = p.upsell, a = upgDe(p);
-  return `\n${u.titulo}\n${u.nome} por ${brl2(a.preco)} (crédito do Essencial já descontado; preço cheio ${brl2(a.precoCheio)}). Vale até ${quandoBR(expiraEm)}.\n${linkUpg(reg, campanha)}\n`;
+  return `\n${u.titulo}\n${u.nome} por ${brl2(a.preco)} (crédito do Essencial já descontado; preço cheio ${brl2(a.precoCheio)}). Vale até ${quandoBR(expiraEm)}.\n${linkUpg(reg, campanha)}\nQuer ver por dentro antes? Prévia grátis: ${linkPrevia(p, reg, campanha)}\n`;
 };
 
 // tipo: 'd1' (1 dia depois) ou 'd3' (6h antes de a janela fechar). Agendado no Resend; cancelado se a pessoa comprar/parar.
