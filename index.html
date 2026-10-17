@@ -501,7 +501,8 @@ input:focus{outline:none;border-color:var(--blu)}
 
   async function init(){
     try{
-      var r=await fetch('/api/config?p='+encodeURIComponent(PID)+(ITEM?'&i='+encodeURIComponent(ITEM):''));
+      var em0=(QS.get('email')||'').trim().toLowerCase();
+      var r=await fetch('/api/config?p='+encodeURIComponent(PID)+(ITEM?'&i='+encodeURIComponent(ITEM)+(em0?'&e='+encodeURIComponent(em0):''):''));
       if(!r.ok)throw 0; CFG=await r.json();
     }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
     if(CFG.teste){var tb=document.createElement('div');tb.style.cssText='background:#b00020;color:#fff;text-align:center;font-weight:800;padding:8px;font-size:15px';tb.textContent='⚠️ MODO DE TESTE DE PREÇO ATIVO — cobrança reduzida';document.body.insertBefore(tb,document.body.firstChild)}
@@ -513,13 +514,31 @@ input:focus{outline:none;border-color:var(--blu)}
     if(qn)$('nome').value=qn.slice(0,40);
     if(ITEM){
       document.querySelector('.warn').innerHTML='⚠️ Use o <b>mesmo e-mail com que você entra no aplicativo</b>. É ele que libera o seu acesso.';
-      var jn=CFG.produto.janela;
-      if(jn&&jn.expiraEm){
-        var dt=new Date(jn.expiraEm).toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'});
-        var nt=document.createElement('div');nt.className='aviso';nt.style.marginTop='10px';
-        nt.innerHTML=jn.naJanela?('⏳ <b>Preço com o crédito do seu Essencial</b>, válido até '+esc(dt)+'. Depois volta a '+brl(jn.precoCheio)+'.'):('O prazo do crédito do Essencial terminou. Este é o preço cheio da versão Completa.');
-        document.querySelector('.warn').insertAdjacentElement('afterend',nt);
-      }
+      var ntEl=null;
+      var mostraJanela=function(){
+        var jn=CFG.produto.janela;
+        if(ntEl){ntEl.remove();ntEl=null}
+        if(jn&&jn.expiraEm){
+          var dt=new Date(jn.expiraEm).toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'});
+          var nt=document.createElement('div');nt.className='aviso';nt.style.marginTop='10px';
+          nt.innerHTML=jn.naJanela?('⏳ <b>Preço com o crédito do seu Essencial</b>, válido até '+esc(dt)+'. Depois volta a '+brl(jn.precoCheio)+'.'):('O prazo do crédito do Essencial terminou. Este é o preço cheio da versão Completa.');
+          document.querySelector('.warn').insertAdjacentElement('afterend',nt);ntEl=nt;
+        }
+      };
+      mostraJanela();
+      // Se a pessoa digitar/alterar o e-mail, busca de novo o preço que vale para ele (o servidor recalcula de qualquer forma na hora de cobrar).
+      var ultEm=(QS.get('email')||'').trim().toLowerCase();
+      $('email').addEventListener('change',function(){
+        var em=$('email').value.trim().toLowerCase();
+        if(em===ultEm||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em))return;
+        ultEm=em;
+        fetch('/api/config?p='+encodeURIComponent(PID)+'&i='+encodeURIComponent(ITEM)+'&e='+encodeURIComponent(em)).then(function(r){return r.json()}).then(function(c){
+          if(!c||!c.produto)return;
+          CFG.produto.preco=c.produto.preco;CFG.produto.janela=c.produto.janela;
+          $('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
+          mostraJanela();atualiza();
+        }).catch(function(){});
+      });
     }
     if(CFG.produto.imagem){$('pImg').src=CFG.produto.imagem;$('pImg').classList.remove('hide')}
     if(CFG.produto.depoimentos&&CFG.produto.depoimentos.length){
