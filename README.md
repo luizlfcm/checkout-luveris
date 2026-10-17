@@ -19,6 +19,7 @@ Edite `bumps` em `api/_lib/produtos.js`.
 - Recuperação de vendas (DESLIGADA por padrão): `RECUPERACAO=1` liga os lembretes por e-mail (Pix pendente após ~25 min; cartão recusado após ~15 min); `RECUPERACAO_DIA2=1` adiciona o lembrete do dia seguinte. Usa o agendamento do Resend e cancela se o cliente pagar. Link "parar" em `/api/parar` (opcional: `RECUPERACAO_SEGREDO`). Vendas recuperadas vão marcadas ao dashboard.
 - Parcelamento no cartão: `MAX_PARCELAS` (padrão 3). Juros por conta do comprador, definidos pelo Mercado Pago; o preço do produto não muda.
 - Pop-up de saída: preço em `precoSaida` (api/_lib/produtos.js), imagem em `imagemSaida`; desconto só no produto principal.
+- Reabrir o preço do upgrade para um cliente que perdeu as 72 h: página `/admin-upgrade.html` (API `/api/reabrir-upgrade`), protegida pela variável `ADMIN_KEY`. Só reabre para quem tem o Essencial e ainda não fez o upgrade; não reenvia e-mails.
 - Dashboard: `DASHBOARD_URL` e `DASHBOARD_WEBHOOK_SECRET` (mesmo valor de CHECKOUT_WEBHOOK_SECRET no dashboard). Não envia em modo de teste.
 - Status dos pedidos para a aba "Checkout" do dashboard: a cada mudança (Pix gerado, aprovado, recusado, expirado, cancelado, reembolsado) o checkout envia `ORDER_STATUS` ao dashboard (mesmas variáveis `DASHBOARD_URL` e `DASHBOARD_WEBHOOK_SECRET`; não envia em modo de teste). Se o envio falhar, a próxima consulta do pedido tenta de novo.
 - Cabeçalho "🔥 N ofertas exclusivas para você" no bloco dos bumps: ligado por padrão (`CHECKOUT_EXCLUSIVAS=0` volta ao "Aproveite e compre junto:").

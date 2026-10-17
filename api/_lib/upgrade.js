@@ -23,6 +23,18 @@ export async function precoUpgrade(produtoId, email) {
   return { preco: naJanela ? a.preco : (a.precoCheio || a.preco), precoPromo: a.preco, precoCheio: a.precoCheio || a.preco, naJanela, expiraEm: expiraEm || 0 };
 }
 
+// Reabre a janela do upgrade para UM cliente (uso manual, pelo painel): o preço com crédito volta a valer por `horas` a partir de agora.
+// Não reenvia e-mails. Retorna { expiraEm (ms) } ou null se o produto não tem upgrade.
+export async function reabrirJanela(produtoId, email, horas = 72) {
+  const a = avulsoUpg(produtoId);
+  if (!a) return null;
+  const h = Math.min(Math.max(Number(horas) || 72, 1), 24 * 14);
+  const janela = a.janelaH || 72;
+  const inicio = Date.now() + (h - janela) * HORA; // início ajustado para a janela terminar daqui a `h` horas
+  await cmd(['SET', chaveInicio(produtoId, email), new Date(inicio).toISOString(), 'EX', String(60 * 60 * 24 * 90)]);
+  return { expiraEm: inicio + janela * HORA };
+}
+
 // Chamada na 1ª confirmação de pagamento do Essencial (front): abre a janela e agenda os e-mails do dia 1 e do dia 3.
 export async function abrirJanela(reg) {
   const p = PRODUTOS[reg.produto];
