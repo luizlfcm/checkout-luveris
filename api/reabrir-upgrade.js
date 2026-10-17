@@ -15,7 +15,18 @@ const chaveOk = (rec) => {
   return a.length === b.length && timingSafeEqual(a, b);
 };
 
+// Os painéis admin dos apps Essencial (instaláveis no celular) chamam este endpoint de outro domínio.
+const ORIGENS = ['fdless', 'apess'].map((id) => { try { return new URL(PRODUTOS[id].appUrl).origin; } catch (e) { return ''; } }).filter(Boolean);
+
 export default async function handler(req, res) {
+  const origem = String(req.headers.origin || '');
+  if (ORIGENS.includes(origem)) {
+    res.setHeader('Access-Control-Allow-Origin', origem);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type, x-admin-key');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  }
+  if (req.method === 'OPTIONS') return res.status(204).end();
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex');
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Método não permitido' });
