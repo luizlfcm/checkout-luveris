@@ -16,7 +16,7 @@ const chaveOk = (rec) => {
 };
 
 // Os painéis admin dos apps Essencial (instaláveis no celular) chamam este endpoint de outro domínio.
-const ORIGENS = ['fdless', 'apess'].map((id) => { try { return new URL(PRODUTOS[id].appUrl).origin; } catch (e) { return ''; } }).filter(Boolean);
+const ORIGENS = ['fdl', 'ap', 'fdless', 'apess'].map((id) => { try { return new URL(PRODUTOS[id].appUrl).origin; } catch (e) { return ''; } }).filter(Boolean);
 
 export default async function handler(req, res) {
   const origem = String(req.headers.origin || '');
