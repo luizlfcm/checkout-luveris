@@ -16,7 +16,7 @@ URL: `https://<dominio>/api/mp-webhook` · evento: Order (Orders)
 ## Order bumps
 Edite `bumps` em `api/_lib/produtos.js`.
 - Teste de preço: `PRECO_TESTE_CENTAVOS` (ex.: 100 = R$ 1,00 por item). REMOVER após o teste.
-- Recuperação de vendas (DESLIGADA por padrão): `RECUPERACAO=1` liga os lembretes por e-mail (Pix pendente após ~25 min; cartão recusado após ~15 min); `RECUPERACAO_DIA2=1` adiciona o lembrete do dia seguinte. Usa o agendamento do Resend e cancela se o cliente pagar. Link "parar" em `/api/parar` (opcional: `RECUPERACAO_SEGREDO`). Vendas recuperadas vão marcadas ao dashboard.
+- Recuperação de vendas (LIGADA por padrão, todos os produtos e também links avulsos/upgrade): Pix pendente → e-mail após ~25 min (com o código) + lembrete no dia seguinte; cartão recusado → e-mail após ~15 min. `RECUPERACAO=0` desliga tudo; `RECUPERACAO_DIA2=0` desliga só o do dia seguinte. Usa o agendamento do Resend e cancela se o cliente pagar. Link "parar" em `/api/parar` (opcional: `RECUPERACAO_SEGREDO`). Vendas recuperadas vão marcadas ao dashboard.
 - Parcelamento no cartão: `MAX_PARCELAS` (padrão 3). Juros por conta do comprador, definidos pelo Mercado Pago; o preço do produto não muda.
 - Pop-up de saída: preço em `precoSaida` (api/_lib/produtos.js), imagem em `imagemSaida`; desconto só no produto principal.
 - Reabrir o preço do upgrade para um cliente que perdeu as 72 h: página `/admin-upgrade.html` (API `/api/reabrir-upgrade`), protegida pela variável `ADMIN_KEY`. Só reabre para quem tem o Essencial e ainda não fez o upgrade; não reenvia e-mails.

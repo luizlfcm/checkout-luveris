@@ -98,14 +98,14 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, id: data.id, status: 'aprovado' });
     }
     if (st === 'falhou' || ['rejected', 'failed'].includes(String(pay.status).toLowerCase())) {
-      if (!reg.avulso) await agendarRecuperacao(reg, 'cartao'); // só age se RECUPERACAO=1 (não vale para links avulsos)
+      await agendarRecuperacao(reg, 'cartao'); // vale para todos os produtos e links avulsos (RECUPERACAO=0 desliga)
       return res.status(402).json({ error: mensagemRecusa(pay.status_detail) });
     }
     return res.status(200).json({ ok: true, id: data.id, status: 'pendente' }); // em análise: o polling acompanha
   }
 
   const pm = pay.payment_method || {};
-  if (!reg.avulso) await agendarRecuperacao(reg, 'pix', pm.qr_code || ''); // só age se RECUPERACAO=1 (não vale para links avulsos)
+  await agendarRecuperacao(reg, 'pix', pm.qr_code || ''); // vale para todos os produtos e links avulsos (RECUPERACAO=0 desliga)
   return res.status(200).json({
     ok: true, id: data.id, status: 'pendente', valor: calc.valor,
     pix: { copiaECola: pm.qr_code || '', qrBase64: pm.qr_code_base64 || '', link: pm.ticket_url || '' },

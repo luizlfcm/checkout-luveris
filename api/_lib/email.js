@@ -183,25 +183,29 @@ export async function enviarRecuperacao(reg, tipo, { pix = '', agendarEm = '' } 
   const p = PRODUTOS[reg.produto];
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
   const nomeCli = primeiroNome(reg.nome);
-  const link = `${BASE}/${reg.produto}?utm_source=recuperacao&utm_medium=email&utm_campaign=${tipo}`;
+  // Compra de item avulso (itens do app, upgrade): o e-mail fala do item e o link volta ao pagamento dele.
+  const av = reg.avulso ? (p.avulsos || []).find((a) => a.id === reg.avulso) : null;
+  if (reg.avulso && !av) return { enviado: false, motivo: 'item desconhecido' };
+  const nomeItem = av ? (av.titulo || av.nome) : p.nome;
+  const link = `${BASE}/${reg.produto}${av ? '/' + av.id : ''}?email=${encodeURIComponent(reg.email)}&utm_source=recuperacao&utm_medium=email&utm_campaign=${tipo}`;
   const olaP = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>`;
   const botao = (rotulo) => `<div style="text-align:center;margin:28px 0"><a href="${esc(link)}" style="display:inline-block;background:${p.cor};color:#fff;padding:16px 30px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">${rotulo}</a></div>`;
   const rodape = `<p style="color:#8b95a1;font-size:12px;line-height:1.6;margin-top:24px">Se você já pagou, é só desconsiderar este e-mail. Não quer mais receber lembretes? <a href="${esc(urlParar(reg.email))}" style="color:#8b95a1">Toque aqui para parar</a>.</p>`;
   let assunto, titulo, miolo, texto;
   if (tipo === 'pix1' && pix) {
-    assunto = `Seu Pix está esperando — ${p.nome}`; titulo = 'Seu Pix está esperando';
-    miolo = `${olaP}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Você gerou o Pix de <b style="color:#fff">${brl(reg.valor)}</b> para <b style="color:#fff">${esc(p.nome)}</b>, mas ainda não vimos o pagamento. O código abaixo vale por mais um tempo. Copie e cole no app do seu banco (Pix Copia e Cola):</p>
+    assunto = `Seu Pix está esperando — ${nomeItem}`; titulo = 'Seu Pix está esperando';
+    miolo = `${olaP}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Você gerou o Pix de <b style="color:#fff">${brl(reg.valor)}</b> para <b style="color:#fff">${esc(nomeItem)}</b>, mas ainda não vimos o pagamento. O código abaixo vale por mais um tempo. Copie e cole no app do seu banco (Pix Copia e Cola):</p>
 <div style="background:#1a1f26;border-radius:10px;padding:14px;margin:16px 0;word-break:break-all;color:#fff;font-size:13px;line-height:1.5;font-family:monospace">${esc(pix)}</div>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Se o código expirou, é só gerar outro:</p>${botao('Abrir o pagamento')}${rodape}`;
-    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu Pix de ${brl(reg.valor)} para ${p.nome} ainda não foi pago. Pix Copia e Cola:\n${pix}\nSe expirou, gere outro: ${link}\nSe já pagou, desconsidere. Para parar: ${urlParar(reg.email)}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu Pix de ${brl(reg.valor)} para ${nomeItem} ainda não foi pago. Pix Copia e Cola:\n${pix}\nSe expirou, gere outro: ${link}\nSe já pagou, desconsidere. Para parar: ${urlParar(reg.email)}`;
   } else if (tipo === 'pix2' || tipo === 'pix1') {
-    assunto = `Ainda dá tempo — ${p.nome}`; titulo = 'Ainda dá tempo de garantir';
-    miolo = `${olaP}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Ontem você começou a comprar <b style="color:#fff">${esc(p.nome)}</b>, mas o Pix não foi concluído. Ele expirou, mas você pode gerar um novo em segundos, e o acesso é liberado na hora, com 30 dias de garantia.</p>${botao('Gerar um novo Pix')}${rodape}`;
-    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! O Pix de ${p.nome} expirou, mas você pode gerar outro: ${link}\nSe já pagou, desconsidere. Para parar: ${urlParar(reg.email)}`;
+    assunto = `Ainda dá tempo — ${nomeItem}`; titulo = 'Ainda dá tempo de garantir';
+    miolo = `${olaP}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Ontem você começou a comprar <b style="color:#fff">${esc(nomeItem)}</b>, mas o Pix não foi concluído. Ele expirou, mas você pode gerar um novo em segundos, e o acesso é liberado na hora, com 30 dias de garantia.</p>${botao('Gerar um novo Pix')}${rodape}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! O Pix de ${nomeItem} expirou, mas você pode gerar outro: ${link}\nSe já pagou, desconsidere. Para parar: ${urlParar(reg.email)}`;
   } else {
-    assunto = `Seu pagamento não foi aprovado — ${p.nome}`; titulo = 'Seu pagamento não foi aprovado';
-    miolo = `${olaP}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Não conseguimos aprovar o pagamento de <b style="color:#fff">${esc(p.nome)}</b> no cartão. Isso pode acontecer por limite, por algum dado digitado errado ou por uma trava do banco. Você pode tentar de novo ou pagar por <b style="color:#fff">Pix</b>, que é aprovado na hora.</p>${botao('Tentar novamente')}${rodape}`;
-    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Não conseguimos aprovar o pagamento de ${p.nome} no cartão. Tente de novo ou pague por Pix: ${link}\nSe já pagou, desconsidere. Para parar: ${urlParar(reg.email)}`;
+    assunto = `Seu pagamento não foi aprovado — ${nomeItem}`; titulo = 'Seu pagamento não foi aprovado';
+    miolo = `${olaP}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Não conseguimos aprovar o pagamento de <b style="color:#fff">${esc(nomeItem)}</b> no cartão. Isso pode acontecer por limite, por algum dado digitado errado ou por uma trava do banco. Você pode tentar de novo ou pagar por <b style="color:#fff">Pix</b>, que é aprovado na hora.</p>${botao('Tentar novamente')}${rodape}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Não conseguimos aprovar o pagamento de ${nomeItem} no cartão. Tente de novo ou pague por Pix: ${link}\nSe já pagou, desconsidere. Para parar: ${urlParar(reg.email)}`;
   }
-  return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, `Olá João! Tentei comprar o ${p.nome} e preciso de ajuda.`), texto, agendarEm);
+  return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, `Olá João! Tentei comprar o ${nomeItem} e preciso de ajuda.`), texto, agendarEm);
 }

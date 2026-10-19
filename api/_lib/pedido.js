@@ -149,8 +149,8 @@ export async function processarPedido(orderId) {
     // Links avulsos (compra de dentro do app, de quem já é aluno) não vão para a API de Conversões da Meta, para não distorcer a otimização dos anúncios (CAPI_AVULSOS=1 liga).
     if (primeira && (!reg.avulso || process.env.CAPI_AVULSOS === '1')) await capiPurchase(reg, orderId);
     // Recuperação de vendas: cancela lembretes pendentes e registra se esta venda foi recuperada.
-    if (primeira && !reg.avulso) {
-      const rc = await cancelarRecuperacao(reg.produto, reg.email);
+    if (primeira) {
+      const rc = await cancelarRecuperacao(reg.produto, reg.email, reg.avulso);
       if (rc.recuperada) await cmd(['SET', `chk_recup:${orderId}`, '1', 'EX', String(60 * 60 * 24 * 90)]).catch(() => {});
     }
     // Essencial: abre a janela do upgrade e agenda os e-mails do dia 1 e do dia 3; comprou o upgrade = cancela o que faltava.
