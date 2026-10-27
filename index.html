@@ -106,6 +106,10 @@ input:focus{outline:none;border-color:var(--blu)}
 .dep q{display:block;quotes:none;font-size:18px;line-height:1.45;color:#1b2430}
 .dep .dm{display:block;margin-top:8px;font-size:14px;color:#566170;font-weight:700}
 .deps .dfim{font-size:13px;color:var(--mut);line-height:1.4;margin:4px 0 0}
+.bf{background:linear-gradient(90deg,#0a0a0a,#1f1b10,#0a0a0a);color:#fff;text-align:center;padding:9px 12px;font-size:14px;font-weight:800;line-height:1.35;border-bottom:2px solid #f5c542;position:relative;overflow:hidden}
+.bf b{color:#f5c542;letter-spacing:1.2px;font-weight:900}.bf s{opacity:.7}.bf .nw{color:#f5c542;font-weight:900}
+.bf:after{content:'';position:absolute;top:0;left:-40%;width:30%;height:100%;background:linear-gradient(100deg,transparent,rgba(245,197,66,.28),transparent);animation:bfsh 3.6s ease-in-out infinite}
+@keyframes bfsh{0%{left:-40%}60%,100%{left:130%}}@media (prefers-reduced-motion:reduce){.bf:after{animation:none;display:none}}
 </style>
 </head>
 <body>
@@ -505,6 +509,9 @@ input:focus{outline:none;border-color:var(--blu)}
       var r=await fetch('/api/config?p='+encodeURIComponent(PID)+(ITEM?'&i='+encodeURIComponent(ITEM)+(em0?'&e='+encodeURIComponent(em0):''):''));
       if(!r.ok)throw 0; CFG=await r.json();
     }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
+    if(CFG.bf&&CFG.bf.ativo){var bf=document.createElement('div');bf.className='bf';bf.setAttribute('role','note');
+      bf.innerHTML='🖤 <b>BLACK FRIDAY</b> · '+(CFG.bf.de&&CFG.bf.de>CFG.produto.preco&&!ITEM?'de <s>'+brl(CFG.bf.de)+'</s> por <span class="nw">'+brl(CFG.produto.preco)+'</span>':'acesso imediato · garantia de 30 dias');
+      document.body.insertBefore(bf,document.body.firstChild)}
     if(CFG.teste){var tb=document.createElement('div');tb.style.cssText='background:#b00020;color:#fff;text-align:center;font-weight:800;padding:8px;font-size:15px';tb.textContent='⚠️ MODO DE TESTE DE PREÇO ATIVO — cobrança reduzida';document.body.insertBefore(tb,document.body.firstChild)}
     $('waFoot').href='https://wa.me/558131963052?text='+encodeURIComponent('Olá! Tenho uma dúvida sobre o '+CFG.produto.nome+' antes de comprar.');
     document.title='Pagamento seguro — '+CFG.produto.nome;

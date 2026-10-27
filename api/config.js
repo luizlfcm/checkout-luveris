@@ -2,6 +2,14 @@
 import { PRODUTOS, precoItem, precoTeste, envId } from './_lib/produtos.js';
 import { precoUpgrade } from './_lib/upgrade.js';
 
+// Faixa de Black Friday no topo do checkout. Ligada por padrão e some sozinha depois da data final.
+// BLACKFRIDAY=0 desliga; BLACKFRIDAY_ATE (ISO, ex.: 2026-11-30T23:59:59-03:00) muda o dia em que ela some.
+function faixaBF(p) {
+  const ate = Date.parse(process.env.BLACKFRIDAY_ATE || '2026-11-30T23:59:59-03:00');
+  const ativo = process.env.BLACKFRIDAY !== '0' && (!Number.isFinite(ate) || Date.now() <= ate);
+  return { ativo, de: p?.bf?.de || 0 };
+}
+
 // Cabeçalho "ofertas exclusivas": ligado por padrão (CHECKOUT_EXCLUSIVAS=0 desliga).
 // Mensagens reais de alunos: DESLIGADAS por padrão (CHECKOUT_DEPOIMENTOS=1 liga).
 export default async function handler(req, res) {
@@ -22,13 +30,14 @@ export default async function handler(req, res) {
       if (pu) { precoMostrar = precoItem(pu.preco); janela = { naJanela: pu.naJanela, expiraEm: pu.expiraEm, precoCheio: pu.precoCheio }; }
     }
     return res.status(200).json({
-      teste: !!precoTeste(), exclusivas: false, publicKey: process.env.MP_PUBLIC_KEY || '', pixelId: '',
+      teste: !!precoTeste(), exclusivas: false, bf: { ...faixaBF(null) }, publicKey: process.env.MP_PUBLIC_KEY || '', pixelId: '',
       produto: { id, nome: a.titulo || a.nome, preco: precoMostrar, janela, precoSaida: 0, imagemSaida: '', appUrl: a.appUrl || p.appUrl, imagem: a.imagem || p.imagem || '', depoimentos: [], bumps: [], avulso: { id: a.id, whatsapp: a.whatsapp || '' } },
     });
   }
   res.setHeader('Cache-Control', 'no-store');
   res.status(200).json({
     teste: !!precoTeste(),
+    bf: faixaBF(p),
     exclusivas: process.env.CHECKOUT_EXCLUSIVAS !== '0',
     publicKey: process.env.MP_PUBLIC_KEY || '',
     pixelId: process.env[`META_PIXEL_ID_${envId(id)}`] || process.env.META_PIXEL_ID || '',
