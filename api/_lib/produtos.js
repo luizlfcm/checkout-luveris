@@ -31,12 +31,12 @@ export const PRODUTOS = {
     ],
     bumps: [
       {
-        id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, de: 58.70, imagem: '/img/bump-ouro.webp',
+        id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, de: 24.70, imagem: '/img/bump-ouro.webp',
         nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais',
         desc: 'Aumente sua linha de produtos sem comprar outro curso: 30 fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza, prontas para produzir e vender aos mesmos clientes.',
       },
       {
-        id: 'form', flag: 'form', hotmartId: 4447291, preco: 19.90, de: 121.37, imagem: '/img/bump-exclusiva.webp',
+        id: 'form', flag: 'form', hotmartId: 4447291, preco: 19.90, de: 49.90, imagem: '/img/bump-exclusiva.webp',
         nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.',
         desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu negócio. Prazo de até 5 dias úteis.',
       },
@@ -67,12 +67,12 @@ export const PRODUTOS = {
     ],
     bumps: [
       {
-        id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 13.90, de: 54.76, imagem: '/img/bump-50formulas.webp',
+        id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 13.90, de: 34.90, imagem: '/img/bump-50formulas.webp',
         nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos',
         desc: 'Aumente sua linha de produtos sem comprar outro curso: 50 fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão do Fórmula Auto Pro, prontas para produzir e vender aos mesmos clientes.',
       },
       {
-        id: 'form', flag: 'form', hotmartId: 7927025, preco: 24.90, de: 121.37, imagem: '/img/bump-exclusiva.webp',
+        id: 'form', flag: 'form', hotmartId: 7927025, preco: 24.90, de: 59.90, imagem: '/img/bump-exclusiva.webp',
         nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.',
         desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu segmento. Prazo de até 5 dias úteis.',
       },
