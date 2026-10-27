@@ -151,7 +151,7 @@ export const PRODUTOS = {
     upsell: {
       nome: 'Fábrica da Limpeza Premium', credito: 14.90, janelaH: 72, fTotal: 200, fMais: 180, linha: 'de limpeza',
       kicker: 'Amplie seu acesso com o crédito da compra do Essencial',
-      titulo: 'Passe de 20 para 200 fórmulas de limpeza por mais R$ 29.',
+      titulo: 'Passe de 20 para 200 fórmulas de limpeza por mais R$ 22,10.',
       h2: 'Mais opções de produtos e apoio para sua produção',
       lead: 'Você já garantiu sua seleção inicial com o Essencial. Com a Fábrica da Limpeza Premium, acrescenta 180 fórmulas para estudar novos produtos e ampliar as opções da sua linha.',
       lead2: 'Além do catálogo maior, você recebe recursos para organizar rótulos, fichas técnicas e o planejamento dos seus resultados.',
@@ -170,7 +170,7 @@ export const PRODUTOS = {
       { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
       { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 6.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
       { id: 'form', flag: 'form', hotmartId: 4447291, preco: 24.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
-      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, precoCheio: 37.00, janelaH: 72, nome: 'Upgrade para a Fábrica da Limpeza Premium', titulo: 'Upgrade — Fábrica da Limpeza Premium (200 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
+      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 22.10, precoCheio: 37.00, janelaH: 72, nome: 'Upgrade para a Fábrica da Limpeza Premium', titulo: 'Upgrade — Fábrica da Limpeza Premium (200 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
     ],
     bumps: [
       {
