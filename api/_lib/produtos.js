@@ -5,8 +5,8 @@
 export const PRODUTOS = {
   fdl: {
     nome: 'Fábrica da Limpeza',
-    preco: 43.90, hotmartId: 4425534, // id da oferta no dashboard (mesmo da Hotmart)
-    precoSaida: 39.50, imagemSaida: '/img/saida-fdl.webp', // pop-up de saída (10% off, só no produto principal)
+    preco: 37.00, hotmartId: 4425534, // id da oferta no dashboard (mesmo da Hotmart)
+    precoSaida: 0, // pop-up de saída desligado no Premium (a imagem /img/saida-fdl.webp tem o preço antigo escrito; para religar: precoSaida: 33.30 + imagemSaida com arte nova)
     flag: 'base',
     redisPrefix: 'fdl_cliente:',
     tokenPrefix: 'FDL_',
@@ -23,19 +23,19 @@ export const PRODUTOS = {
     ],
     // Links de pagamento avulsos (/fdl/<id>): ofertas vendidas dentro do app, só o item (sem produto principal, sem bumps).
     avulsos: [
-      { id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 14.90, nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/avulso-ouro.webp' },
+      { id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/avulso-ouro.webp' },
       { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
       { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 13.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
-      { id: 'form', flag: 'form', hotmartId: 4447291, preco: 24.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
+      { id: 'form', flag: 'form', hotmartId: 4447291, preco: 19.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
     ],
     bumps: [
       {
-        id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 14.90, de: 58.70, imagem: '/img/bump-ouro.webp',
+        id: 'limp', flag: 'limp', hotmartId: 5959285, preco: 9.90, de: 58.70, imagem: '/img/bump-ouro.webp',
         nome: 'Ouro Automotivo — 30 Fórmulas', titulo: 'Ouro Automotivo — 30 Fórmulas de Produtos Automotivos Profissionais',
         desc: 'Aumente sua linha de produtos sem comprar outro curso: 30 fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza, prontas para produzir e vender aos mesmos clientes.',
       },
       {
-        id: 'form', flag: 'form', hotmartId: 4447291, preco: 24.90, de: 121.37, imagem: '/img/bump-exclusiva.webp',
+        id: 'form', flag: 'form', hotmartId: 4447291, preco: 19.90, de: 121.37, imagem: '/img/bump-exclusiva.webp',
         nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.',
         desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu negócio. Prazo de até 5 dias úteis.',
       },
@@ -170,7 +170,7 @@ export const PRODUTOS = {
       { id: 'perf', flag: 'perf', hotmartId: 5959154, preco: 6.90, nome: 'Perfumes de Casa de Rico', titulo: 'Perfumes de Casa de Rico', imagem: '/img/avulso-perfumes.webp' },
       { id: 'leg', flag: 'leg', hotmartId: 6000725, preco: 6.90, nome: 'Guia de Legalização Rápida', titulo: 'Guia de Legalização Rápida', imagem: '/img/avulso-legalizacao-fdl.webp' },
       { id: 'form', flag: 'form', hotmartId: 4447291, preco: 24.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
-      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, precoCheio: 43.90, janelaH: 72, nome: 'Upgrade para a Fábrica da Limpeza Premium', titulo: 'Upgrade — Fábrica da Limpeza Premium (200 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
+      { id: 'upg', flag: 'upg', tambem: { produto: 'fdl', flag: 'base' }, hotmartId: 9200005, preco: 29.00, precoCheio: 37.00, janelaH: 72, nome: 'Upgrade para a Fábrica da Limpeza Premium', titulo: 'Upgrade — Fábrica da Limpeza Premium (200 fórmulas)', imagem: '/img/fdl.webp', appUrl: 'https://fabricadalimpeza.luverisgroup.com.br/' },
     ],
     bumps: [
       {

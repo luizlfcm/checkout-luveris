@@ -40,6 +40,6 @@ Produtos `apess` (Fórmula Auto Pro Essencial) e `fdless` (Fábrica da Limpeza E
 - IDs de oferta no dashboard: só Front e Upsell são novos (AP: 9100001 front, 9100004 upg; FDL: 9200001 front, 9200005 upg). Os order bumps reaproveitam os IDs que já existem (AP: 7927216 limp, 7927079 leg; FDL: 5959285 Ouro, 5959154 perfumes, 6000725 leg). SQL em `dashboard/migrations/2026-10-ofertas-essencial.sql`.
 
 ### Upgrade com janela de 72 h (Essencial → Completa)
-- Ao confirmar o pagamento do Essencial abre-se a janela (`chk_upg:<produto>:<email>`): dentro de 72 h o upgrade custa R$ 27,00 (AP) / R$ 29,00 (FDL); depois, o preço cheio da Completa (R$ 41,90 / R$ 43,90). O preço é sempre calculado no servidor (`api/_lib/upgrade.js`); `GET /api/upgrade?p=apess&email=` informa preço e prazo ao app.
+- Ao confirmar o pagamento do Essencial abre-se a janela (`chk_upg:<produto>:<email>`): dentro de 72 h o upgrade custa R$ 27,00 (AP) / R$ 29,00 (FDL); depois, o preço cheio da Completa (R$ 41,90 / R$ 37,00). O preço é sempre calculado no servidor (`api/_lib/upgrade.js`); `GET /api/upgrade?p=apess&email=` informa preço e prazo ao app.
 - Página de obrigado do Essencial mostra o acesso e a oferta (textos em `upsell` de cada produto, com contagem regressiva real).
 - E-mails: bloco do upgrade no e-mail de entrega + e-mail do dia 1 (24 h) + do dia 3 (66 h, 6 h antes de fechar), agendados no Resend e cancelados se a pessoa comprar o upgrade, pedir reembolso ou clicar em "parar" (mesmo link da recuperação). `UPSELL_EMAILS=0` desliga os e-mails.
