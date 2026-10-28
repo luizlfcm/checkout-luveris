@@ -7,6 +7,8 @@ export const PRODUTOS = {
     nome: 'Fábrica da Limpeza',
     preco: 37.00, hotmartId: 4425534, // id da oferta no dashboard (mesmo da Hotmart)
     bf: { de: 43.90 }, // preço anterior, mostrado na faixa de Black Friday (só onde o preço realmente baixou)
+    // Pós-venda por e-mail (sem upgrade): oferece os itens que a pessoa ainda não tem. horas = quanto depois da compra. Some se ela comprar o item, pedir reembolso ou clicar em "parar". POSVENDA_EMAILS=0 desliga.
+    posVenda: [{ item: 'limp', tipo: 'pv1', horas: 24 }, { item: 'form', tipo: 'pv2', horas: 120 }],
     precoSaida: 0, // pop-up de saída desligado no Premium (a imagem /img/saida-fdl.webp tem o preço antigo escrito; para religar: precoSaida: 33.30 + imagemSaida com arte nova)
     flag: 'base',
     redisPrefix: 'fdl_cliente:',

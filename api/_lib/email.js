@@ -178,6 +178,40 @@ export async function enviarUpsell(reg, tipo, { agendarEm = '', expiraEm = 0 } =
   return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, tipo === 'ex' ? 'Olá João! Tenho uma dúvida sobre a Fórmula Exclusiva.' : `Olá João! Tenho uma dúvida sobre a ${u.nome}.`), texto, agendarEm);
 }
 
+// Pós-venda do produto principal (sem upgrade): oferece um item que a pessoa ainda não tem. plano = { item, tipo }.
+export async function enviarPosVenda(reg, plano, { agendarEm = '' } = {}) {
+  const p = PRODUTOS[reg.produto];
+  if (!p) return { enviado: false, motivo: 'produto desconhecido' };
+  const it = (p.avulsos || []).find((a) => a.id === plano.item);
+  if (!it) return { enviado: false, motivo: 'item desconhecido' };
+  const bump = (p.bumps || []).find((b) => b.id === plano.item);
+  const de = bump && bump.de > it.preco ? bump.de : 0;
+  const nomeCli = primeiroNome(reg.nome);
+  const ola = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>`;
+  const link = `${BASE}/${reg.produto}/${it.id}?email=${encodeURIComponent(reg.email)}&utm_source=email&utm_medium=email&utm_campaign=posvenda_${it.id}`;
+  const parar = `<p style="color:#8b95a1;font-size:12px;line-height:1.6;margin-top:24px">Não quer mais receber mensagens sobre estas ofertas? <a href="${esc(urlParar(reg.email))}" style="color:#8b95a1">Clique aqui para parar</a>.</p>`;
+  const preco = (cta) => `<div style="background:#1a1f26;border-radius:10px;padding:14px;text-align:center;margin:18px 0">
+<p style="color:#aab3bd;font-size:13px;margin:0 0 4px">${esc(it.nome)}${de ? `: <s>${brl2(de)}</s>` : ''}</p>
+<p style="color:${p.cor};font-size:34px;font-weight:900;margin:0">${brl2(it.preco)}</p>
+<p style="color:#8b95a1;font-size:12px;margin:4px 0 0">pagamento único · garantia de 30 dias</p></div>
+<div style="text-align:center"><a href="${esc(link)}" style="display:inline-block;background:${p.cor};color:#fff;padding:15px 28px;border-radius:12px;text-decoration:none;font-weight:800;font-size:15px">${esc(cta)} →</a></div>`;
+  let assunto, titulo, miolo, texto;
+  if (it.id === 'limp') {
+    assunto = 'Já fez sua primeira receita? (e uma ideia para ampliar sua linha)'; titulo = 'Como está indo?';
+    miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Ontem você entrou na ${esc(p.nome)}. Um conselho de quem formula há mais de 10 anos: <b style="color:#fff">comece pequeno</b>. Faça um lote de teste de 1 litro de uma receita simples, anote o resultado e só depois aumente a produção.</p>
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">E uma ideia para quando você estiver produzindo: quem fabrica produtos de limpeza costuma conseguir vender também para o <b style="color:#fff">mesmo cliente</b> produtos de estética automotiva. O <b style="color:#fff">Ouro Automotivo</b> traz 30 fórmulas profissionais, no mesmo padrão da ${esc(p.nome)}, prontas para produzir e vender.</p>${preco('Quero o Ouro Automotivo')}${parar}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Como está indo? Comece com um lote de teste de 1 litro. Para ampliar sua linha: ${it.nome} por ${brl2(it.preco)}${de ? ` (de ${brl2(de)})` : ''}: ${link}\nPara parar de receber: ${urlParar(reg.email)}`;
+  } else if (it.id === 'form') {
+    assunto = 'Uma fórmula feita só para o seu negócio'; titulo = 'Fórmula Exclusiva';
+    miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Já se passaram alguns dias desde que você entrou na ${esc(p.nome)}. Se alguma das receitas ficou perto do que você quer vender, mas não exatamente, <b style="color:#fff">existe um caminho mais rápido</b>.</p>
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">Na <b style="color:#fff">Fórmula Exclusiva</b>, o especialista (engenheiro químico) cria de <b style="color:#fff">3 a 5 fórmulas pensadas para o seu negócio</b>: o seu público, a sua região e o seu orçamento. Você recebe tudo pelo WhatsApp, em até 5 dias úteis.</p>${preco('Quero minha Fórmula Exclusiva')}${parar}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Na Fórmula Exclusiva o especialista cria de 3 a 5 fórmulas feitas para o seu negócio, entregues pelo WhatsApp em até 5 dias úteis, por ${brl2(it.preco)}${de ? ` (de ${brl2(de)})` : ''}: ${link}\nPara parar de receber: ${urlParar(reg.email)}`;
+  } else {
+    return { enviado: false, motivo: 'sem texto para o item' };
+  }
+  return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, `Olá João! Tenho uma dúvida sobre ${it.nome}.`), texto, agendarEm);
+}
+
 // tipo: 'pix1' (Pix gerado e não pago), 'pix2' (dia seguinte), 'cartao' (pagamento recusado)
 export async function enviarRecuperacao(reg, tipo, { pix = '', agendarEm = '' } = {}) {
   const p = PRODUTOS[reg.produto];

@@ -9,6 +9,7 @@ import { notificarDashboard, notificarStatus } from './dashboard.js';
 import { enviarEntrega, enviarReembolso } from './email.js';
 import { cancelarRecuperacao } from './recuperacao.js';
 import { abrirJanela, cancelarUpsell } from './upgrade.js';
+import { agendarPosVenda } from './posvenda.js';
 import { espelharNoCompleto } from './espelho.js';
 
 const APROVADO = ['processed', 'accredited'];
@@ -155,8 +156,10 @@ export async function processarPedido(orderId) {
     }
     // Essencial: abre a janela do upgrade e agenda os e-mails do dia 1 e do dia 3; comprou o upgrade = cancela o que faltava.
     if (primeira && !reg.avulso) await abrirJanela(reg);
+    if (primeira && !reg.avulso) await agendarPosVenda(reg); // produtos sem upgrade (Premium): e-mails oferecendo Ouro Automotivo e Fórmula Exclusiva
+    if (primeira && reg.avulso === 'limp') await cancelarUpsell(reg.produto, reg.email, ['pv1']); // já comprou o Ouro: não manda a oferta
     if (primeira && reg.avulso === 'upg') await cancelarUpsell(reg.produto, reg.email, ['d1', 'd3']);
-    if (primeira && reg.avulso === 'form') await cancelarUpsell(reg.produto, reg.email, ['ex']); // já comprou a Exclusiva: não manda o e-mail do dia 5
+    if (primeira && reg.avulso === 'form') await cancelarUpsell(reg.produto, reg.email, ['ex', 'pv2']); // já comprou a Exclusiva: não manda o e-mail do dia 5
     // E-mail de entrega: uma única vez por pedido; se falhar, libera a trava para tentar de novo.
     const mailTrava = await cmd(['SET', `chk_mail:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     if (mailTrava) {

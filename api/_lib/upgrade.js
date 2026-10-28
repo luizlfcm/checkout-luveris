@@ -5,7 +5,7 @@ import { PRODUTOS } from './produtos.js';
 import { enviarUpsell } from './email.js';
 
 const chaveInicio = (produto, email) => `chk_upg:${produto}:${String(email).toLowerCase()}`;
-const chaveMails = (produto, email) => `chk_upgmail:${produto}:${String(email).toLowerCase()}`;
+export const chaveMails = (produto, email) => `chk_upgmail:${produto}:${String(email).toLowerCase()}`;
 export const chaveParar = (email) => `chk_rec_parar:${String(email).toLowerCase()}`; // mesma chave do "parar" da recuperação
 const HORA = 3600 * 1000;
 const ativo = () => process.env.UPSELL_EMAILS !== '0';
@@ -78,4 +78,4 @@ export async function cancelarUpsell(produtoId, email, tipos = null) {
     else await cmd(['DEL', chaveMails(produtoId, email)]);
   } catch (e) { console.error('upgrade: falha ao cancelar', e?.message); }
 }
-export const cancelarTodosUpsell = async (email) => { for (const id of Object.keys(PRODUTOS)) if (PRODUTOS[id].upsell) await cancelarUpsell(id, email); };
+export const cancelarTodosUpsell = async (email) => { for (const id of Object.keys(PRODUTOS)) if (PRODUTOS[id].upsell || PRODUTOS[id].posVenda) await cancelarUpsell(id, email); };
