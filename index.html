@@ -498,6 +498,8 @@ input:focus{outline:none;border-color:var(--blu)}
       $('okPassos').innerHTML='<li>Toque no botão abaixo e fale com o João no WhatsApp</li><li>Ele vai preparar o seu material e enviar para você</li>';
       $('btnApp').textContent='Chamar o João no WhatsApp';
       $('btnApp').href='https://wa.me/558131963052?text='+encodeURIComponent(av.whatsapp);
+    }else if(av&&av.id==='pacote'){
+      $('okPassos').innerHTML='<li>Abra o seu aplicativo normalmente</li><li>Entre com este e-mail:<br><b>'+esc(email)+'</b></li>'+(av.zap?'<li>Para a Fórmula Exclusiva, fale com o João no WhatsApp: <a href="https://wa.me/558131963052?text='+encodeURIComponent(av.zap)+'" style="color:inherit;font-weight:800">toque aqui</a></li>':'');
     }else if(av){
       $('okPassos').innerHTML='<li>Abra o seu aplicativo normalmente</li><li>Entre com este e-mail:<br><b>'+esc(email)+'</b></li>';
     }
@@ -541,6 +543,16 @@ input:focus{outline:none;border-color:var(--blu)}
       var mostraJanela=function(){
         var jn=CFG.produto.janela;
         if(ntEl){ntEl.remove();ntEl=null}
+        if(jn&&jn.pacote){
+          var np=document.createElement('div');np.className='aviso';np.style.marginTop='10px';
+          if(jn.indisponivel){np.innerHTML=esc(jn.indisponivel)}
+          else{
+            var dtp=jn.expiraEm?new Date(jn.expiraEm).toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'}):'';
+            var lst=(jn.itens||[]).map(function(i){return '<b>'+esc(i.nome)+'</b>'}).join(' + ');
+            np.innerHTML=jn.naJanela?('🎁 <b>'+jn.pct+'% de desconto</b> em tudo o que falta no seu acesso: '+lst+'. Válido até '+esc(dtp)+'. Depois volta a '+brl(jn.precoCheio)+'.'):('O prazo do desconto terminou. Este é o preço normal dos itens que faltam: '+lst+'.');
+          }
+          document.querySelector('.warn').insertAdjacentElement('afterend',np);ntEl=np;return;
+        }
         if(jn&&jn.expiraEm){
           var dt=new Date(jn.expiraEm).toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'});
           var nt=document.createElement('div');nt.className='aviso';nt.style.marginTop='10px';
@@ -557,7 +569,7 @@ input:focus{outline:none;border-color:var(--blu)}
         ultEm=em;
         fetch('/api/config?p='+encodeURIComponent(PID)+'&i='+encodeURIComponent(ITEM)+'&e='+encodeURIComponent(em)).then(function(r){return r.json()}).then(function(c){
           if(!c||!c.produto)return;
-          CFG.produto.preco=c.produto.preco;CFG.produto.janela=c.produto.janela;
+          CFG.produto.preco=c.produto.preco;CFG.produto.janela=c.produto.janela;CFG.produto.avulso=c.produto.avulso;
           $('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
           mostraJanela();atualiza();
         }).catch(function(){});

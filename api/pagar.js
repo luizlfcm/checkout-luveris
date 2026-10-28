@@ -5,6 +5,7 @@ import { mpFetch, cpfValido, mensagemRecusa } from './_lib/mp.js';
 import { salvarRegistro, processarPedido, statusSimples, statusDetalhado, registrarStatus } from './_lib/pedido.js';
 import { agendarRecuperacao } from './_lib/recuperacao.js';
 import { precoUpgrade } from './_lib/upgrade.js';
+import { calcularPacote } from './_lib/pacote.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -15,11 +16,17 @@ export default async function handler(req, res) {
   }
   const b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
 
-  let calc = calcular(String(b.produto || ''), Array.isArray(b.bumps) ? b.bumps : [], b.saida === true, String(b.avulso || ''));
+  const ehPacote = String(b.avulso || '') === 'pacote';
+  let calc = ehPacote ? true : calcular(String(b.produto || ''), Array.isArray(b.bumps) ? b.bumps : [], b.saida === true, String(b.avulso || ''));
   if (!calc) return res.status(400).json({ error: 'Produto inválido.' });
 
   const email = String(b.email || '').trim().toLowerCase();
   if (!EMAIL_RE.test(email) || email.length > 120) return res.status(400).json({ error: 'Confira o e-mail digitado.' });
+  // Pacote com desconto: o servidor decide o que falta e o preço para este e-mail (só quem já é cliente do produto principal).
+  if (ehPacote) {
+    calc = await calcularPacote(String(b.produto || ''), email);
+    if (!calc) return res.status(400).json({ error: 'Este pacote não está disponível para este e-mail (use o e-mail da sua compra, ou você já tem todos os itens).' });
+  }
   // Upgrade com janela: o preço depende de quando o e-mail comprou o Essencial (decidido aqui, nunca pelo navegador).
   if (calc.avulso?.janelaH) {
     const pu = await precoUpgrade(String(b.produto), email);

@@ -51,12 +51,14 @@ async function resend(p, to, subject, html, text, agendarEm = '') {
 export async function enviarEntrega(reg) {
   const p = PRODUTOS[reg.produto];
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
-  const av = reg.avulso ? (p.avulsos || []).find((a) => a.id === reg.avulso) : null; // compra avulsa (link dentro do app)
-  const extras = av ? [] : p.bumps.filter((b) => (reg.bumps || []).includes(b.id));
-  const comprados = av ? [av.nome] : [p.nome, ...extras.map((b) => b.nome)];
+  const pac = reg.avulso === 'pacote'; // pacote com desconto: vários itens de uma vez
+  const av = reg.avulso && !pac ? (p.avulsos || []).find((a) => a.id === reg.avulso) : null; // compra avulsa (link dentro do app)
+  const extras = av || pac ? [] : p.bumps.filter((b) => (reg.bumps || []).includes(b.id));
+  const itensPac = pac ? (p.avulsos || []).filter((a) => (reg.flags || []).includes(a.flag)) : [];
+  const comprados = pac ? itensPac.map((a) => a.nome) : av ? [av.nome] : [p.nome, ...extras.map((b) => b.nome)];
   const comApp = av ? (av.whatsapp ? [] : [av.nome]) : [p.nome, ...extras.filter((b) => !b.whatsapp).map((b) => b.nome)];
-  const comZap = av ? (av.whatsapp ? [av] : []) : extras.filter((b) => b.whatsapp);
-  const soZap = !!(av && av.whatsapp); // entrega manual: sem botão do app
+  const comZap = pac ? itensPac.filter((a) => a.whatsapp) : av ? (av.whatsapp ? [av] : []) : extras.filter((b) => b.whatsapp);
+  const soZap = pac ? (itensPac.length > 0 && itensPac.every((a) => a.whatsapp)) : !!(av && av.whatsapp); // entrega manual: sem botão do app
 
   const nomeCli = primeiroNome(reg.nome);
   const appUrl = (av && av.appUrl) || p.appUrl;
@@ -85,14 +87,14 @@ ${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para ace
     `\n30 dias de garantia. Dúvidas técnicas: WhatsApp do especialista (João Silva) (81) 3196-3052. Reembolso e demais assuntos: ${CONTATO}.\nResponsável técnico: João Silva - 53.168.292 LUIZ FELIPE CORREA MIRANDA - CNPJ 53.168.292/0001-32`;
   const titulo = 'Acesso Liberado!';
   void comApp;
-  return resend(p, reg.email, `${av ? av.nome : p.nome} - Acesso liberado!`, moldura(p, titulo, av ? av.nome : p.nome, miolo), text);
+  return resend(p, reg.email, `${pac ? 'Pacote' : av ? av.nome : p.nome} - Acesso liberado!`, moldura(p, titulo, pac ? comprados.join(' + ') : av ? av.nome : p.nome, miolo), text);
 }
 
 export async function enviarReembolso(reg) {
   const p = PRODUTOS[reg.produto];
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
   const nomeCli = primeiroNome(reg.nome);
-  const nomeCompra = (reg.avulso && (p.avulsos || []).find((a) => a.id === reg.avulso)?.nome) || p.nome;
+  const nomeCompra = reg.avulso === 'pacote' ? 'Pacote com desconto' : (reg.avulso && (p.avulsos || []).find((a) => a.id === reg.avulso)?.nome) || p.nome;
   const miolo = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu reembolso de <strong>${esc(nomeCompra)}</strong> foi processado com sucesso. O acesso ao produto foi encerrado conforme solicitado.</p>
 <div style="background:#1a1f26;border-radius:10px;padding:14px;border-left:3px solid ${p.cor};margin-top:20px">
@@ -178,15 +180,45 @@ export async function enviarUpsell(reg, tipo, { agendarEm = '', expiraEm = 0 } =
   return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, tipo === 'ex' ? 'Olá João! Tenho uma dúvida sobre a Fórmula Exclusiva.' : `Olá João! Tenho uma dúvida sobre a ${u.nome}.`), texto, agendarEm);
 }
 
+// Cupom do pacote (pv3 = dia 3, pv4 = reta final): todos os itens que a pessoa ainda não tem, com pct% de desconto até expiraEm.
+async function enviarCupomPacote(reg, p, tipo, { agendarEm = '', faltam = [], expiraEm = 0, pct = 30 } = {}) {
+  if (!faltam.length || !expiraEm) return { enviado: false, motivo: 'nada a oferecer' };
+  const nomeCli = primeiroNome(reg.nome);
+  const ola = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>`;
+  const link = `${BASE}/${reg.produto}/pacote?email=${encodeURIComponent(reg.email)}&utm_source=email&utm_medium=email&utm_campaign=posvenda_pacote_${tipo}`;
+  const parar = `<p style="color:#8b95a1;font-size:12px;line-height:1.6;margin-top:24px">Não quer mais receber mensagens sobre estas ofertas? <a href="${esc(urlParar(reg.email))}" style="color:#8b95a1">Clique aqui para parar</a>.</p>`;
+  const cheio = faltam.reduce((t, i) => t + Math.round(i.preco * 100), 0);
+  const com = Math.round(cheio * (100 - pct) / 100);
+  const lis = faltam.map((i) => `<li style="margin:0 0 10px"><b style="color:#fff">${esc(i.nome)}</b>${i.desc ? `<br><span style="color:#aab3bd;font-size:13px">${esc(i.desc)}</span>` : ''}</li>`).join('');
+  const ate = quandoBR(expiraEm);
+  const ultimo = tipo === 'pv4';
+  const assunto = ultimo ? `Últimas horas: ${pct}% de desconto no que falta no seu acesso` : `${pct}% de desconto no que falta no seu acesso`;
+  const titulo = ultimo ? 'Seu desconto termina em breve' : `${pct}% de desconto para você`;
+  const intro = ultimo
+    ? `Um aviso rápido: o seu desconto de <b style="color:#fff">${pct}%</b> vale só até <b style="color:#fff">${esc(ate)}</b>. Depois disso, cada item volta ao preço normal.`
+    : `Você já está dentro da ${esc(p.nome)}. Para completar o seu acesso, separei uma condição especial: <b style="color:#fff">${pct}% de desconto</b> em tudo o que você ainda não tem, liberado de uma vez no mesmo e-mail.`;
+  const miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">${intro}</p>
+<ul style="color:#e6ebf0;font-size:14px;line-height:1.55;padding-left:20px;margin:16px 0">${lis}</ul>
+<div style="background:#1a1f26;border-radius:10px;padding:14px;text-align:center;margin:18px 0">
+<p style="color:#aab3bd;font-size:13px;margin:0 0 4px">${faltam.length > 1 ? 'Os itens separados' : 'Preço normal'}: <s>${brl2(cheio / 100)}</s> · ${pct}% de desconto</p>
+<p style="color:${p.cor};font-size:34px;font-weight:900;margin:0">${brl2(com / 100)}</p>
+<p style="color:#8b95a1;font-size:12px;margin:4px 0 0">pagamento único · válido até ${esc(ate)} · garantia de 30 dias</p></div>
+<div style="text-align:center"><a href="${esc(link)}" style="display:inline-block;background:${p.cor};color:#fff;padding:15px 28px;border-radius:12px;text-decoration:none;font-weight:800;font-size:15px">Quero o desconto de ${pct}% →</a></div>${parar}`;
+  const texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! ${pct}% de desconto no que falta no seu acesso (${faltam.map((i) => i.nome).join(' + ')}): de ${brl2(cheio / 100)} por ${brl2(com / 100)}, válido até ${ate}.\n${link}\nPara parar de receber: ${urlParar(reg.email)}`;
+  return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, `Olá João! Tenho uma dúvida sobre o pacote com desconto.`), texto, agendarEm);
+}
+
 // Texto do item "limp" no pós-venda de cada produto principal.
 const IDEIA_LIMP = {
   fdl: { frase: 'quem fabrica produtos de limpeza costuma conseguir vender também, para o mesmo cliente, produtos de estética automotiva.', oque: 'fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza, prontas para produzir e vender.', cta: 'Quero o Ouro Automotivo' },
   ap: { frase: 'quem fabrica produtos automotivos costuma conseguir vender também, para o mesmo cliente, produtos de limpeza.', oque: 'fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão da Fórmula Auto Pro, prontas para produzir e vender.', cta: 'Quero as 50 Fórmulas de Limpeza' },
 };
 // Pós-venda do produto principal (sem upgrade): oferece um item que a pessoa ainda não tem. plano = { item, tipo }.
-export async function enviarPosVenda(reg, plano, { agendarEm = '' } = {}) {
+export async function enviarPosVenda(reg, plano, opts = {}) {
+  const { agendarEm = '' } = opts;
   const p = PRODUTOS[reg.produto];
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
+  if (plano.tipo === 'pv3' || plano.tipo === 'pv4') return enviarCupomPacote(reg, p, plano.tipo, opts);
   const it = (p.avulsos || []).find((a) => a.id === plano.item);
   if (!it) return { enviado: false, motivo: 'item desconhecido' };
   const bump = (p.bumps || []).find((b) => b.id === plano.item);
@@ -223,10 +255,11 @@ export async function enviarRecuperacao(reg, tipo, { pix = '', agendarEm = '' } 
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
   const nomeCli = primeiroNome(reg.nome);
   // Compra de item avulso (itens do app, upgrade): o e-mail fala do item e o link volta ao pagamento dele.
-  const av = reg.avulso ? (p.avulsos || []).find((a) => a.id === reg.avulso) : null;
-  if (reg.avulso && !av) return { enviado: false, motivo: 'item desconhecido' };
-  const nomeItem = av ? (av.titulo || av.nome) : p.nome;
-  const link = `${BASE}/${reg.produto}${av ? '/' + av.id : ''}?email=${encodeURIComponent(reg.email)}&utm_source=recuperacao&utm_medium=email&utm_campaign=${tipo}`;
+  const pac = reg.avulso === 'pacote';
+  const av = reg.avulso && !pac ? (p.avulsos || []).find((a) => a.id === reg.avulso) : null;
+  if (reg.avulso && !av && !pac) return { enviado: false, motivo: 'item desconhecido' };
+  const nomeItem = pac ? 'Pacote com desconto' : av ? (av.titulo || av.nome) : p.nome;
+  const link = `${BASE}/${reg.produto}${pac ? '/pacote' : av ? '/' + av.id : ''}?email=${encodeURIComponent(reg.email)}&utm_source=recuperacao&utm_medium=email&utm_campaign=${tipo}`;
   const olaP = `<p style="color:#f2f4f6;font-size:16px">Olá${nomeCli ? ', ' + esc(nomeCli) : ''}!</p>`;
   const botao = (rotulo) => `<div style="text-align:center;margin:28px 0"><a href="${esc(link)}" style="display:inline-block;background:${p.cor};color:#fff;padding:16px 30px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">${rotulo}</a></div>`;
   const rodape = `<p style="color:#8b95a1;font-size:12px;line-height:1.6;margin-top:24px">Se você já pagou, é só desconsiderar este e-mail. Não quer mais receber lembretes? <a href="${esc(urlParar(reg.email))}" style="color:#8b95a1">Toque aqui para parar</a>.</p>`;
