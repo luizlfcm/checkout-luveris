@@ -178,6 +178,11 @@ export async function enviarUpsell(reg, tipo, { agendarEm = '', expiraEm = 0 } =
   return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, tipo === 'ex' ? 'Olá João! Tenho uma dúvida sobre a Fórmula Exclusiva.' : `Olá João! Tenho uma dúvida sobre a ${u.nome}.`), texto, agendarEm);
 }
 
+// Texto do item "limp" no pós-venda de cada produto principal.
+const IDEIA_LIMP = {
+  fdl: { frase: 'quem fabrica produtos de limpeza costuma conseguir vender também, para o mesmo cliente, produtos de estética automotiva.', oque: 'fórmulas profissionais de estética automotiva, no mesmo padrão da Fábrica da Limpeza, prontas para produzir e vender.', cta: 'Quero o Ouro Automotivo' },
+  ap: { frase: 'quem fabrica produtos automotivos costuma conseguir vender também, para o mesmo cliente, produtos de limpeza.', oque: 'fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão da Fórmula Auto Pro, prontas para produzir e vender.', cta: 'Quero as 50 Fórmulas de Limpeza' },
+};
 // Pós-venda do produto principal (sem upgrade): oferece um item que a pessoa ainda não tem. plano = { item, tipo }.
 export async function enviarPosVenda(reg, plano, { agendarEm = '' } = {}) {
   const p = PRODUTOS[reg.produto];
@@ -199,7 +204,7 @@ export async function enviarPosVenda(reg, plano, { agendarEm = '' } = {}) {
   if (it.id === 'limp') {
     assunto = 'Já fez sua primeira receita? (e uma ideia para ampliar sua linha)'; titulo = 'Como está indo?';
     miolo = `${ola}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Ontem você entrou na ${esc(p.nome)}. Um conselho de quem formula há mais de 10 anos: <b style="color:#fff">comece pequeno</b>. Faça um lote de teste de 1 litro de uma receita simples, anote o resultado e só depois aumente a produção.</p>
-<p style="color:#8b95a1;font-size:14px;line-height:1.7">E uma ideia para quando você estiver produzindo: quem fabrica produtos de limpeza costuma conseguir vender também para o <b style="color:#fff">mesmo cliente</b> produtos de estética automotiva. O <b style="color:#fff">Ouro Automotivo</b> traz 30 fórmulas profissionais, no mesmo padrão da ${esc(p.nome)}, prontas para produzir e vender.</p>${preco('Quero o Ouro Automotivo')}${parar}`;
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">E uma ideia para quando você estiver produzindo: ${esc(IDEIA_LIMP[reg.produto] ? IDEIA_LIMP[reg.produto].frase : 'dá para ampliar a sua linha vendendo para o mesmo cliente.')} Conheça o pacote <b style="color:#fff">${esc(it.nome)}</b>: ${esc(IDEIA_LIMP[reg.produto] ? IDEIA_LIMP[reg.produto].oque : 'fórmulas profissionais, prontas para produzir e vender.')}</p>${preco(IDEIA_LIMP[reg.produto] ? IDEIA_LIMP[reg.produto].cta : 'Quero este item')}${parar}`;
     texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Como está indo? Comece com um lote de teste de 1 litro. Para ampliar sua linha: ${it.nome} por ${brl2(it.preco)}${de ? ` (de ${brl2(de)})` : ''}: ${link}\nPara parar de receber: ${urlParar(reg.email)}`;
   } else if (it.id === 'form') {
     assunto = 'Uma fórmula feita só para o seu negócio'; titulo = 'Fórmula Exclusiva';

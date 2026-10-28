@@ -46,8 +46,11 @@ export const PRODUTOS = {
   },
   ap: {
     nome: 'Fórmula Auto Pro',
-    preco: 41.90, hotmartId: 7926953,
-    precoSaida: 37.70, imagemSaida: '/img/saida-ap.webp',
+    preco: 37.00, hotmartId: 7926953,
+    bf: { de: 41.90 }, // preço anterior, mostrado na faixa de Black Friday
+    precoSaida: 0, // pop-up de saída desligado (a imagem /img/saida-ap.webp tem o preço antigo escrito; para religar: precoSaida: 33.30 + imagemSaida com arte nova)
+    // Pós-venda por e-mail (sem upgrade): oferece os itens que a pessoa ainda não tem. POSVENDA_EMAILS=0 desliga.
+    posVenda: [{ item: 'limp', tipo: 'pv1', horas: 24 }, { item: 'form', tipo: 'pv2', horas: 120 }],
     flag: 'base',
     redisPrefix: 'cliente:',
     tokenPrefix: 'FAP_',
@@ -63,18 +66,18 @@ export const PRODUTOS = {
     ],
     // Links de pagamento avulsos (/ap/<id>): ofertas vendidas dentro do app, só o item (sem produto principal, sem bumps).
     avulsos: [
-      { id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 13.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
+      { id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
       { id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 13.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '/img/bump-legalizacao-ap.webp' },
-      { id: 'form', flag: 'form', hotmartId: 7927025, preco: 24.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
+      { id: 'form', flag: 'form', hotmartId: 7927025, preco: 19.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
     ],
     bumps: [
       {
-        id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 13.90, de: 34.90, imagem: '/img/bump-50formulas.webp',
+        id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, de: 24.70, imagem: '/img/bump-50formulas.webp',
         nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos',
         desc: 'Aumente sua linha de produtos sem comprar outro curso: 50 fórmulas profissionais de limpeza doméstica e industrial, no mesmo padrão do Fórmula Auto Pro, prontas para produzir e vender aos mesmos clientes.',
       },
       {
-        id: 'form', flag: 'form', hotmartId: 7927025, preco: 24.90, de: 59.90, imagem: '/img/bump-exclusiva.webp',
+        id: 'form', flag: 'form', hotmartId: 7927025, preco: 19.90, de: 49.90, imagem: '/img/bump-exclusiva.webp',
         nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.',
         desc: 'Conte o que você precisa e receba de 3 a 5 fórmulas criadas por um especialista só para o seu segmento. Prazo de até 5 dias úteis.',
       },
@@ -101,7 +104,7 @@ export const PRODUTOS = {
     upsell: {
       nome: 'Fórmula Auto Pro Completa', credito: 14.90, janelaH: 72, fTotal: 80, fMais: 60, linha: 'automotivas',
       kicker: 'Uma opção para ampliar o que você acabou de adquirir',
-      titulo: 'Passe de 20 para 80 fórmulas automotivas por mais R$ 27.',
+      titulo: 'Passe de 20 para 80 fórmulas automotivas por mais R$ 22,10.',
       h2: 'O que você recebe com a ampliação:',
       lead2: 'São <b>60 fórmulas adicionais</b>, além de recursos para organizar seus produtos e planejar preços.',
       extra: 'O acesso completo também inclui PDF para download, glossário de insumos, lista de fornecedores, precificação automática e suporte direto com João Silva, Engenheiro Químico.',
@@ -120,7 +123,7 @@ export const PRODUTOS = {
       { id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 6.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '/img/bump-legalizacao-ap.webp' },
       { id: 'form', flag: 'form', hotmartId: 7927025, preco: 24.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
       // Upgrade: libera o Essencial como "Completa" (flag upg) e dá acesso à base do app completo (chave cliente:).
-      { id: 'upg', flag: 'upg', tambem: { produto: 'ap', flag: 'base' }, hotmartId: 9100004, preco: 27.00, precoCheio: 41.90, janelaH: 72, nome: 'Upgrade para a Fórmula Auto Pro Completa', titulo: 'Upgrade — Fórmula Auto Pro Completa (80 fórmulas)', imagem: '/img/ap.webp', appUrl: 'https://formulaauto.luverisgroup.com.br/' },
+      { id: 'upg', flag: 'upg', tambem: { produto: 'ap', flag: 'base' }, hotmartId: 9100004, preco: 22.10, precoCheio: 37.00, janelaH: 72, nome: 'Upgrade para a Fórmula Auto Pro Completa', titulo: 'Upgrade — Fórmula Auto Pro Completa (80 fórmulas)', imagem: '/img/ap.webp', appUrl: 'https://formulaauto.luverisgroup.com.br/' },
     ],
     bumps: [
       {
