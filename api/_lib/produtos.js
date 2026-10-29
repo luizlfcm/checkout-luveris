@@ -12,6 +12,8 @@ export const PRODUTOS = {
     // Pacote com desconto: no dia 3 e na reta final, e-mail oferecendo TODOS os itens que a pessoa ainda não tem com pct% de desconto, válido por janelaH horas a partir da compra.
     // PACOTE_PCT (env) muda o desconto sem mexer no código.
     pacote: { itens: ['limp', 'form'], pct: 30, janelaH: 120, emails: [{ tipo: 'pv3', horas: 72 }, { tipo: 'pv4', horas: 108 }] },
+    // Recuperação do Pix: 3º e-mail (último, horas após gerar o Pix) com pct% de desconto no produto, válido validadeH horas. RECUPERACAO_PCT / RECUPERACAO_CUPOM=0 (env).
+    cupomRec: { pct: 20, horas: 72, validadeH: 24 },
     precoSaida: 0, // pop-up de saída desligado no Premium (a imagem /img/saida-fdl.webp tem o preço antigo escrito; para religar: precoSaida: 33.30 + imagemSaida com arte nova)
     flag: 'base',
     redisPrefix: 'fdl_cliente:',
@@ -57,6 +59,8 @@ export const PRODUTOS = {
     // Pacote com desconto: no dia 3 e na reta final, e-mail oferecendo TODOS os itens que a pessoa ainda não tem com pct% de desconto, válido por janelaH horas a partir da compra.
     // PACOTE_PCT (env) muda o desconto sem mexer no código.
     pacote: { itens: ['limp', 'form'], pct: 30, janelaH: 120, emails: [{ tipo: 'pv3', horas: 72 }, { tipo: 'pv4', horas: 108 }] },
+    // Recuperação do Pix: 3º e-mail (último, horas após gerar o Pix) com pct% de desconto no produto, válido validadeH horas. RECUPERACAO_PCT / RECUPERACAO_CUPOM=0 (env).
+    cupomRec: { pct: 20, horas: 72, validadeH: 24 },
     flag: 'base',
     redisPrefix: 'cliente:',
     tokenPrefix: 'FAP_',
@@ -225,7 +229,7 @@ export function alvoExtra(reg) {
 // Chave das variáveis de ambiente (pixel/CAPI): o funil Essencial usa as do produto original.
 export const envId = (id) => String(PRODUTOS[id]?.pixelDe || id).toUpperCase();
 
-export function calcular(produtoId, bumpIds = [], saida = false, avulsoId = '', precoAvulso = null) {
+export function calcular(produtoId, bumpIds = [], saida = false, avulsoId = '', precoAvulso = null, descontoPct = 0) {
   const p = PRODUTOS[produtoId];
   if (!p) return null;
   if (avulsoId) {
@@ -237,11 +241,14 @@ export function calcular(produtoId, bumpIds = [], saida = false, avulsoId = '', 
   }
   const escolhidos = p.bumps.filter((b) => bumpIds.includes(b.id));
   const flags = [p.flag, ...escolhidos.map((b) => b.flag)];
-  const centavos = Math.round(precoItem(saida && p.precoSaida ? p.precoSaida : p.preco) * 100) + escolhidos.reduce((s, b) => s + Math.round(precoItem(b.preco) * 100), 0);
+  // Cupom da recuperação (descontoPct): só no produto principal, decidido pelo servidor; não acumula com o desconto de saída.
+  const pctCupom = descontoPct > 0 && !(saida && p.precoSaida) ? descontoPct : 0;
+  const centPrincipal = pctCupom ? Math.round(Math.round(precoItem(p.preco) * 100) * (100 - pctCupom) / 100) : Math.round(precoItem(saida && p.precoSaida ? p.precoSaida : p.preco) * 100);
+  const centavos = centPrincipal + escolhidos.reduce((s, b) => s + Math.round(precoItem(b.preco) * 100), 0);
   // Itens como o dashboard os registra (um por produto/bump, com o id da oferta).
   const itens = [
-    { produto_id: p.hotmartId, nome: p.nome, valor: Math.round(precoItem(saida && p.precoSaida ? p.precoSaida : p.preco) * 100) / 100 },
+    { produto_id: p.hotmartId, nome: p.nome, valor: centPrincipal / 100 },
     ...escolhidos.map((b) => ({ produto_id: b.hotmartId, nome: b.nome, valor: Math.round(precoItem(b.preco) * 100) / 100 })),
   ];
-  return { produto: p, saida: !!(saida && p.precoSaida), itens, flags, centavos, valor: (centavos / 100).toFixed(2), bumps: escolhidos.map((b) => b.id), escolhidos };
+  return { produto: p, saida: !!(saida && p.precoSaida), cupomPct: pctCupom, itens, flags, centavos, valor: (centavos / 100).toFixed(2), bumps: escolhidos.map((b) => b.id), escolhidos };
 }

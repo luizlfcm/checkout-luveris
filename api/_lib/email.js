@@ -1,7 +1,7 @@
 // E-mails via Resend (mesmo visual/remetente dos fluxos do n8n).
 // Só envia se RESEND_API_KEY estiver configurada. Falhas nunca derrubam a liberação.
 import { createHash } from 'crypto';
-import { PRODUTOS } from './produtos.js';
+import { PRODUTOS, precoItem } from './produtos.js';
 
 const WA = 'https://wa.me/558131963052';
 const CONTATO = 'contato@luverisgroup.com.br';
@@ -250,7 +250,7 @@ export async function enviarPosVenda(reg, plano, opts = {}) {
 }
 
 // tipo: 'pix1' (Pix gerado e não pago), 'pix2' (dia seguinte), 'cartao' (pagamento recusado)
-export async function enviarRecuperacao(reg, tipo, { pix = '', agendarEm = '' } = {}) {
+export async function enviarRecuperacao(reg, tipo, { pix = '', agendarEm = '', pct = 0, expiraEm = 0 } = {}) {
   const p = PRODUTOS[reg.produto];
   if (!p) return { enviado: false, motivo: 'produto desconhecido' };
   const nomeCli = primeiroNome(reg.nome);
@@ -270,6 +270,20 @@ export async function enviarRecuperacao(reg, tipo, { pix = '', agendarEm = '' } 
 <div style="background:#1a1f26;border-radius:10px;padding:14px;margin:16px 0;word-break:break-all;color:#fff;font-size:13px;line-height:1.5;font-family:monospace">${esc(pix)}</div>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Se o código expirou, é só gerar outro:</p>${botao('Abrir o pagamento')}${rodape}`;
     texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu Pix de ${brl(reg.valor)} para ${nomeItem} ainda não foi pago. Pix Copia e Cola:\n${pix}\nSe expirou, gere outro: ${link}\nSe já pagou, desconsidere. Para parar: ${urlParar(reg.email)}`;
+  } else if (tipo === 'pix3' && pct > 0 && expiraEm && !av && !pac) {
+    // Último e-mail da sequência: desconto com prazo real (o servidor só aplica entre o envio e o fim da validade).
+    const cheio = Math.round(precoItem(p.preco) * 100), com = Math.round(cheio * (100 - pct) / 100);
+    const ate = quandoBR(expiraEm);
+    assunto = `Última oportunidade: ${pct}% de desconto no ${p.nome}`; titulo = 'Última oportunidade';
+    miolo = `${olaP}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Você começou a garantir o <b style="color:#fff">${esc(p.nome)}</b> e não concluiu. Este é o <b style="color:#fff">último aviso</b> que vou te mandar sobre isso.</p>
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para você não deixar passar, liberei <b style="color:#fff">${pct}% de desconto</b>, só para o seu e-mail. Ele vale até <b style="color:#fff">${esc(ate)}</b>. Depois desse prazo o link volta ao preço normal e eu não te escrevo mais.</p>
+<div style="background:#1a1f26;border-radius:10px;padding:14px;text-align:center;margin:18px 0">
+<p style="color:#aab3bd;font-size:13px;margin:0 0 4px">De <s>${brl2(cheio / 100)}</s> por apenas</p>
+<p style="color:${p.cor};font-size:36px;font-weight:900;margin:0">${brl2(com / 100)}</p>
+<p style="color:#8b95a1;font-size:12px;margin:4px 0 0">pagamento único · acesso imediato · garantia de 30 dias</p></div>
+${botao(`Garantir com ${pct}% de desconto →`)}
+<p style="color:#8b95a1;font-size:13px;line-height:1.7;text-align:center">⏳ Desconto válido até ${esc(ate)}</p>${rodape}`;
+    texto = `Olá${nomeCli ? ', ' + nomeCli : ''}! ÚLTIMA OPORTUNIDADE: ${pct}% de desconto no ${p.nome}, de ${brl2(cheio / 100)} por ${brl2(com / 100)}, válido até ${ate}.\nGaranta aqui: ${link}\nSe já pagou, desconsidere. Para parar: ${urlParar(reg.email)}`;
   } else if (tipo === 'pix2' || tipo === 'pix1') {
     assunto = `Ainda dá tempo — ${nomeItem}`; titulo = 'Ainda dá tempo de garantir';
     miolo = `${olaP}<p style="color:#8b95a1;font-size:14px;line-height:1.7">Ontem você começou a comprar <b style="color:#fff">${esc(nomeItem)}</b>, mas o Pix não foi concluído. Ele expirou, mas você pode gerar um novo em segundos, e o acesso é liberado na hora, com 30 dias de garantia.</p>${botao('Gerar um novo Pix')}${rodape}`;

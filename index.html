@@ -524,11 +524,11 @@ input:focus{outline:none;border-color:var(--blu)}
   async function init(){
     try{
       var em0=(QS.get('email')||'').trim().toLowerCase();
-      var r=await fetch('/api/config?p='+encodeURIComponent(PID)+(ITEM?'&i='+encodeURIComponent(ITEM)+(em0?'&e='+encodeURIComponent(em0):''):''));
+      var r=await fetch('/api/config?p='+encodeURIComponent(PID)+(ITEM?'&i='+encodeURIComponent(ITEM):'')+(em0?'&e='+encodeURIComponent(em0):''));
       if(!r.ok)throw 0; CFG=await r.json();
     }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
     if(CFG.bf&&CFG.bf.ativo){var bf=document.createElement('div');bf.className='bf';bf.setAttribute('role','note');
-      bf.innerHTML='🖤 <b>BLACK FRIDAY</b> · '+(CFG.bf.de&&CFG.bf.de>CFG.produto.preco&&!ITEM?'de <s>'+brl(CFG.bf.de)+'</s> por <span class="nw">'+brl(CFG.produto.preco)+'</span>':'acesso imediato · garantia de 30 dias');
+      bf.innerHTML='🖤 <b>BLACK FRIDAY</b> · '+(CFG.bf.de&&CFG.bf.de>CFG.produto.preco&&!ITEM&&!CFG.cupom?'de <s>'+brl(CFG.bf.de)+'</s> por <span class="nw">'+brl(CFG.produto.preco)+'</span>':'acesso imediato · garantia de 30 dias');
       document.body.insertBefore(bf,document.body.firstChild)}
     if(CFG.teste){var tb=document.createElement('div');tb.style.cssText='background:#b00020;color:#fff;text-align:center;font-weight:800;padding:8px;font-size:15px';tb.textContent='⚠️ MODO DE TESTE DE PREÇO ATIVO — cobrança reduzida';document.body.insertBefore(tb,document.body.firstChild)}
     $('waFoot').href='https://wa.me/558131963052?text='+encodeURIComponent('Olá! Tenho uma dúvida sobre o '+CFG.produto.nome+' antes de comprar.');
@@ -537,6 +537,29 @@ input:focus{outline:none;border-color:var(--blu)}
     var q=QS.get('email'),qn=QS.get('nome');
     if(q&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(q))$('email').value=q;
     if(qn)$('nome').value=qn.slice(0,40);
+    if(!ITEM){
+      var cuEl=null;
+      var mostraCupom=function(){
+        if(cuEl){cuEl.remove();cuEl=null}
+        var cu=CFG.cupom;if(!cu)return;
+        var dtc=new Date(cu.expiraEm).toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'});
+        var nc=document.createElement('div');nc.className='aviso';nc.style.marginTop='10px';
+        nc.innerHTML='🎁 <b>'+cu.pct+'% de desconto liberado para você</b>: de <s>'+brl(cu.precoCheio)+'</s> por <b>'+brl(cu.preco)+'</b>. Válido até '+esc(dtc)+'.';
+        var w=document.querySelector('.warn');w.insertAdjacentElement('afterend',nc);cuEl=nc;
+      };
+      mostraCupom();
+      var ultEmC=(QS.get('email')||'').trim().toLowerCase();
+      $('email').addEventListener('change',function(){
+        var em=$('email').value.trim().toLowerCase();
+        if(em===ultEmC||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em))return;
+        ultEmC=em;
+        fetch('/api/config?p='+encodeURIComponent(PID)+'&e='+encodeURIComponent(em)).then(function(r){return r.json()}).then(function(c){
+          if(!c||!c.produto)return;
+          CFG.cupom=c.cupom;CFG.produto.preco=c.produto.preco;CFG.produto.precoSaida=c.produto.precoSaida;
+          mostraCupom();atualiza();
+        }).catch(function(){});
+      });
+    }
     if(ITEM){
       document.querySelector('.warn').innerHTML='⚠️ Use o <b>mesmo e-mail com que você entra no aplicativo</b>. É ele que libera o seu acesso.';
       var ntEl=null;

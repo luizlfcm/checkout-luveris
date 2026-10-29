@@ -6,6 +6,7 @@ import { salvarRegistro, processarPedido, statusSimples, statusDetalhado, regist
 import { agendarRecuperacao } from './_lib/recuperacao.js';
 import { precoUpgrade } from './_lib/upgrade.js';
 import { calcularPacote } from './_lib/pacote.js';
+import { cupomRecAtivo } from './_lib/cupomrec.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -26,6 +27,11 @@ export default async function handler(req, res) {
   if (ehPacote) {
     calc = await calcularPacote(String(b.produto || ''), email);
     if (!calc) return res.status(400).json({ error: 'Este pacote não está disponível para este e-mail (use o e-mail da sua compra, ou você já tem todos os itens).' });
+  }
+  // Cupom do último e-mail de recuperação do Pix: desconto só no produto principal, só dentro do prazo (o servidor decide, nunca o navegador).
+  if (!ehPacote && !b.avulso) {
+    const cp = await cupomRecAtivo(String(b.produto), email);
+    if (cp) calc = calcular(String(b.produto), Array.isArray(b.bumps) ? b.bumps : [], false, '', null, cp.pct);
   }
   // Upgrade com janela: o preço depende de quando o e-mail comprou o Essencial (decidido aqui, nunca pelo navegador).
   if (calc.avulso?.janelaH) {
@@ -88,7 +94,7 @@ export default async function handler(req, res) {
   const fbcFinal = b.fbc || (atrib.fbclid ? `fb.1.${Date.now()}.${atrib.fbclid}` : '');
   const reg = {
     atrib,
-    produto: String(b.produto), avulso: calc.avulso ? calc.avulso.id : '', email, nome, flags: calc.flags, bumps: calc.bumps, itens: calc.itens, valor: calc.valor, metodo, parcelas, desconto: calc.saida ? 'saida10' : '',
+    produto: String(b.produto), avulso: calc.avulso ? calc.avulso.id : '', email, nome, flags: calc.flags, bumps: calc.bumps, itens: calc.itens, valor: calc.valor, metodo, parcelas, desconto: calc.saida ? 'saida10' : calc.cupomPct ? `cupom_rec${calc.cupomPct}` : '',
     fbp: b.fbp || '', fbc: fbcFinal, ip: fwd, ua: String(req.headers['user-agent'] || '').slice(0, 250),
     url: String(req.headers.referer || '').slice(0, 250),
     criadoEm: new Date().toISOString(),

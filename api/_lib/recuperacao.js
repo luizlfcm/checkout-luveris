@@ -4,6 +4,7 @@
 // Os e-mails são agendados no próprio Resend (scheduled_at) e cancelados quando o pagamento chega.
 import { cmd } from './redis.js';
 import { enviarRecuperacao } from './email.js';
+import { cfgCupomRec, abrirCupomRec, limparCupomRec } from './cupomrec.js';
 
 const MIN = 60 * 1000;
 const ligada = () => process.env.RECUPERACAO !== '0';
@@ -19,13 +20,17 @@ export async function agendarRecuperacao(reg, situacao, pix = '') {
     if (await cmd(['GET', chaveParar(reg.email)])) return;
     const trava = await cmd(['SET', chave(reg.produto, reg.email, reg.avulso), JSON.stringify({ itens: [] }), 'NX', 'EX', TTL]);
     if (!trava) return; // já existe uma sequência ativa para este e-mail e produto
+    // 3º e-mail (último, com desconto): só para compra do produto principal que tem cupomRec (Premium e Auto Pro), não para itens avulsos.
+    const cup = situacao === 'pix' && !reg.avulso ? cfgCupomRec(reg.produto) : null;
     const plano = situacao === 'pix'
-      ? [{ tipo: 'pix1', apos: 25 * MIN }, ...(process.env.RECUPERACAO_DIA2 !== '0' ? [{ tipo: 'pix2', apos: 24 * 60 * MIN }] : [])]
+      ? [{ tipo: 'pix1', apos: 25 * MIN }, ...(process.env.RECUPERACAO_DIA2 !== '0' ? [{ tipo: 'pix2', apos: 24 * 60 * MIN }] : []), ...(cup ? [{ tipo: 'pix3', apos: cup.horas * 60 * MIN }] : [])]
       : [{ tipo: 'cartao', apos: 15 * MIN }];
     const itens = [];
     for (const e of plano) {
       const quando = Date.now() + e.apos;
-      const r = await enviarRecuperacao(reg, e.tipo, { pix, agendarEm: new Date(quando).toISOString() });
+      let opc = { pix, agendarEm: new Date(quando).toISOString() };
+      if (e.tipo === 'pix3') { const j = await abrirCupomRec(reg.produto, reg.email, quando); if (!j) continue; opc = { ...opc, pct: j.pct, expiraEm: j.ate }; }
+      const r = await enviarRecuperacao(reg, e.tipo, opc);
       if (r.enviado && r.id) itens.push({ id: r.id, quando, tipo: e.tipo });
     }
     await cmd(['SET', chave(reg.produto, reg.email, reg.avulso), JSON.stringify({ itens }), 'EX', TTL]);
@@ -38,7 +43,7 @@ export async function agendarRecuperacao(reg, situacao, pix = '') {
 export async function cancelarRecuperacao(produto, email, avulso = '') {
   try {
     const raw = await cmd(['GET', chave(produto, email, avulso)]);
-    if (!raw) return { recuperada: false };
+    if (!raw) { if (!avulso) await limparCupomRec(produto, email); return { recuperada: false }; }
     const { itens = [] } = JSON.parse(raw);
     const key = process.env.RESEND_API_KEY;
     let recuperada = false;
@@ -50,6 +55,7 @@ export async function cancelarRecuperacao(produto, email, avulso = '') {
         .catch((e) => console.error('recuperação: cancelar erro', e?.message));
     }
     await cmd(['DEL', chave(produto, email, avulso)]);
+    if (!avulso) await limparCupomRec(produto, email);
     return { recuperada };
   } catch (e) { console.error('recuperação: falha ao cancelar', e?.message); return { recuperada: false }; }
 }

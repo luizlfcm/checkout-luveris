@@ -2,6 +2,7 @@
 import { PRODUTOS, precoItem, precoTeste, envId } from './_lib/produtos.js';
 import { precoUpgrade } from './_lib/upgrade.js';
 import { precoPacote, cfgPacote } from './_lib/pacote.js';
+import { cupomRecAtivo } from './_lib/cupomrec.js';
 
 // Faixa de Black Friday no topo do checkout. Ligada por padrão e some sozinha depois da data final.
 // BLACKFRIDAY=0 desliga; BLACKFRIDAY_ATE (ISO, ex.: 2026-11-30T23:59:59-03:00) muda o dia em que ela some.
@@ -59,14 +60,20 @@ export default async function handler(req, res) {
     });
   }
   res.setHeader('Cache-Control', 'no-store');
+  // Cupom da recuperação (link do último e-mail traz ?email=): preço com desconto só para quem tem o cupom valendo agora.
+  const emC = String(req.query.e || '').trim().toLowerCase();
+  const cp = emC ? await cupomRecAtivo(id, emC).catch(() => null) : null;
+  const precoBase = precoItem(p.preco);
+  const cupom = cp ? { pct: cp.pct, expiraEm: cp.ate, precoCheio: precoBase, preco: Math.round(Math.round(precoBase * 100) * (100 - cp.pct) / 100) / 100 } : null;
   res.status(200).json({
     teste: !!precoTeste(),
+    cupom,
     bf: faixaBF(p),
     posVenda: (p.posVenda || []).map((e) => { const a = (p.avulsos || []).find((x) => x.id === e.item); const b = (p.bumps || []).find((x) => x.id === e.item); return a ? { id: a.id, nome: a.nome, preco: precoItem(a.preco), de: b && b.de > a.preco ? b.de : 0, imagem: a.imagem || '', desc: (b && b.desc) || '' } : null; }).filter(Boolean),
     exclusivas: process.env.CHECKOUT_EXCLUSIVAS !== '0',
     publicKey: process.env.MP_PUBLIC_KEY || '',
     pixelId: process.env[`META_PIXEL_ID_${envId(id)}`] || process.env.META_PIXEL_ID || '',
     clarityId: process.env[`CLARITY_ID_${id.toUpperCase()}`] || p.clarityId || '', // Microsoft Clarity (gravação de sessões); o ID não é segredo
-    produto: { id, nome: p.titulo || p.nome, preco: precoItem(p.preco), precoSaida: p.precoSaida ? precoItem(p.precoSaida) : 0, imagemSaida: p.imagemSaida || '', appUrl: p.appUrl, imagem: p.imagem || '', cor: p.cor || '', bg: p.bg || '', imagemUp: (p.avulsos || []).find((x) => x.id === 'upg')?.imagem || '', upsell: p.upsell ? { ...p.upsell, preco: (p.avulsos || []).find((x) => x.id === 'upg')?.preco, precoCheio: (p.avulsos || []).find((x) => x.id === 'upg')?.precoCheio } : null, depoimentos: process.env.CHECKOUT_DEPOIMENTOS === '1' ? (p.depoimentos || []) : [], bumps: p.bumps.map(({ id, nome, titulo, desc, cta, preco, de, imagem }) => ({ id, nome: titulo || nome, desc, cta: cta || '', preco: precoItem(preco), de: de || 0, imagem: imagem || '' })) },
+    produto: { id, nome: p.titulo || p.nome, preco: cupom ? cupom.preco : precoItem(p.preco), precoSaida: p.precoSaida && !cupom ? precoItem(p.precoSaida) : 0, imagemSaida: p.imagemSaida || '', appUrl: p.appUrl, imagem: p.imagem || '', cor: p.cor || '', bg: p.bg || '', imagemUp: (p.avulsos || []).find((x) => x.id === 'upg')?.imagem || '', upsell: p.upsell ? { ...p.upsell, preco: (p.avulsos || []).find((x) => x.id === 'upg')?.preco, precoCheio: (p.avulsos || []).find((x) => x.id === 'upg')?.precoCheio } : null, depoimentos: process.env.CHECKOUT_DEPOIMENTOS === '1' ? (p.depoimentos || []) : [], bumps: p.bumps.map(({ id, nome, titulo, desc, cta, preco, de, imagem }) => ({ id, nome: titulo || nome, desc, cta: cta || '', preco: precoItem(preco), de: de || 0, imagem: imagem || '' })) },
   });
 }
