@@ -528,7 +528,7 @@ input:focus{outline:none;border-color:var(--blu)}
       if(!r.ok)throw 0; CFG=await r.json();
     }catch(e){return fatal('Link de pagamento inválido. Volte à página da oferta e tente de novo.')}
     if(CFG.bf&&CFG.bf.ativo){var bf=document.createElement('div');bf.className='bf';bf.setAttribute('role','note');
-      bf.innerHTML='🖤 <b>BLACK FRIDAY</b> · '+(CFG.bf.de&&CFG.bf.de>CFG.produto.preco&&!ITEM&&!CFG.cupom?'de <s>'+brl(CFG.bf.de)+'</s> por <span class="nw">'+brl(CFG.produto.preco)+'</span>':'acesso imediato · garantia de 30 dias');
+      bf.innerHTML='🖤 <b>BLACK FRIDAY</b> · '+(ITEM?'promoção imperdível · acesso imediato':'promoção imperdível · <span class="nw">'+brl(CFG.produto.preco)+'</span>');
       document.body.insertBefore(bf,document.body.firstChild)}
     if(CFG.teste){var tb=document.createElement('div');tb.style.cssText='background:#b00020;color:#fff;text-align:center;font-weight:800;padding:8px;font-size:15px';tb.textContent='⚠️ MODO DE TESTE DE PREÇO ATIVO — cobrança reduzida';document.body.insertBefore(tb,document.body.firstChild)}
     $('waFoot').href='https://wa.me/558131963052?text='+encodeURIComponent('Olá! Tenho uma dúvida sobre o '+CFG.produto.nome+' antes de comprar.');
