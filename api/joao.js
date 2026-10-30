@@ -1,17 +1,17 @@
 // Joãozinho (assistente virtual dos apps e do Clube): registra as perguntas que ele NÃO soube responder,
 // para você ver o que os alunos perguntam e ampliar as respostas.
-//   POST /api/joao   body (text/plain com JSON): { q: 'pergunta', app: 'fdl'|'ap'|'fdless'|'apess'|'clube' }
+//   POST /api/joao   body (text/plain com JSON): { q: 'pergunta', app: 'fdl'|'ap'|'fdless'|'apess'|'clube'|'pvfdl'|'pvap' (pv* = páginas de vendas) }
 //   GET  /api/joao   (header x-admin-key = ADMIN_KEY)  -> as perguntas mais repetidas ( ?fmt=txt para texto simples )
 // Não guarda e-mail, IP nem identificação: só o texto da pergunta (com e-mails e números longos mascarados) e o app.
 import { timingSafeEqual } from 'crypto';
 import { cmd } from './_lib/redis.js';
 import { PRODUTOS } from './_lib/produtos.js';
 
-const APPS = ['fdl', 'ap', 'fdless', 'apess', 'clube'];
+const APPS = ['fdl', 'ap', 'fdless', 'apess', 'clube', 'pvfdl', 'pvap'];
 const CHAVE = 'joao_sr';
 const MAX = 1500;
 const origemDe = (u) => { try { return new URL(u).origin; } catch (e) { return ''; } };
-const ORIGENS = () => [...['fdl', 'ap', 'fdless', 'apess'].map((id) => origemDe(PRODUTOS[id].appUrl)), origemDe(process.env.COMUNIDADE_URL || 'https://clube.luverisgroup.com.br')].filter(Boolean);
+const ORIGENS = () => [...['fdl', 'ap', 'fdless', 'apess'].map((id) => origemDe(PRODUTOS[id].appUrl)), origemDe(process.env.COMUNIDADE_URL || 'https://clube.luverisgroup.com.br'), 'https://limpezaelucrativa.luverisgroup.com.br', 'https://formulaautopro.luverisgroup.com.br', ...String(process.env.PV_ORIGENS || '').split(/[\s,]+/).map(origemDe)].filter(Boolean);
 const chaveOk = (rec) => {
   const esp = process.env.ADMIN_KEY || '';
   if (!esp || !rec) return false;
