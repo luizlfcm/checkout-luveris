@@ -483,7 +483,7 @@ input:focus{outline:none;border-color:var(--blu)}
   function convidaComunidade(){
     var box=$('okCom');
     if(!box||ITEM||!CFG.comunidade)return;
-    box.innerHTML='<div class="pvo" style="margin-top:14px"><h2>💬 Entre na Comunidade Luveris</h2><p class="ps">Tire dúvidas, mostre seus resultados e troque receitas com outros alunos. Use o mesmo e-mail da compra.</p><a class="linkbtn" id="btnCom" style="background:#11263A;height:54px;font-size:17px" target="_blank" rel="noopener" href="'+esc(CFG.comunidade)+'/?utm_source=checkout&utm_medium=obrigado">Entrar na comunidade</a></div>';
+    box.innerHTML='<div class="pvo" style="margin-top:14px"><h2>💬 Entre no Clube da Renda Extra</h2><p class="ps">Tire dúvidas, mostre seus resultados e troque receitas com outros alunos. Use o mesmo e-mail da compra.</p><a class="linkbtn" id="btnCom" style="background:#11263A;height:54px;font-size:17px" target="_blank" rel="noopener" href="'+esc(CFG.comunidade)+'/?utm_source=checkout&utm_medium=obrigado">Entrar no clube</a></div>';
   }
   function ofertaPosVenda(email){
     var box=$('okUp'),lista=CFG.produto.posVenda||[];
