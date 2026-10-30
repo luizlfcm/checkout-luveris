@@ -68,6 +68,7 @@ export default async function handler(req, res) {
   res.status(200).json({
     teste: !!precoTeste(),
     cupom,
+    comunidade: /^https:\/\//.test(String(process.env.COMUNIDADE_URL || '')) ? String(process.env.COMUNIDADE_URL).trim().replace(/\/+$/, '') : '',
     bf: faixaBF(p),
     posVenda: (p.posVenda || []).map((e) => { const a = (p.avulsos || []).find((x) => x.id === e.item); const b = (p.bumps || []).find((x) => x.id === e.item); return a ? { id: a.id, nome: a.nome, preco: precoItem(a.preco), de: b && b.de > a.preco ? b.de : 0, imagem: a.imagem || '', desc: (b && b.desc) || '' } : null; }).filter(Boolean),
     exclusivas: process.env.CHECKOUT_EXCLUSIVAS !== '0',

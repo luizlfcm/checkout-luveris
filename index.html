@@ -234,6 +234,7 @@ input:focus{outline:none;border-color:var(--blu)}
       <div class="aviso" style="margin-top:14px">✉️ Também enviamos o acesso para o seu e-mail. Se não encontrar, olhe a caixa de spam.</div>
     </div>
     <div id="okUp"></div>
+    <div id="okCom"></div>
   </div>
 </div>
 
@@ -479,6 +480,11 @@ input:focus{outline:none;border-color:var(--blu)}
   }
 
   // Segunda chance logo após a compra do produto principal: itens que a pessoa não levou no pedido (só quem tem pós-venda no servidor).
+  function convidaComunidade(){
+    var box=$('okCom');
+    if(!box||ITEM||!CFG.comunidade)return;
+    box.innerHTML='<div class="pvo" style="margin-top:14px"><h2>💬 Entre na Comunidade Luveris</h2><p class="ps">Tire dúvidas, mostre seus resultados e troque receitas com outros alunos. Use o mesmo e-mail da compra.</p><a class="linkbtn" id="btnCom" style="background:#11263A;height:54px;font-size:17px" target="_blank" rel="noopener" href="'+esc(CFG.comunidade)+'/?utm_source=checkout&utm_medium=obrigado">Entrar na comunidade</a></div>';
+  }
   function ofertaPosVenda(email){
     var box=$('okUp'),lista=CFG.produto.posVenda||[];
     if(!box||ITEM||CFG.produto.upsell||!lista.length)return;
@@ -509,7 +515,7 @@ input:focus{outline:none;border-color:var(--blu)}
       var box=$('okUp');if(box)box.innerHTML='<p style="text-align:center;font-weight:700;padding:14px">Abrindo sua oferta exclusiva…</p>';
       setTimeout(function(){location.href='/'+PID+'/oferta?email='+encodeURIComponent(email)},1500);
       setTimeout(function(){ofertaUpgrade(email)},6000);
-    }else{ofertaUpgrade(email);ofertaPosVenda(email)}
+    }else{ofertaUpgrade(email);ofertaPosVenda(email);convidaComunidade()}
   }
 
   function copiar(){

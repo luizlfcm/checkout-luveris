@@ -77,6 +77,14 @@ ${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para ace
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu pedido foi confirmado! Entre em contato pelo WhatsApp para enviar as informações e iniciamos o desenvolvimento.</p>
 <div style="text-align:center;margin:20px 0"><a href="${WA}?text=${encodeURIComponent(b.whatsapp)}" style="display:inline-block;background:#25D366;color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Enviar mensagem no WhatsApp</a></div></div>`;
   }
+  // Convite para a Comunidade (só na compra do produto principal e só se COMUNIDADE_URL estiver configurada).
+  const comUrl = String(process.env.COMUNIDADE_URL || '').trim().replace(/\/+$/, '');
+  if (/^https:\/\//.test(comUrl) && !reg.avulso) {
+    miolo += `<div style="border-top:1px solid #1e2530;padding-top:20px;margin-top:8px">
+<p style="color:#f2f4f6;font-size:15px"><b>💬 Entre na Comunidade Luveris</b></p>
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">Tire dúvidas, mostre seus resultados e troque receitas com outros alunos. Entre com este mesmo e-mail (${esc(reg.email)}).</p>
+<div style="text-align:center;margin:18px 0"><a href="${esc(comUrl)}/?utm_source=email&utm_medium=entrega" style="display:inline-block;background:#1a1f26;color:#fff;border:1px solid ${p.cor};padding:13px 26px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Entrar na comunidade</a></div></div>`;
+  }
   miolo += `<p style="color:#8b95a1;font-size:13px">🛡️ Você tem 30 dias de garantia.</p>`;
   if (!av && p.upsell) miolo += blocoUpsell(p, reg, Date.now() + (upgDe(p).janelaH || 72) * 3600 * 1000, 'upg_entrega');
 
