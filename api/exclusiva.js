@@ -98,7 +98,7 @@ export default async function handler(req, res) {
     if (!EMAIL_RE.test(email)) return res.status(400).json({ ok: false, error: 'Entre no app com o e-mail da compra.' });
     if (!contatoValido(contato)) return res.status(400).json({ ok: false, error: 'Informe um WhatsApp (com DDD) ou um e-mail válido para a resposta.' });
     const itens = (Array.isArray(b.itens) ? b.itens : []).slice(0, MAX_ITENS)
-      .map((i) => ({ nome: cortar(i && i.nome, 120), descricao: cortar(i && i.descricao, 1500), custo: cortar(i && i.custo, 30) }))
+      .map((i) => ({ nome: cortar(i && i.nome, 120), descricao: cortar(i && i.descricao, 1500), custo: cortar(i && i.custo, 30), qualidade: ['economica', 'intermediaria', 'premium'].includes(i && i.qualidade) ? i.qualidade : '' }))
       .filter((i) => i.nome);
     if (!itens.length) return res.status(400).json({ ok: false, error: 'Preencha ao menos a Fórmula 1.' });
 
@@ -118,7 +118,7 @@ export default async function handler(req, res) {
     await cmd(['LPUSH', `exc:cli:${produto}:${email}`, id]);
 
     // aviso ao dono (se EXCLUSIVA_AVISO_EMAIL estiver definido)
-    const linhas = itens.map((i, n) => `<p><b>Fórmula ${n + 1}: ${esc(i.nome)}</b><br>${esc(i.descricao || '—').replace(/\n/g, '<br>')}${i.custo ? `<br><i>Custo desejado: ${esc(i.custo)}</i>` : ''}</p>`).join('');
+    const linhas = itens.map((i, n) => `<p><b>Fórmula ${n + 1}: ${esc(i.nome)}</b><br>${esc(i.descricao || '—').replace(/\n/g, '<br>')}${i.custo ? `<br><i>Custo esperado/litro: ${esc(i.custo)}</i>` : ''}${i.qualidade ? `<br><i>Qualidade: ${esc(i.qualidade)}</i>` : ''}</p>`).join('');
     enviarAvisoAdmin(produto, `🧪 Novo pedido de Fórmula Exclusiva — ${p.nome}`,
       `<div style="font-family:Arial,sans-serif;font-size:15px"><h2>Novo pedido de Fórmula Exclusiva</h2><p>Produto: <b>${esc(p.nome)}</b><br>Cliente: ${esc(cli.nome || '')} (${esc(email)})<br>Resposta em: <b>${esc(contato)}</b></p>${linhas}<p>Veja no painel: <a href="https://pagamento.luverisgroup.com.br/admin-exclusiva.html">admin-exclusiva</a></p></div>`,
       `Novo pedido de Fórmula Exclusiva (${p.nome}) de ${email}. Resposta em: ${contato}`).catch(() => {});

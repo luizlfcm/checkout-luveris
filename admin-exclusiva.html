@@ -49,7 +49,7 @@ function draw(){
   $('list').innerHTML=L.length?L.map(function(p){
     return '<div class="card '+p.status+'" data-id="'+p.id+'"><div class="top"><span>'+dt(p.criadoEm)+' · '+esc(p.produtoNome||p.produto)+'</span><span class="tag '+p.status+'">'+NOME[p.status]+'</span></div>'
     +'<div style="margin:8px 0;font-size:14px"><b>'+esc(p.nome||'')+'</b> · '+esc(p.email)+'<br>Resposta: '+link(p.contato)+'</div>'
-    +p.itens.map(function(i,k){return '<div class="it"><b>Fórmula '+(k+1)+': '+esc(i.nome)+'</b>'+(i.descricao?'\n'+esc(i.descricao):'')+(i.custo?'\n<i>Custo desejado: '+esc(i.custo)+'</i>':'')+'</div>'}).join('')
+    +p.itens.map(function(i,k){return '<div class="it"><b>Fórmula '+(k+1)+': '+esc(i.nome)+'</b>'+(i.descricao?'\n'+esc(i.descricao):'')+(i.custo?'\n<i>Custo esperado/litro: '+esc(i.custo)+'</i>':'')+(i.qualidade?'\n<i>Qualidade: '+({economica:'Econômica',intermediaria:'Intermediária',premium:'Premium'}[i.qualidade]||i.qualidade)+'</i>':'')+'</div>'}).join('')
     +'<textarea placeholder="Anotação interna (opcional)" data-nota>'+esc(p.nota||'')+'</textarea>'
     +'<div class="acts">'+(p.status!=='andamento'?'<button data-s="andamento">▶ Em andamento</button>':'')+(p.status!=='entregue'?'<button class="pri" data-s="entregue">✅ Marcar como entregue</button>':'')+(p.status!=='novo'?'<button data-s="novo">↩ Voltar p/ novo</button>':'')+'</div></div>';
   }).join(''):'<p class="s">Nenhum pedido aqui.</p>';
