@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Pedidos · Fórmula Exclusiva</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:#0d1117;color:#e6edf3;font-family:system-ui,Arial,sans-serif;padding:16px}
+.c{max-width:760px;margin:0 auto}h1{font-size:20px;margin:8px 0 4px}p.s{color:#8b95a1;font-size:13px;margin:0 0 14px;line-height:1.5}
+input,button,textarea{padding:12px;border-radius:10px;border:1px solid #30363d;background:#161b22;color:#e6edf3;font-size:15px;font-family:inherit}
+button{cursor:pointer;font-weight:700}.pri{background:#238636;border:0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.bar input{flex:1;min-width:160px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.tabs button{padding:8px 12px;font-size:13px}.tabs .on{background:#1f6feb;border-color:#1f6feb}
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;margin:10px 0}
+.card.novo{border-color:#d29922}.card.entregue{opacity:.65}
+.top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:#8b95a1}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;background:#30363d}
+.tag.novo{background:#9e6a03}.tag.andamento{background:#1f6feb}.tag.entregue{background:#238636}
+.it{background:#0d1117;border-radius:8px;padding:10px;margin:8px 0;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.it b{color:#f0b400}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.acts button{padding:9px 12px;font-size:13px}
+textarea{width:100%;margin-top:8px;font-size:13px;min-height:44px}
+a{color:#58a6ff}.e{color:#ff7b72}
+</style></head><body><div class="c">
+<h1>🧪 Pedidos de Fórmula Exclusiva</h1>
+<p class="s">Todos os pedidos enviados dentro dos apps (Fábrica da Limpeza e Fórmula Auto Pro). Toque no contato para responder.</p>
+<div class="bar"><input id="k" type="password" placeholder="Senha (ADMIN_KEY)" autocomplete="current-password"><button class="pri" id="go">Entrar</button></div>
+<div id="err" class="e"></div>
+<div class="tabs" id="tabs" hidden></div>
+<div id="list"></div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)},P=[],F='novo',KEY='';
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function dt(s){try{return new Date(s).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})}catch(e){return s}}
+function link(c){c=String(c||'');if(/@/.test(c))return '<a href="mailto:'+esc(c)+'">'+esc(c)+'</a>';var d=c.replace(/\D/g,'');if(d.length<=11)d='55'+d;return esc(c)+' · <a href="https://wa.me/'+d+'" target="_blank" rel="noopener">WhatsApp</a>'}
+var NOME={novo:'Novos',andamento:'Em andamento',entregue:'Entregues',todos:'Todos'};
+function load(){
+  $('err').textContent='';
+  fetch('/api/exclusiva',{headers:{'x-admin-key':$('k').value},cache:'no-store'}).then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){$('err').textContent=d.error||'Erro';return}
+    try{localStorage.setItem('adm_k',$('k').value)}catch(e){}
+    KEY=$('k').value;P=d.pedidos||[];draw();
+  }).catch(function(){$('err').textContent='Falha de conexão.'});
+}
+function draw(){
+  var n={todos:P.length};['novo','andamento','entregue'].forEach(function(s){n[s]=P.filter(function(p){return p.status===s}).length});
+  $('tabs').hidden=false;
+  $('tabs').innerHTML=['novo','andamento','entregue','todos'].map(function(s){return '<button data-f="'+s+'" class="'+(F===s?'on':'')+'">'+NOME[s]+' ('+n[s]+')</button>'}).join('');
+  var L=P.filter(function(p){return F==='todos'||p.status===F});
+  $('list').innerHTML=L.length?L.map(function(p){
+    return '<div class="card '+p.status+'" data-id="'+p.id+'"><div class="top"><span>'+dt(p.criadoEm)+' · '+esc(p.produtoNome||p.produto)+'</span><span class="tag '+p.status+'">'+NOME[p.status]+'</span></div>'
+    +'<div style="margin:8px 0;font-size:14px"><b>'+esc(p.nome||'')+'</b> · '+esc(p.email)+'<br>Resposta: '+link(p.contato)+'</div>'
+    +p.itens.map(function(i,k){return '<div class="it"><b>Fórmula '+(k+1)+': '+esc(i.nome)+'</b>'+(i.descricao?'\n'+esc(i.descricao):'')+(i.custo?'\n<i>Custo desejado: '+esc(i.custo)+'</i>':'')+'</div>'}).join('')
+    +'<textarea placeholder="Anotação interna (opcional)" data-nota>'+esc(p.nota||'')+'</textarea>'
+    +'<div class="acts">'+(p.status!=='andamento'?'<button data-s="andamento">▶ Em andamento</button>':'')+(p.status!=='entregue'?'<button class="pri" data-s="entregue">✅ Marcar como entregue</button>':'')+(p.status!=='novo'?'<button data-s="novo">↩ Voltar p/ novo</button>':'')+'</div></div>';
+  }).join(''):'<p class="s">Nenhum pedido aqui.</p>';
+}
+$('tabs').onclick=function(e){var f=e.target.getAttribute('data-f');if(f){F=f;draw()}};
+$('list').onclick=function(e){
+  var s=e.target.getAttribute('data-s');if(!s)return;
+  var card=e.target.closest('.card'),id=card.getAttribute('data-id'),nota=card.querySelector('[data-nota]').value;
+  e.target.disabled=true;
+  fetch('/api/exclusiva',{method:'POST',headers:{'content-type':'application/json','x-admin-key':KEY},body:JSON.stringify({acao:'status',id:id,status:s,nota:nota})})
+  .then(function(r){return r.json()}).then(function(d){if(!d.ok){$('err').textContent=d.error||'Erro';e.target.disabled=false;return}
+    P=P.map(function(p){return p.id===id?d.pedido:p});draw()}).catch(function(){$('err').textContent='Falha de conexão.';e.target.disabled=false});
+};
+$('go').onclick=load;
+try{var k=localStorage.getItem('adm_k');if(k){$('k').value=k;load()}}catch(e){}
+</script></body></html>

@@ -304,3 +304,11 @@ ${botao(`Garantir com ${pct}% de desconto →`)}
   }
   return resend(p, reg.email, assunto, moldura(p, titulo, p.nome, miolo, true, `Olá João! Tentei comprar o ${nomeItem} e preciso de ajuda.`), texto, agendarEm);
 }
+
+// Aviso interno (para o dono) — ex.: novo pedido de Fórmula Exclusiva. Só envia se EXCLUSIVA_AVISO_EMAIL estiver definido.
+export async function enviarAvisoAdmin(produtoId, subject, html, text) {
+  const to = String(process.env.EXCLUSIVA_AVISO_EMAIL || '').trim();
+  const p = PRODUTOS[produtoId];
+  if (!to || !p) return { enviado: false, motivo: 'EXCLUSIVA_AVISO_EMAIL não definido' };
+  return resend(p, to, subject, html, text);
+}
