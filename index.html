@@ -198,7 +198,7 @@ input:focus{outline:none;border-color:var(--blu)}
     <div class="foot">
       <b>Luveris Mídia</b><br>
       53.168.292 LUIZ FELIPE CORREA MIRANDA · CNPJ 53.168.292/0001-32<br>
-      Dúvidas? Fale conosco pelo <a id="waFoot" href="https://wa.me/558131963052">WhatsApp (81) 3196-3052</a>
+      Dúvidas? Fale conosco pelo <a id="waFoot" href="https://wa.me/5511955073898">WhatsApp (11) 95507-3898</a>
     </div>
   </div>
 
@@ -503,9 +503,9 @@ input:focus{outline:none;border-color:var(--blu)}
     if(av&&av.whatsapp){
       $('okPassos').innerHTML='<li>Toque no botão abaixo e fale com o João no WhatsApp</li><li>Ele vai preparar o seu material e enviar para você</li>';
       $('btnApp').textContent='Chamar o João no WhatsApp';
-      $('btnApp').href='https://wa.me/558131963052?text='+encodeURIComponent(av.whatsapp);
+      $('btnApp').href='https://wa.me/5511955073898?text='+encodeURIComponent(av.whatsapp);
     }else if(av&&av.id==='pacote'){
-      $('okPassos').innerHTML='<li>Abra o seu aplicativo normalmente</li><li>Entre com este e-mail:<br><b>'+esc(email)+'</b></li>'+(av.zap?'<li>Para a Fórmula Exclusiva, fale com o João no WhatsApp: <a href="https://wa.me/558131963052?text='+encodeURIComponent(av.zap)+'" style="color:inherit;font-weight:800">toque aqui</a></li>':'');
+      $('okPassos').innerHTML='<li>Abra o seu aplicativo normalmente</li><li>Entre com este e-mail:<br><b>'+esc(email)+'</b></li>'+(av.zap?'<li>Para a Fórmula Exclusiva, fale com o João no WhatsApp: <a href="https://wa.me/5511955073898?text='+encodeURIComponent(av.zap)+'" style="color:inherit;font-weight:800">toque aqui</a></li>':'');
     }else if(av){
       $('okPassos').innerHTML='<li>Abra o seu aplicativo normalmente</li><li>Entre com este e-mail:<br><b>'+esc(email)+'</b></li>';
     }
@@ -537,7 +537,7 @@ input:focus{outline:none;border-color:var(--blu)}
       bf.innerHTML='🖤 <b>BLACK FRIDAY</b> · '+(ITEM?'promoção imperdível · acesso imediato':'promoção imperdível · <span class="nw">'+brl(CFG.produto.preco)+'</span>');
       document.body.insertBefore(bf,document.body.firstChild)}
     if(CFG.teste){var tb=document.createElement('div');tb.style.cssText='background:#b00020;color:#fff;text-align:center;font-weight:800;padding:8px;font-size:15px';tb.textContent='⚠️ MODO DE TESTE DE PREÇO ATIVO — cobrança reduzida';document.body.insertBefore(tb,document.body.firstChild)}
-    $('waFoot').href='https://wa.me/558131963052?text='+encodeURIComponent('Olá! Tenho uma dúvida sobre o '+CFG.produto.nome+' antes de comprar.');
+    $('waFoot').href='https://wa.me/5511955073898?text='+encodeURIComponent('Olá! Tenho uma dúvida sobre o '+CFG.produto.nome+' antes de comprar.');
     document.title='Pagamento seguro — '+CFG.produto.nome;
     $('pNome').textContent=CFG.produto.nome;$('pPreco').innerHTML=brl(CFG.produto.preco)+' <small>à vista</small>';
     var q=QS.get('email'),qn=QS.get('nome');
@@ -641,8 +641,5 @@ input:focus{outline:none;border-color:var(--blu)}
 })();
 </script>
 <script src="https://sdk.mercadopago.com/js/v2" async></script>
-<!--AVISO:START-->
-<script>window.AVISO_CFG={modal:false};!function(){var e="https://www.instagram.com/joaosilvaquimico?srtk=MWE1MDM1dzVuY294",t="@joaosilvaquimico",a=window.AVISO_CFG||{},o=/(wa\.me|api\.whatsapp\.com\/send\?phone=|whatsapp\.com\/send\?phone=)\/?558131963052/,n=/\(81\)\s?3196-3052/g;function r(e){return e===e.toUpperCase()?"INSTAGRAM":"Instagram"}function i(e){for(var a,o=document.createTreeWalker(e,NodeFilter.SHOW_TEXT,null),i=[];a=o.nextNode();)i.push(a);i.forEach(function(e){var a=e.parentNode&&e.parentNode.nodeName;if("SCRIPT"!==a&&"STYLE"!==a&&"TEXTAREA"!==a){var o=e.nodeValue,i=o;n.test(o)&&(n.lastIndex=0,o=o.replace(/WhatsApp\s*:?\s*\*{0,2}\(81\)\s?3196-3052\*{0,2}/gi,function(e){return r(e.slice(0,8))+" "+t}).replace(n,t)),n.lastIndex=0,o!==i&&(e.nodeValue=o)}})}var d=!1;function s(){if(!d){d=!0;try{!function(a){for(var i=a.querySelectorAll?a.querySelectorAll("a[href]"):[],d=0;d<i.length;d++){var s=i[d];if(o.test(s.getAttribute("href"))){s.setAttribute("href",e),s.setAttribute("target","_blank"),s.setAttribute("rel","noopener"),s.removeAttribute("onclick");for(var l,p=document.createTreeWalker(s,NodeFilter.SHOW_TEXT,null);l=p.nextNode();)l.nodeValue=l.nodeValue.replace(/WhatsApp/gi,r).replace(n,t).replace(/chamar o jo[ãa]o no/i,"Chamar o João no")}}}(document),i(document.body||document.documentElement)}catch(e){}d=!1}}var l=0;function p(){l||(l=setTimeout(function(){l=0,s()},120))}function c(){!function(){s();try{new MutationObserver(p).observe(document.documentElement,{childList:!0,subtree:!0,attributes:!0,attributeFilter:["href"]})}catch(e){}}(),a.modal&&function(){try{if(sessionStorage.getItem("aviso_ok"))return}catch(e){}var a=document.createElement("style");a.textContent='#avz{position:fixed;inset:0;z-index:10300;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:18px;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;animation:avzf .25s ease}@keyframes avzf{from{opacity:0}to{opacity:1}}#avz .b{width:100%;max-width:420px;max-height:92vh;overflow:auto;background:#0b0d10;color:#fff;border:1px solid #3a1a1a;border-radius:20px;padding:22px 20px 18px;box-shadow:0 0 60px rgba(239,35,35,.25)}#avz .t{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#e11d1d,#a50f0f);border-radius:12px;padding:8px 16px 8px 12px;font-weight:900;font-size:24px;letter-spacing:.5px;box-shadow:0 0 22px rgba(239,35,35,.45)}#avz .t i{font-style:normal;font-size:26px}#avz h2{font-size:21px;line-height:1.25;margin:16px 0 6px;font-weight:800}#avz h2 b{background:#e11d1d;border-radius:6px;padding:0 6px;font-weight:800}#avz p{font-size:15px;line-height:1.5;color:#e5e7eb;margin:0 0 12px;padding-left:12px;border-left:3px solid #e11d1d}#avz .g{border:1.5px solid #22c55e;background:rgba(34,197,94,.08);border-radius:14px;padding:14px;margin:6px 0 12px;font-size:16px;line-height:1.4;box-shadow:0 0 18px rgba(34,197,94,.18)}#avz .g b{color:#4ade80}#avz a.ig{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#f58529,#dd2a7b 55%,#8134af);color:#fff;text-decoration:none;font-weight:800;font-size:16px;border-radius:12px;min-height:50px;margin-bottom:8px}#avz button{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;background:transparent;color:#cbd5e1;border:1px solid #334155;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer}#avz small{display:block;font-size:12px;line-height:1.45;color:#94a3b8;margin:0 0 12px;text-align:center}',document.head.appendChild(a);var o=document.createElement("div");o.id="avz",o.setAttribute("role","alertdialog"),o.setAttribute("aria-modal","true"),o.setAttribute("aria-label","Aviso importante"),o.innerHTML='<div class="b"><div class="t"><i>⚠️</i>AVISO</div><h2>Houve uma tentativa de <b>clonar ou hackear</b> o WhatsApp do João.</h2><p>Já estamos tentando recuperar o número junto ao WhatsApp.</p><div class="g">Qualquer dúvida, <b>fale com ele pelo Instagram</b> até regularizar a situação.</div><a class="ig" href="'+e+'" target="_blank" rel="noopener">📸 Chamar no Instagram '+t+'</a><small>Por segurança: não responda mensagens em nome do João pedindo dinheiro, código ou senha.</small><button type="button" id="avz-ok">Entendi</button></div>',document.body.appendChild(o);var n=function(){try{sessionStorage.setItem("aviso_ok","1")}catch(e){}o.parentNode&&o.parentNode.removeChild(o)};document.getElementById("avz-ok").onclick=n,o.addEventListener("click",function(e){e.target===o&&n()})}()}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",c):c()}();</script>
-<!--AVISO:END-->
 </body>
 </html>

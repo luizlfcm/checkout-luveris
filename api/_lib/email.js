@@ -3,8 +3,7 @@
 import { createHash } from 'crypto';
 import { PRODUTOS, precoItem } from './produtos.js';
 
-// AVISO TEMPORÁRIO: WhatsApp do atendimento fora do ar — contato pelo Instagram (voltar: restaurar wa.me/558131963052 e os textos)
-const WA = 'https://www.instagram.com/joaosilvaquimico?srtk=MWE1MDM1dzVuY294';
+const WA = 'https://wa.me/5511955073898';
 const CONTATO = 'contato@luverisgroup.com.br';
 const BASE = 'https://pagamento.luverisgroup.com.br';
 const LOGO = `${BASE}/img/luveris-logo.jpg`;
@@ -15,8 +14,8 @@ const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 function moldura(p, titulo, subtitulo, miolo, suporte = true, zapTexto = '') {
   const bloco = suporte ? `<div style="background:#1a1f26;border-radius:12px;padding:20px;text-align:center;margin-top:28px">
 <p style="color:#f2f4f6;font-size:15px;margin:0 0 6px">💬 <b>Dúvidas técnicas? Fale direto com o especialista (João Silva)</b></p>
-<p style="color:#8b95a1;font-size:13px;margin:0 0 14px">Instagram: @joaosilvaquimico (o WhatsApp está temporariamente fora do ar)</p>
-<a href="${WA}" style="display:inline-block;background:#dd2a7b;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">Chamar no Instagram</a></div>` : '';
+<p style="color:#8b95a1;font-size:13px;margin:0 0 14px">WhatsApp: (11) 95507-3898</p>
+<a href="${WA}?text=${encodeURIComponent(zapTexto || `Olá João! Comprei o ${p.nome} e tenho uma dúvida.`)}" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">Chamar no WhatsApp</a></div>` : '';
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f0f0f0;font-family:Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 0">
@@ -75,8 +74,8 @@ ${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para ace
   for (const b of comZap) {
     miolo += `<div style="border-top:1px solid #1e2530;padding-top:20px;margin-top:8px">
 <p style="color:#f2f4f6;font-size:15px"><b>${esc(b.nome)}</b></p>
-<p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu pedido foi confirmado! Entre em contato pelo Instagram (@joaosilvaquimico) para enviar as informações e iniciamos o desenvolvimento.</p>
-<div style="text-align:center;margin:20px 0"><a href="${WA}" style="display:inline-block;background:#dd2a7b;color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Enviar mensagem no Instagram</a></div></div>`;
+<p style="color:#8b95a1;font-size:14px;line-height:1.7">Seu pedido foi confirmado! Entre em contato pelo WhatsApp para enviar as informações e iniciamos o desenvolvimento.</p>
+<div style="text-align:center;margin:20px 0"><a href="${WA}?text=${encodeURIComponent(b.whatsapp)}" style="display:inline-block;background:#25D366;color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Enviar mensagem no WhatsApp</a></div></div>`;
   }
   // Convite para a Comunidade (só na compra do produto principal e só se COMUNIDADE_URL estiver configurada).
   const comUrl = String(process.env.COMUNIDADE_URL || '').trim().replace(/\/+$/, '');
@@ -92,8 +91,8 @@ ${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para ace
   const text = `Olá${nomeCli ? ', ' + nomeCli : ''}! Seu pagamento foi confirmado (${comprados.join(', ')}).\n` +
     (soZap ? '' : `Acesse ${appUrl} e faça login com o e-mail: ${reg.email}\n`) +
     (!av && p.upsell ? textoUpsell(p, reg, Date.now() + (upgDe(p).janelaH || 72) * 3600 * 1000, 'upg_entrega') : '') +
-    comZap.map((b) => `\n${b.nome}: envie as informações pelo Instagram ${WA}\n`).join('') +
-    `\n30 dias de garantia. Dúvidas técnicas: Instagram do especialista (João Silva) @joaosilvaquimico (o WhatsApp está temporariamente fora do ar). Reembolso e demais assuntos: ${CONTATO}.\nResponsável técnico: João Silva - 53.168.292 LUIZ FELIPE CORREA MIRANDA - CNPJ 53.168.292/0001-32`;
+    comZap.map((b) => `\n${b.nome}: envie as informações pelo WhatsApp ${WA}\n`).join('') +
+    `\n30 dias de garantia. Dúvidas técnicas: WhatsApp do especialista (João Silva) (11) 95507-3898. Reembolso e demais assuntos: ${CONTATO}.\nResponsável técnico: João Silva - 53.168.292 LUIZ FELIPE CORREA MIRANDA - CNPJ 53.168.292/0001-32`;
   const titulo = 'Acesso Liberado!';
   void comApp;
   return resend(p, reg.email, `${pac ? 'Pacote' : av ? av.nome : p.nome} - Acesso liberado!`, moldura(p, titulo, pac ? comprados.join(' + ') : av ? av.nome : p.nome, miolo), text);
