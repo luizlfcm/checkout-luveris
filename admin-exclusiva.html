@@ -41,6 +41,13 @@ function load(){
     KEY=$('k').value;P=d.pedidos||[];draw();
   }).catch(function(){$('err').textContent='Falha de conexão.'});
 }
+
+function excTxt(p,k){var i=p.itens[k],t='*Fórmula '+(k+1)+': '+i.nome+'*';if(i.descricao)t+='\nDescrição: '+i.descricao;if(i.custo)t+='\nCusto esperado por litro: '+i.custo;if(i.qualidade)t+='\nQualidade: '+({economica:'Econômica',intermediaria:'Intermediária',premium:'Premium'}[i.qualidade]||i.qualidade);return t}
+function excCopia(txt,btn){
+  var ok=function(){var o=btn.getAttribute('data-l')||btn.textContent;btn.setAttribute('data-l',o);btn.textContent='✓ Copiado!';setTimeout(function(){btn.textContent=o},1600)};
+  try{navigator.clipboard.writeText(txt).then(ok,function(){fb()})}catch(e){fb()}
+  function fb(){var t=document.createElement('textarea');t.value=txt;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(e){}t.remove();ok()}
+}
 function draw(){
   var n={todos:P.length};['novo','andamento','entregue'].forEach(function(s){n[s]=P.filter(function(p){return p.status===s}).length});
   $('tabs').hidden=false;
@@ -49,13 +56,15 @@ function draw(){
   $('list').innerHTML=L.length?L.map(function(p){
     return '<div class="card '+p.status+'" data-id="'+p.id+'"><div class="top"><span>'+dt(p.criadoEm)+' · '+esc(p.produtoNome||p.produto)+'</span><span class="tag '+p.status+'">'+NOME[p.status]+'</span></div>'
     +'<div style="margin:8px 0;font-size:14px"><b>'+esc(p.nome||'')+'</b> · '+esc(p.email)+'<br>Resposta: '+link(p.contato)+'</div>'
-    +p.itens.map(function(i,k){return '<div class="it"><b>Fórmula '+(k+1)+': '+esc(i.nome)+'</b>'+(i.descricao?'\n'+esc(i.descricao):'')+(i.custo?'\n<i>Custo esperado/litro: '+esc(i.custo)+'</i>':'')+(i.qualidade?'\n<i>Qualidade: '+({economica:'Econômica',intermediaria:'Intermediária',premium:'Premium'}[i.qualidade]||i.qualidade)+'</i>':'')+'</div>'}).join('')
+    +p.itens.map(function(i,k){return '<div class="it"><b>Fórmula '+(k+1)+': '+esc(i.nome)+'</b>'+(i.descricao?'\n'+esc(i.descricao):'')+(i.custo?'\n<i>Custo esperado/litro: '+esc(i.custo)+'</i>':'')+(i.qualidade?'\n<i>Qualidade: '+({economica:'Econômica',intermediaria:'Intermediária',premium:'Premium'}[i.qualidade]||i.qualidade)+'</i>':'')+'</div>'+'<div style="text-align:right;margin:-2px 0 6px"><button type="button" data-ecp="'+k+'" style="padding:7px 12px;font-size:12px">📋 Copiar esta fórmula</button></div>'}).join('')
     +'<textarea placeholder="Anotação interna (opcional)" data-nota>'+esc(p.nota||'')+'</textarea>'
     +'<div class="acts">'+(p.status!=='andamento'?'<button data-s="andamento">▶ Em andamento</button>':'')+(p.status!=='entregue'?'<button class="pri" data-s="entregue">✅ Marcar como entregue</button>':'')+(p.status!=='novo'?'<button data-s="novo">↩ Voltar p/ novo</button>':'')+'</div></div>';
   }).join(''):'<p class="s">Nenhum pedido aqui.</p>';
 }
 $('tabs').onclick=function(e){var f=e.target.getAttribute('data-f');if(f){F=f;draw()}};
 $('list').onclick=function(e){
+  var cp=e.target.getAttribute('data-ecp');
+  if(cp!==null){var id0=e.target.closest('.card').getAttribute('data-id'),p0=P.filter(function(x){return x.id===id0})[0];if(p0)excCopia(excTxt(p0,+cp),e.target);return}
   var s=e.target.getAttribute('data-s');if(!s)return;
   var card=e.target.closest('.card'),id=card.getAttribute('data-id'),nota=card.querySelector('[data-nota]').value;
   e.target.disabled=true;
