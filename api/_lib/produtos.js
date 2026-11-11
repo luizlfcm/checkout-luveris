@@ -76,6 +76,8 @@ export const PRODUTOS = {
     ],
     // Links de pagamento avulsos (/ap/<id>): ofertas vendidas dentro do app, só o item (sem produto principal, sem bumps).
     avulsos: [
+      // Link especial R$ 27 (/ap/p27): vende o Auto Pro COMPLETO (mesmo acesso, mesma entrega) por preço único. Sem bumps/pop-up/pixel; no dashboard conta como venda normal do Auto Pro.
+      { id: 'p27', flag: 'base', principal: true, hotmartId: 7926953, preco: 27.00, nome: 'Fórmula Auto Pro', titulo: 'Fórmula Auto Pro – 80 Fórmulas de Produtos Automotivos Profissionais', imagem: '/img/ap.webp' },
       { id: 'limp', flag: 'limp', hotmartId: 7927216, preco: 9.90, nome: '50 Fórmulas de Limpeza', titulo: '50 Fórmulas de Limpeza — Expanda Sua Linha de Produtos', imagem: '/img/bump-50formulas.webp' },
       { id: 'leg', flag: 'leg', hotmartId: 7927079, preco: 13.90, nome: 'Guia de Legalização', titulo: 'Guia de Legalização — Venda Seus Produtos do Jeito Certo', imagem: '/img/bump-legalizacao-ap.webp' },
       { id: 'form', flag: 'form', hotmartId: 7927025, preco: 19.90, nome: 'Fórmula Exclusiva', titulo: 'Fórmula Exclusiva — Receitas Criadas Para o Seu Negócio', imagem: '/img/bump-exclusiva.webp', whatsapp: 'Ola Joao! Comprei a Formula Exclusiva.' },
@@ -218,6 +220,9 @@ export function precoTeste() {
   return n >= 1 && n <= 1000 ? n : 0;
 }
 export const precoItem = (preco) => (precoTeste() ? precoTeste() / 100 : preco);
+
+// Link avulso que na verdade é o produto principal por outro preço (ex.: /ap/p27): conta como venda normal.
+export const avulsoPrincipal = (reg) => !!(reg && reg.avulso && (PRODUTOS[reg.produto]?.avulsos || []).find((a) => a.id === reg.avulso)?.principal);
 
 // Venda que também mexe em OUTRO app (upgrade): { produto: <objeto do catálogo>, flag } ou null.
 export function alvoExtra(reg) {

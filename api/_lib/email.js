@@ -79,7 +79,7 @@ ${soZap ? '' : `<p style="color:#8b95a1;font-size:14px;line-height:1.7">Para ace
   }
   // Convite para a Comunidade (só na compra do produto principal e só se COMUNIDADE_URL estiver configurada).
   const comUrl = String(process.env.COMUNIDADE_URL || '').trim().replace(/\/+$/, '');
-  if (/^https:\/\//.test(comUrl) && !reg.avulso) {
+  if (/^https:\/\//.test(comUrl) && (!reg.avulso || av?.principal)) {
     miolo += `<div style="border-top:1px solid #1e2530;padding-top:20px;margin-top:8px">
 <p style="color:#f2f4f6;font-size:15px"><b>💬 Entre no Clube da Renda Extra</b></p>
 <p style="color:#8b95a1;font-size:14px;line-height:1.7">Tire dúvidas, mostre seus resultados e troque receitas com outros alunos. Entre com este mesmo e-mail (${esc(reg.email)}).</p>

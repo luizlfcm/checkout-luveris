@@ -4,7 +4,7 @@
 import { createHash } from 'crypto';
 import { cmd, setFlag } from './redis.js';
 import { mpFetch } from './mp.js';
-import { PRODUTOS, calcular, alvoExtra, envId } from './produtos.js';
+import { PRODUTOS, calcular, alvoExtra, envId, avulsoPrincipal } from './produtos.js';
 import { notificarDashboard, notificarStatus } from './dashboard.js';
 import { enviarEntrega, enviarReembolso } from './email.js';
 import { cancelarRecuperacao } from './recuperacao.js';
@@ -105,11 +105,11 @@ async function origemDoCliente(orderId, reg) {
     const email = String(reg.email || '').trim().toLowerCase();
     if (!email) return {};
     const chave = `chk_orig:${email}`;
-    if (!reg.avulso) await cmd(['SET', chave, JSON.stringify({ pedido: orderId, produto: reg.produto, atrib: reg.atrib || {}, data: new Date().toISOString() }), 'NX']).catch(() => {});
+    if (!reg.avulso || avulsoPrincipal(reg)) await cmd(['SET', chave, JSON.stringify({ pedido: orderId, produto: reg.produto, atrib: reg.atrib || {}, data: new Date().toISOString() }), 'NX']).catch(() => {});
     const raw = await cmd(['GET', chave]).catch(() => null);
     const orig = raw ? JSON.parse(raw) : null;
     const outroPedido = !!orig && orig.pedido !== orderId;
-    const tipoApp = reg.avulso ? String(reg.avulso) : '';
+    const tipoApp = reg.avulso && !avulsoPrincipal(reg) ? String(reg.avulso) : '';
     const recompra = !tipoApp && outroPedido;
     return { tipoApp, recompra, atribCliente: (tipoApp || recompra) && outroPedido ? (orig.atrib || {}) : {} };
   } catch (e) { return {}; }
@@ -148,7 +148,7 @@ export async function processarPedido(orderId) {
     const primeira = await cmd(['SET', `chk_paid:${orderId}`, '1', 'NX', 'EX', String(60 * 60 * 24 * 90)]);
     console.log('pedido: aprovado, acesso liberado', { orderId, produto: reg.produto, flags: reg.flags, primeiraConfirmacao: !!primeira });
     // Links avulsos (compra de dentro do app, de quem já é aluno) não vão para a API de Conversões da Meta, para não distorcer a otimização dos anúncios (CAPI_AVULSOS=1 liga).
-    if (primeira && (!reg.avulso || process.env.CAPI_AVULSOS === '1')) await capiPurchase(reg, orderId);
+    if (primeira && (!reg.avulso || avulsoPrincipal(reg) || process.env.CAPI_AVULSOS === '1')) await capiPurchase(reg, orderId);
     // Recuperação de vendas: cancela lembretes pendentes e registra se esta venda foi recuperada.
     if (primeira) {
       const rc = await cancelarRecuperacao(reg.produto, reg.email, reg.avulso);
